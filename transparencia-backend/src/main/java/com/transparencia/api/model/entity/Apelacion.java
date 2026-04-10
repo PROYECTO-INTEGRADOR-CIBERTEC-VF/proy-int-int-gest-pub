@@ -69,3 +69,5 @@ public class Apelacion {
         return this.idApelacion;
     }
 }
+
+//apleacion
