@@ -1,0 +1,41 @@
+<div style="padding: 20px; font-family: sans-serif;">
+  <h2>Bandeja del Tribunal (TTAIP)</h2>
+
+  <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+    <button (click)="setFiltro('TODOS')"
+            [style.fontWeight]="filtroActual === 'TODOS' ? 'bold' : 'normal'">
+      Todas las Apelaciones
+    </button>
+    <button (click)="setFiltro('SUBSANADAS')"
+            [style.fontWeight]="filtroActual === 'SUBSANADAS' ? 'bold' : 'normal'">
+      Apelaciones Subsanadas (Para 2da Calificación)
+    </button>
+  </div>
+
+  <table border="1" cellPadding="10" style="border-collapse: collapse; width: 100%;">
+    <thead>
+    <tr>
+      <th>Expediente</th>
+      <th>Ciudadano</th>
+      <th>Fecha</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let ap of apelacionesFiltradas">
+      <td>{{ ap.expediente }}</td>
+      <td>{{ ap.ciudadano }}</td>
+      <td>{{ ap.fecha }}</td>
+      <td>{{ ap.estado }}</td>
+      <td>
+        <a *ngIf="ap.estado === 'EN_CALIFICACION_2'"
+           [routerLink]="['/ttaip/segunda-calificacion', ap.expediente]"
+           style="color: blue; text-decoration: underline; cursor: pointer;">
+          Evaluar
+        </a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
