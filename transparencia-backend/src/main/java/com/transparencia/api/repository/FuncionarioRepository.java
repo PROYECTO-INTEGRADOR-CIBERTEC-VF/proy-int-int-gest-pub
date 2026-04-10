@@ -1,8 +1,8 @@
-package pe.gob.saip.backend.repository;
+package com.transparencia.api.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import pe.gob.saip.backend.model.entity.Funcionario;
+import com.transparencia.api.model.entity.Funcionario;
 
 import java.util.List;
 

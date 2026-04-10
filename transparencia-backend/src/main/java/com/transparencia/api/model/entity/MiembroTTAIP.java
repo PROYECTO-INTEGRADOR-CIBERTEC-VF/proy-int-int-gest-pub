@@ -1,4 +1,4 @@
-package pe.gob.saip.backend.model.entity;
+package com.transparencia.api.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,19 +15,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "administradores")
+@Table(name = "miembros_ttaip")
 @PrimaryKeyJoinColumn(name = "id_usuario")
-public class Administrador extends Usuario {
+public class MiembroTTAIP extends Usuario {
 
     @NotBlank(message = "El nombre completo no puede estar vacio")
     @Column(name = "nombre_completo", nullable = false, length = 200)
     private String nombreCompleto;
 
     @Column(length = 100)
-    private String rol;
+    private String cargo;
+
+    @Column(length = 30)
+    private String sala;
 
     @Column(length = 500)
-    private String permisos;
+    private String especialidad;
 
     public Long getId() {
         return this.getIdUsuario();

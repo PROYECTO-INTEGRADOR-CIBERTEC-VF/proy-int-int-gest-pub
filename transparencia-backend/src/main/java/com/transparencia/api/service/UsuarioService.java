@@ -1,9 +1,9 @@
-package pe.gob.saip.backend.service;
+package com.transparencia.api.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pe.gob.saip.backend.model.entity.Usuario;
-import pe.gob.saip.backend.repository.UsuarioRepository;
+import com.transparencia.api.model.entity.Usuario;
+import com.transparencia.api.repository.UsuarioRepository;
 
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-package pe.gob.saip.backend.model.entity;
+package com.transparencia.api.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
