@@ -2,6 +2,7 @@ package com.transparencia.api.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -15,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -87,6 +89,18 @@ class SolicitudServiceTest {
     }
 
     @Test
+    void saveConExpedienteEnBlancoDebeRegenerar() {
+        Solicitud solicitud = crearSolicitud(null, "   ", Solicitud.EstadoSolicitud.RECEPCIONADA);
+        int year = LocalDate.now().getYear();
+        when(solicitudRepository.findMaxExpedienteNumber(anyString())).thenReturn(9);
+        when(solicitudRepository.save(any(Solicitud.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Solicitud resultado = solicitudService.save(solicitud);
+
+        assertThat(resultado.getExpediente()).isEqualTo("SAIP-" + year + "-00010");
+    }
+
+    @Test
     void detectarSilencioAdministrativoDebeMarcarVencidasYPersistir() {
         Solicitud solicitud1 = crearSolicitud(1L, "SAIP-2026-00001", Solicitud.EstadoSolicitud.RECEPCIONADA);
         Solicitud solicitud2 = crearSolicitud(2L, "SAIP-2026-00002", Solicitud.EstadoSolicitud.EN_REVISION);
@@ -98,6 +112,7 @@ class SolicitudServiceTest {
         assertThat(totalVencidas).isEqualTo(2);
         assertThat(solicitud1.getEstado()).isEqualTo(Solicitud.EstadoSolicitud.VENCIDA);
         assertThat(solicitud2.getEstado()).isEqualTo(Solicitud.EstadoSolicitud.VENCIDA);
+        verify(solicitudRepository).findVencidas(eq(LocalDate.now()), anyList());
         verify(solicitudRepository).saveAll(anyList());
     }
 
@@ -136,5 +151,14 @@ class SolicitudServiceTest {
         long total = solicitudService.count();
 
         assertThat(total).isEqualTo(27L);
+    }
+
+    @Test
+    void eliminarSolicitudDebeInvocarDeleteById() {
+        solicitudService.eliminarSolicitud(11L);
+
+        ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
+        verify(solicitudRepository).deleteById(idCaptor.capture());
+        assertThat(idCaptor.getValue()).isEqualTo(11L);
     }
 }
