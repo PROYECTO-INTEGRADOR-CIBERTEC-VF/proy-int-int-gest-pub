@@ -1,7 +1,18 @@
 import { Routes } from '@angular/router';
-import { TtaipDashboardComponent } from './pages/ttaip/ttaip-dashboard.component';
 
 export const routes: Routes = [
-  // Hacemos que el Dashboard cargue directamente al entrar a la página
-  { path: '', component: TtaipDashboardComponent }
+  {
+    path: 'ttaip',
+    loadComponent: () => import('./pages/ttaip/ttaip-dashboard.component').then(m => m.TtaipDashboardComponent)
+  },
+  {
+    path: 'ttaip/segunda-calificacion',
+    loadComponent: () => import('./pages/ttaip/ttaip-segunda-calificacion.component').then(m => m.TtaipSegundaCalificacionComponent)
+  },
+  {
+    path: 'ttaip/segunda-calificacion/:expediente',
+    loadComponent: () => import('./pages/ttaip/ttaip-segunda-calificacion.component').then(m => m.TtaipSegundaCalificacionComponent)
+  },
+  { path: '', redirectTo: 'ttaip', pathMatch: 'full' },
+  { path: '**', redirectTo: 'ttaip' }
 ];
