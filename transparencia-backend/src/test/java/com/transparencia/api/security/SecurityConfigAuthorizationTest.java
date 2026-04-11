@@ -25,7 +25,7 @@ class SecurityConfigAuthorizationTest {
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-            .andExpect(status().isNotFound());
+            .andExpect(status().isBadRequest());
     }
 
     @Test
