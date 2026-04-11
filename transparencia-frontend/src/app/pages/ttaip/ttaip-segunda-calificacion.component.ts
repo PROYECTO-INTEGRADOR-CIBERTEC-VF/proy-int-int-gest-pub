@@ -17,6 +17,7 @@ export class TtaipSegundaCalificacionComponent {
   activeTab: TabType = 'subsanacion';
   decision: DecisionType = null;
   fundamentos: string = '';
+  showPreview: boolean = false;
 
   constructor(private route: ActivatedRoute) {
     this.expediente = this.route.snapshot.paramMap.get('expediente') || '00237-2025-JUS/TTAIP';
