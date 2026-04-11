@@ -10,19 +10,23 @@ import { RouterModule } from '@angular/router';
   styleUrl: './ttaip-dashboard.component.css'
 })
 export class TtaipDashboardComponent {
-  filtroActual: string = 'TODOS';
-
-  expedientes = [
-    { id: '00237-2025-JUS/TTAIP', ciudadano: 'Juan Perez', fecha: '10/04/2026', estado: 'SUBSANADO' },
-    { id: '00238-2025-JUS/TTAIP', ciudadano: 'Maria Lopez', fecha: '09/04/2026', estado: 'PENDIENTE' }
+  // Datos simulados temporales para maquetación y pruebas
+  apelaciones = [
+    { expediente: 'EXP-2026-001', estado: 'EN_CALIFICACION_2', ciudadano: 'Carlos Ruiz', fecha: '2026-04-10' },
+    { expediente: 'EXP-2026-002', estado: 'EN_CALIFICACION_1', ciudadano: 'Ana Torres', fecha: '2026-04-09' },
+    { expediente: 'EXP-2026-003', estado: 'EN_CALIFICACION_2', ciudadano: 'Luis Mendoza', fecha: '2026-04-10' }
   ];
 
-  get expedientesFiltrados() {
-    if (this.filtroActual === 'TODOS') return this.expedientes;
-    return this.expedientes.filter(e => e.estado === 'SUBSANADO');
+  filtroActual: string = 'TODOS';
+
+  get apelacionesFiltradas() {
+    if (this.filtroActual === 'SUBSANADAS') {
+      return this.apelaciones.filter(a => a.estado === 'EN_CALIFICACION_2');
+    }
+    return this.apelaciones;
   }
 
-  setFiltro(nuevoFiltro: string) {
-    this.filtroActual = nuevoFiltro;
+  setFiltro(filtro: string) {
+    this.filtroActual = filtro;
   }
 }

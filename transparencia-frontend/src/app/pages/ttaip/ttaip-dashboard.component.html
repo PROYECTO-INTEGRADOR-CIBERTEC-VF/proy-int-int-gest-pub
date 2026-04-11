@@ -1,41 +1,50 @@
-<div style="padding: 20px; font-family: sans-serif;">
-  <h2>Bandeja del Tribunal (TTAIP)</h2>
+<div class="p-8 font-sans bg-gray-50 min-h-screen text-gray-800">
+  <h2 class="text-2xl font-bold mb-6 text-gray-900">Bandeja del Tribunal (TTAIP)</h2>
 
-  <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+  <div class="mb-6 flex gap-3">
     <button (click)="setFiltro('TODOS')"
-            [style.fontWeight]="filtroActual === 'TODOS' ? 'bold' : 'normal'">
+            class="px-4 py-2 rounded-md border transition-colors duration-200 cursor-pointer"
+            [ngClass]="filtroActual === 'TODOS' ? 'bg-[#A72525] text-white font-bold border-[#A72525]' : 'bg-white text-gray-600 hover:bg-gray-100 border-gray-300'">
       Todas las Apelaciones
     </button>
     <button (click)="setFiltro('SUBSANADAS')"
-            [style.fontWeight]="filtroActual === 'SUBSANADAS' ? 'bold' : 'normal'">
+            class="px-4 py-2 rounded-md border transition-colors duration-200 cursor-pointer"
+            [ngClass]="filtroActual === 'SUBSANADAS' ? 'bg-[#A72525] text-white font-bold border-[#A72525]' : 'bg-white text-gray-600 hover:bg-gray-100 border-gray-300'">
       Apelaciones Subsanadas (Para 2da Calificación)
     </button>
   </div>
 
-  <table border="1" cellPadding="10" style="border-collapse: collapse; width: 100%;">
-    <thead>
-    <tr>
-      <th>Expediente</th>
-      <th>Ciudadano</th>
-      <th>Fecha</th>
-      <th>Estado</th>
-      <th>Acciones</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr *ngFor="let item of expedientesFiltrados">
-      <td>{{ item.id }}</td>
-      <td>{{ item.ciudadano }}</td>
-      <td>{{ item.fecha }}</td>
-      <td>{{ item.estado }}</td>
-      <td>
-        <button *ngIf="item.estado === 'SUBSANADO'"
-                [routerLink]="['/ttaip/segunda-calificacion', item.id]"
-                style="background-color: #007bff; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px;">
-          Resolver 2da Calificación
-        </button>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+  <div class="overflow-hidden rounded-lg shadow ring-1 ring-black ring-opacity-5">
+    <table class="min-w-full divide-y divide-gray-300 bg-white text-left">
+      <thead class="bg-gray-50">
+      <tr>
+        <th scope="col" class="px-6 py-3 text-sm font-semibold text-gray-900">Expediente</th>
+        <th scope="col" class="px-6 py-3 text-sm font-semibold text-gray-900">Ciudadano</th>
+        <th scope="col" class="px-6 py-3 text-sm font-semibold text-gray-900">Fecha</th>
+        <th scope="col" class="px-6 py-3 text-sm font-semibold text-gray-900">Estado</th>
+        <th scope="col" class="px-6 py-3 text-sm font-semibold text-gray-900">Acciones</th>
+      </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+      <tr *ngFor="let ap of apelacionesFiltradas" class="hover:bg-gray-50 transition-colors">
+        <td class="px-6 py-4 text-sm text-gray-700">{{ ap.expediente }}</td>
+        <td class="px-6 py-4 text-sm text-gray-700">{{ ap.ciudadano }}</td>
+        <td class="px-6 py-4 text-sm text-gray-700">{{ ap.fecha }}</td>
+        <td class="px-6 py-4 text-sm text-gray-700">
+          <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
+                [ngClass]="ap.estado === 'EN_CALIFICACION_2' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' : 'bg-gray-50 text-gray-600 ring-gray-500/10'">
+            {{ ap.estado }}
+          </span>
+        </td>
+        <td class="px-6 py-4 text-sm font-medium">
+          <a *ngIf="ap.estado === 'EN_CALIFICACION_2'"
+             [routerLink]="['/ttaip/segunda-calificacion', ap.expediente]"
+             class="text-[#A72525] hover:text-red-900 font-bold no-underline cursor-pointer">
+            Evaluar
+          </a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

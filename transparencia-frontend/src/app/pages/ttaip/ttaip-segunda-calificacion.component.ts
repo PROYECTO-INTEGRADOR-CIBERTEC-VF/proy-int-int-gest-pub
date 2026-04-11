@@ -28,6 +28,11 @@ export class TtaipSegundaCalificacionComponent {
       alert('Complete todos los campos obligatorios.');
       return;
     }
-    alert('¡Éxito! 2da Calificación emitida correctamente.');
+
+    if (this.decision === 'admitido') {
+      alert('2da Calificación emitida: ADMITIDO A TRÁMITE');
+    } else {
+      alert('2da Calificación emitida: IMPROCEDENTE');
+    }
   }
 }
