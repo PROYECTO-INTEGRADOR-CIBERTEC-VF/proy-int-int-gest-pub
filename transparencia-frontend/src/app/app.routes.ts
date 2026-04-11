@@ -1,3 +1,18 @@
 import { Routes } from '@angular/router';
 
-export const routes: Routes = [];
+export const routes: Routes = [
+  {
+    path: 'ttaip',
+    loadComponent: () => import('./pages/ttaip/ttaip-dashboard.component').then(m => m.TtaipDashboardComponent)
+  },
+  {
+    path: 'ttaip/segunda-calificacion',
+    loadComponent: () => import('./pages/ttaip/ttaip-segunda-calificacion.component').then(m => m.TtaipSegundaCalificacionComponent)
+  },
+  {
+    path: 'ttaip/segunda-calificacion/:expediente',
+    loadComponent: () => import('./pages/ttaip/ttaip-segunda-calificacion.component').then(m => m.TtaipSegundaCalificacionComponent)
+  },
+  { path: '', redirectTo: 'ttaip', pathMatch: 'full' },
+  { path: '**', redirectTo: 'ttaip' }
+];
