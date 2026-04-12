@@ -1,6 +1,10 @@
 import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
+    path: 'ciudadano/nueva-saip',
+    loadComponent: () => import('./pages/ciudadano/nueva-saip.component').then(m => m.NuevaSaipComponent)
+  },
+  {
     path: 'ttaip',
     loadComponent: () => import('./pages/ttaip/ttaip-dashboard.component').then(m => m.TtaipDashboardComponent)
   },

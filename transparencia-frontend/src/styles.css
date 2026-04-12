@@ -1,4 +1,453 @@
-/* You can add global styles to this file, and also import other style files */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+:root {
+	--peru-rojo: #c8102e;
+	--peru-rojo-hover: #a80d25;
+	--peru-rojo-profundo: #8b0a1e;
+	--peru-rojo-suave: #fef2f2;
+	--peru-rojo-glow: rgba(200, 16, 46, 0.15);
+
+	--peru-oro: #c8a96e;
+	--peru-oro-brillante: #d4a843;
+	--peru-oro-profundo: #9a7b3c;
+	--peru-oro-suave: #fffbeb;
+	--peru-oro-glow: rgba(200, 169, 110, 0.18);
+
+	--carbon: #171717;
+	--carbon-suave: #262626;
+	--humo: #525252;
+	--niebla: #737373;
+	--ceniza: #d4d4d4;
+	--ceniza-claro: #e5e5e5;
+	--nieve: #f5f5f5;
+	--nieve-calida: #fafafa;
+	--blanco: #ffffff;
+
+	--estado-verde: #059669;
+	--estado-verde-suave: #ecfdf5;
+	--estado-verde-borde: #a7f3d0;
+	--estado-ambar: #d97706;
+	--estado-ambar-suave: #fffbeb;
+	--estado-ambar-borde: #fde68a;
+	--estado-rojo: #dc2626;
+	--estado-rojo-suave: #fef2f2;
+	--estado-rojo-borde: #fecaca;
+	--estado-azul: #2563eb;
+	--estado-azul-suave: #eff6ff;
+	--estado-azul-borde: #bfdbfe;
+
+	--background: var(--blanco);
+	--foreground: var(--carbon);
+	--card: var(--blanco);
+	--card-foreground: var(--carbon);
+	--primary: var(--peru-rojo);
+	--primary-foreground: var(--blanco);
+	--border: var(--ceniza);
+	--input: var(--ceniza);
+	--input-background: var(--blanco);
+	--radius: 0.75rem;
+
+	--shadow-xs: 0 1px 2px rgba(26, 26, 46, 0.04);
+	--shadow-sm: 0 2px 8px -2px rgba(26, 26, 46, 0.06), 0 1px 3px rgba(26, 26, 46, 0.04);
+	--shadow-md: 0 8px 24px -6px rgba(26, 26, 46, 0.08), 0 2px 6px rgba(26, 26, 46, 0.04);
+	--shadow-lg: 0 16px 40px -10px rgba(26, 26, 46, 0.12), 0 4px 12px rgba(26, 26, 46, 0.05);
+	--shadow-glow-rojo: 0 0 24px -4px rgba(200, 16, 46, 0.25);
+	--shadow-glow-oro: 0 0 24px -4px rgba(200, 169, 110, 0.3);
+
+	--ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+	--duration-fast: 150ms;
+	--duration-normal: 250ms;
+	--duration-slow: 400ms;
+}
+
+* {
+	border-color: var(--ceniza-claro);
+}
+
+html,
+body {
+	min-height: 100%;
+}
+
+html {
+	scroll-behavior: smooth;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+body {
+	margin: 0;
+	background: var(--background);
+	color: var(--foreground);
+	font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+	font-size: 16px;
+	line-height: 1.6;
+	overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+	letter-spacing: -0.02em;
+	color: var(--carbon);
+	line-height: 1.2;
+}
+
+.font-expediente {
+	font-family: 'JetBrains Mono', ui-monospace, monospace;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+}
+
+.btn-primary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1.5rem;
+	background: var(--peru-rojo);
+	color: var(--blanco);
+	font-weight: 600;
+	font-size: 0.9375rem;
+	border-radius: var(--radius);
+	border: none;
+	cursor: pointer;
+	position: relative;
+	overflow: hidden;
+	transition: all var(--duration-normal) var(--ease-out-expo);
+	box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.btn-primary::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: rgba(255, 255, 255, 0.08);
+	opacity: 0;
+	transition: opacity var(--duration-normal);
+}
+
+.btn-primary:hover {
+	transform: translateY(-1px);
+	box-shadow: var(--shadow-md), var(--shadow-glow-rojo);
+}
+
+.btn-primary:hover::before {
+	opacity: 1;
+}
+
+.btn-primary:active {
+	transform: translateY(0);
+	box-shadow: var(--shadow-xs);
+}
+
+.btn-primary:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
+}
+
+.btn-outline {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1.5rem;
+	background: transparent;
+	color: var(--carbon);
+	font-weight: 600;
+	font-size: 0.9375rem;
+	border-radius: var(--radius);
+	border: 1.5px solid var(--ceniza);
+	cursor: pointer;
+	transition: all var(--duration-normal) var(--ease-out-expo);
+}
+
+.btn-outline:hover {
+	background: var(--nieve);
+	border-color: var(--niebla);
+	transform: translateY(-1px);
+	box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1.5rem;
+	background: var(--peru-oro);
+	color: var(--carbon);
+	font-weight: 600;
+	font-size: 0.9375rem;
+	border-radius: var(--radius);
+	border: none;
+	cursor: pointer;
+	transition: all var(--duration-normal) var(--ease-out-expo);
+	box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.btn-secondary:hover {
+	transform: translateY(-1px);
+	box-shadow: var(--shadow-md), var(--shadow-glow-oro);
+}
+
+.card {
+	background: var(--blanco);
+	border: 1px solid var(--ceniza-claro);
+	border-radius: 1rem;
+	box-shadow: var(--shadow-sm);
+	transition: all var(--duration-slow) var(--ease-out-expo);
+}
+
+.card:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-lg);
+	border-color: var(--ceniza);
+}
+
+.card-elevated {
+	background: var(--blanco);
+	border: 1px solid var(--ceniza-claro);
+	border-radius: 1rem;
+	box-shadow: var(--shadow-md);
+}
+
+.input {
+	width: 100%;
+	padding: 0.75rem 1rem;
+	background: var(--input-background);
+	border: 1.5px solid var(--input);
+	border-radius: var(--radius);
+	font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+	font-size: 0.9375rem;
+	color: var(--carbon);
+	transition: all var(--duration-normal) var(--ease-out-expo);
+	outline: none;
+}
+
+.input::placeholder {
+	color: var(--niebla);
+}
+
+.input:hover {
+	border-color: var(--niebla);
+}
+
+.input:focus {
+	border-color: var(--peru-rojo);
+	box-shadow: 0 0 0 3px var(--peru-rojo-glow), var(--shadow-xs);
+}
+
+select.input {
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238B8CA7' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6L8 9.5 11.5 6'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 0.75rem center;
+	padding-right: 2.5rem;
+}
+
+textarea.input {
+	min-height: 5rem;
+	resize: vertical;
+}
+
+.label {
+	display: block;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--humo);
+	margin-bottom: 0.5rem;
+	letter-spacing: 0.01em;
+}
+
+.helper {
+	color: var(--niebla);
+	font-size: 0.75rem;
+}
+
+.error-text {
+	color: var(--estado-rojo);
+	font-size: 0.75rem;
+}
+
+.alert-error,
+.alert-success,
+.alert-warning,
+.alert-info {
+	display: flex;
+	gap: 0.75rem;
+	padding: 1rem 1.25rem;
+	border-radius: var(--radius);
+	font-size: 0.875rem;
+	line-height: 1.5;
+	border: 1px solid;
+}
+
+.alert-error {
+	background: var(--estado-rojo-suave);
+	border-color: var(--estado-rojo-borde);
+	color: var(--estado-rojo);
+}
+
+.alert-success {
+	background: var(--estado-verde-suave);
+	border-color: var(--estado-verde-borde);
+	color: var(--estado-verde);
+}
+
+.alert-warning {
+	background: var(--estado-ambar-suave);
+	border-color: var(--estado-ambar-borde);
+	color: var(--estado-ambar);
+}
+
+.alert-info {
+	background: var(--estado-azul-suave);
+	border-color: var(--estado-azul-borde);
+	color: var(--estado-azul);
+}
+
+.bg-gradient-peru-hero {
+	background:
+		radial-gradient(circle at 90% -10%, rgba(200, 16, 46, 0.08), transparent 40%),
+		radial-gradient(circle at 5% 0%, rgba(23, 23, 23, 0.05), transparent 32%),
+		linear-gradient(180deg, var(--nieve-calida) 0%, #ffffff 100%);
+}
+
+.section-header {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding-bottom: 0.75rem;
+	border-bottom: 1px solid var(--ceniza-claro);
+}
+
+.section-index {
+	width: 2rem;
+	height: 2rem;
+	border-radius: 0.75rem;
+	background: var(--peru-rojo);
+	color: #ffffff;
+	font-size: 0.875rem;
+	font-weight: 600;
+	display: grid;
+	place-items: center;
+}
+
+.section-index-muted {
+	background: var(--ceniza-claro);
+	color: var(--humo);
+}
+
+.section-title {
+	color: var(--carbon);
+	font-weight: 600;
+}
+
+.option-card {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	border: 1px solid var(--ceniza-claro);
+	border-radius: 0.75rem;
+	padding: 0.75rem;
+	background: #ffffff;
+	cursor: pointer;
+}
+
+.option-card:hover {
+	background: var(--nieve);
+	border-color: #d0d0d0;
+}
+
+.checkbox {
+	width: 1rem;
+	height: 1rem;
+	accent-color: var(--peru-rojo);
+}
+
+.upload-zone {
+	border: 2px dashed var(--ceniza-claro);
+	border-radius: 0.9rem;
+	padding: 1.5rem;
+	text-align: center;
+	background: #ffffff;
+	transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.upload-zone:hover {
+	border-color: rgba(200, 16, 46, 0.35);
+	background: #fffdfd;
+}
+
+.sidebar-card {
+	border-radius: 1rem;
+	border: 1px solid var(--ceniza-claro);
+	background: #ffffff;
+	box-shadow: var(--shadow-sm);
+	overflow: hidden;
+}
+
+.sidebar-top-bar {
+	height: 0.2rem;
+	background: var(--peru-rojo);
+}
+
+.sidebar-title {
+	color: var(--peru-rojo);
+	font-weight: 700;
+	margin-bottom: 1rem;
+}
+
+.bullet-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5rem;
+}
+
+.bullet-item::before {
+	content: '';
+	width: 0.38rem;
+	height: 0.38rem;
+	border-radius: 999px;
+	margin-top: 0.42rem;
+	flex-shrink: 0;
+}
+
+.bullet-item-ok::before {
+	background: var(--estado-verde);
+}
+
+.bullet-item-bad::before {
+	background: var(--estado-rojo);
+}
+
+.info-note {
+	background: var(--peru-rojo-suave);
+	border: 1px solid rgba(200, 16, 46, 0.15);
+	border-radius: 0.75rem;
+	padding: 0.75rem;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(4px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.animate-fade-in {
+	animation: fadeIn 220ms ease both;
+}
