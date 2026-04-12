@@ -6,7 +6,6 @@ describe('TtaipSegundaCalificacionService', () => {
   let service: TtaipSegundaCalificacionService;
   let httpMock: HttpTestingController;
 
-  // Esta es la URL base que tu servicio usa para hablar con el backend
   const apiUrl = 'http://localhost:8080/api/ttaip/segunda-calificacion';
 
   beforeEach(() => {
@@ -31,16 +30,16 @@ describe('TtaipSegundaCalificacionService', () => {
     const mockResponse = { mensaje: 'Admitido correctamente' };
     const expediente = 'EXP-2026-001';
 
-    // 1. Llamamos al método de tu servicio
+    // 1. Llamada al método del servicio
     service.admitirSegundaCalificacion(expediente).subscribe(res => {
       expect(res).toEqual(mockResponse);
     });
 
-    // 2. Comprobamos que el servicio intentó ir a la URL correcta usando POST
+    // 2. Comprobar que el servicio intentó ir a la URL correcta usando POST
     const req = httpMock.expectOne(`${apiUrl}/${expediente}/admitir`);
     expect(req.request.method).toBe('POST');
 
-    // 3. Simulamos que el backend respondió exitosamente
+    // 3. Simular que el backend respondió exitosamente
     req.flush(mockResponse);
   });
 
