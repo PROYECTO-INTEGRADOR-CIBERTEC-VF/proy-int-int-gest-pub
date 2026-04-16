@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnDestroy,
   PLATFORM_ID,
   computed,
   inject,
@@ -14,7 +15,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { EntidadService } from '../../services/entidad.service';
 import { SolicitudService } from '../../services/solicitud.service';
 import { Entidad } from '../../models/entidad.model';
@@ -50,17 +51,21 @@ const alMenosUnFormatoSeleccionado: ValidatorFn = (group) => {
   templateUrl: './nueva-saip.component.html',
   styleUrl: './nueva-saip.component.css',
 })
-export class NuevaSaipComponent {
+export class NuevaSaipComponent implements OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly entidadService = inject(EntidadService);
   private readonly solicitudService = inject(SolicitudService);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly router = inject(Router);
+
+  private redirectTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   readonly entidades = signal<Entidad[]>([]);
   readonly loadingEntidades = signal(false);
   readonly submitting = signal(false);
   readonly error = signal<string | null>(null);
-  readonly success = signal<string | null>(null);
+  readonly confirmacionVisible = signal(false);
+  readonly expedienteGenerado = signal<string | null>(null);
   readonly adjuntos = signal<File[]>([]);
 
   readonly form = this.fb.group(
@@ -101,7 +106,8 @@ export class NuevaSaipComponent {
 
   onSubmit(): void {
     this.error.set(null);
-    this.success.set(null);
+    this.confirmacionVisible.set(false);
+    this.expedienteGenerado.set(null);
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -132,7 +138,8 @@ export class NuevaSaipComponent {
     this.solicitudService.crear(payload).subscribe({
       next: (solicitud) => {
         this.submitting.set(false);
-        this.success.set(`Solicitud registrada correctamente: ${solicitud.expediente}.`);
+        this.expedienteGenerado.set(solicitud.expediente);
+        this.confirmacionVisible.set(true);
         this.form.reset({
           entidadId: 0,
           asunto: '',
@@ -143,6 +150,7 @@ export class NuevaSaipComponent {
           copiaSimple: true,
           copiaCertificada: false,
         });
+        this.programarRedireccion();
       },
       error: (errorResponse) => {
         this.submitting.set(false);
@@ -178,5 +186,23 @@ export class NuevaSaipComponent {
     } catch {
       return null;
     }
+  }
+
+  ngOnDestroy(): void {
+    if (this.redirectTimeoutId) {
+      clearTimeout(this.redirectTimeoutId);
+      this.redirectTimeoutId = null;
+    }
+  }
+
+  private programarRedireccion(): void {
+    if (this.redirectTimeoutId) {
+      clearTimeout(this.redirectTimeoutId);
+    }
+
+    this.redirectTimeoutId = setTimeout(() => {
+      this.confirmacionVisible.set(false);
+      this.router.navigate(['/ciudadano']);
+    }, 2000);
   }
 }

@@ -20,10 +20,6 @@
               <div class="alert-error animate-fade-in">{{ error() }}</div>
             }
 
-            @if (success()) {
-              <div class="alert-success animate-fade-in">{{ success() }}</div>
-            }
-
             <div class="space-y-4">
               <div class="section-header">
                 <div class="section-index">1</div>
@@ -157,13 +153,23 @@
             <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[var(--ceniza-claro)]">
               <button type="submit" [disabled]="submitting()" class="btn-primary flex-1 h-12">
                 @if (submitting()) {
-                  Registrando...
+                  <span class="inline-flex items-center gap-2">
+                    <span class="inline-block h-3.5 w-3.5 rounded-full border-2 border-white/35 border-t-white animate-spin" aria-hidden="true"></span>
+                    Registrando...
+                  </span>
                 } @else {
                   Presentar SAIP
                 }
               </button>
               <a routerLink="/" class="btn-outline flex-1 h-12">Cancelar</a>
             </div>
+
+            @if (submitting()) {
+              <div class="flex items-center gap-2 rounded-xl border border-[var(--ceniza-claro)] bg-[var(--nieve)] px-3 py-2 text-sm text-[var(--niebla)] animate-fade-in">
+                <span class="inline-block h-3.5 w-3.5 rounded-full border-2 border-[rgba(23,23,23,0.18)] border-t-[var(--peru-rojo)] animate-spin" aria-hidden="true"></span>
+                Enviando solicitud a la entidad seleccionada...
+              </div>
+            }
           </form>
         </div>
       </div>
@@ -208,4 +214,19 @@
       </aside>
     </div>
   </section>
+
+  @if (confirmacionVisible()) {
+    <div class="fixed inset-0 z-60 grid place-items-center bg-[rgba(23,23,23,0.55)] p-4">
+      <section class="w-full max-w-md rounded-2xl border border-[var(--ceniza-claro)] bg-white p-5 text-center shadow-[0_10px_26px_-8px_rgba(23,23,23,0.12),0_3px_10px_rgba(23,23,23,0.06)] animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="confirmacion-saip-titulo">
+        <div class="mx-auto mb-3 grid h-9 w-9 place-items-center rounded-full border border-[var(--estado-verde-borde)] bg-[var(--estado-verde-suave)] text-[var(--estado-verde)] font-bold" aria-hidden="true">✓</div>
+        <h2 id="confirmacion-saip-titulo" class="text-xl font-semibold text-[var(--carbon)]">Solicitud SAIP registrada</h2>
+        <p class="text-sm text-[var(--niebla)] mt-1">Numero de expediente generado:</p>
+        <p class="mt-2 font-mono text-base font-bold text-[var(--peru-rojo)]">{{ expedienteGenerado() }}</p>
+        <p class="text-xs text-[var(--niebla)] mt-4 inline-flex items-center gap-2">
+          <span class="inline-block h-3.5 w-3.5 rounded-full border-2 border-[rgba(23,23,23,0.18)] border-t-[var(--peru-rojo)] animate-spin" aria-hidden="true"></span>
+          Sera redirigido a /ciudadano en 2 segundos...
+        </p>
+      </section>
+    </div>
+  }
 </main>
