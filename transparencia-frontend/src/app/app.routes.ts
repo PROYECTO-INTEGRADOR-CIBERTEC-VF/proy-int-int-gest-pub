@@ -5,6 +5,14 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/ciudadano/nueva-saip.component').then(m => m.NuevaSaipComponent)
   },
   {
+    path: 'ciudadano/nueva-apelacion',
+    loadComponent: () => import('./pages/ciudadano/nueva-apelacion.component').then(m => m.NuevaApelacionComponent)
+  },
+  {
+    path: 'ciudadano/subsanacion',
+    loadComponent: () => import('./pages/ciudadano/subsanacion.component').then(m => m.SubsanacionComponent)
+  },
+  {
     path: 'ttaip',
     loadComponent: () => import('./pages/ttaip/ttaip-dashboard.component').then(m => m.TtaipDashboardComponent)
   },
