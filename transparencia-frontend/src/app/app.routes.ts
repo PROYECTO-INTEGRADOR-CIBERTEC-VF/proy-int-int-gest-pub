@@ -1,6 +1,11 @@
 import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
+    path: 'ciudadano',
+    redirectTo: 'ciudadano/nueva-saip',
+    pathMatch: 'full'
+  },
+  {
     path: 'ciudadano/nueva-saip',
     loadComponent: () => import('./pages/ciudadano/nueva-saip.component').then(m => m.NuevaSaipComponent)
   },
