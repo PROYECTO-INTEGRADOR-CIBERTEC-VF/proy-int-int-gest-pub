@@ -147,11 +147,10 @@
                 </h3>
               </div>
 
-              <div class="upload-zone">
-                <p class="text-sm text-[var(--niebla)]">
-                  Arrastra archivos o <span class="font-medium text-[var(--peru-rojo)]">haz clic para seleccionar</span>
-                </p>
-                <p class="text-xs text-[var(--niebla)] mt-1">PDF, DOC, DOCX, JPG, PNG (max. 5MB)</p>
+              <app-file-upload [maxFiles]="3" (filesChanged)="onFilesChanged($event)"></app-file-upload>
+
+              <div class="rounded-xl border border-[var(--ceniza-claro)] bg-[var(--nieve)] px-3 py-2 text-xs text-[var(--niebla)]">
+                Archivos cargados: {{ adjuntos().length }} de 3.
               </div>
             </div>
 

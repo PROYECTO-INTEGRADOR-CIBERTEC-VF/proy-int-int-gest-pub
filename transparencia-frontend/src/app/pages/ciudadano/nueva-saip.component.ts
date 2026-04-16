@@ -19,6 +19,7 @@ import { EntidadService } from '../../services/entidad.service';
 import { SolicitudService } from '../../services/solicitud.service';
 import { Entidad } from '../../models/entidad.model';
 import { SolicitudCreate } from '../../models/solicitud.model';
+import { FileUploadComponent } from '../../components/file-upload/file-upload.component';
 
 interface SesionUsuario {
   ciudadanoId?: number;
@@ -45,7 +46,7 @@ const alMenosUnFormatoSeleccionado: ValidatorFn = (group) => {
 @Component({
   selector: 'app-nueva-saip',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, FileUploadComponent],
   templateUrl: './nueva-saip.component.html',
   styleUrl: './nueva-saip.component.css',
 })
@@ -60,6 +61,7 @@ export class NuevaSaipComponent {
   readonly submitting = signal(false);
   readonly error = signal<string | null>(null);
   readonly success = signal<string | null>(null);
+  readonly adjuntos = signal<File[]>([]);
 
   readonly form = this.fb.group(
     {
@@ -148,6 +150,10 @@ export class NuevaSaipComponent {
         this.error.set(mensaje ?? 'No se pudo registrar la solicitud SAIP.');
       },
     });
+  }
+
+  onFilesChanged(files: File[]): void {
+    this.adjuntos.set(files);
   }
 
   private obtenerCiudadanoIdDesdeSesion(): number | null {
