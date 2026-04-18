@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { DatePipe, isPlatformBrowser } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Solicitud } from '../../models/solicitud.model';
 import { SolicitudService } from '../../services/solicitud.service';
 
@@ -18,7 +19,7 @@ interface SesionFuncionario {
 @Component({
   selector: 'app-funcionario-dashboard',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe],
+  imports: [DatePipe, RouterLink],
   templateUrl: './funcionario-dashboard.component.html',
   styleUrl: './funcionario-dashboard.component.css',
 })
