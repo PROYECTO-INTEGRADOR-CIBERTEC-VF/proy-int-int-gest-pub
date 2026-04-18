@@ -1,0 +1,111 @@
+<div class="min-h-screen bg-(--nieve-calida)">
+  <section class="bg-gradient-peru-hero px-4 pb-10 pt-24">
+    <div class="mx-auto max-w-7xl">
+      <p class="text-sm font-semibold uppercase tracking-[0.08em] text-(--niebla)">HU-03 · FE-01</p>
+      <h1 class="mt-2 text-3xl font-extrabold text-(--carbon)">Dashboard de Funcionario</h1>
+      <p class="mt-1 text-sm text-(--humo)">{{ entidadNombre() }}</p>
+    </div>
+  </section>
+
+  <section class="mx-auto -mt-5 max-w-7xl px-4 pb-10">
+    <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <article class="summary-card">
+        <span class="summary-label">Pendientes</span>
+        <span class="summary-value text-(--estado-azul)">{{ pendientes() }}</span>
+      </article>
+      <article class="summary-card">
+        <span class="summary-label">Urgentes</span>
+        <span class="summary-value text-(--estado-rojo)">{{ urgentes() }}</span>
+      </article>
+      <article class="summary-card">
+        <span class="summary-label">Silencio</span>
+        <span class="summary-value text-(--carbon)">{{ vencidas() }}</span>
+      </article>
+      <article class="summary-card">
+        <span class="summary-label">Respondidas</span>
+        <span class="summary-value text-(--estado-verde)">{{ respondidas() }}</span>
+      </article>
+    </div>
+
+    @if (error()) {
+      <div class="alert-error mt-5">
+        <p>{{ error() }}</p>
+      </div>
+    }
+
+    <div class="card mt-5 overflow-hidden">
+      <div class="border-b border-(--ceniza-claro) px-5 py-4">
+        <h2 class="text-lg font-semibold text-(--carbon)">Solicitudes de la entidad</h2>
+      </div>
+
+      @if (loading()) {
+        <div class="py-16 text-center">
+          <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-(--ceniza) border-t-(--peru-rojo)"></div>
+          <p class="mt-4 text-sm text-(--niebla)">Cargando solicitudes...</p>
+        </div>
+      } @else if (solicitudes().length === 0) {
+        <div class="py-16 text-center">
+          <p class="text-sm text-(--niebla)">No hay solicitudes asignadas para esta entidad.</p>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="min-w-full border-collapse">
+            <thead class="bg-(--nieve) text-left">
+              <tr>
+                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--humo)">Expediente</th>
+                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--humo)">Asunto</th>
+                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--humo)">Fecha limite</th>
+                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--humo)">Dias restantes</th>
+                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--humo)">Semaforo</th>
+                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--humo)">Estado</th>
+                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--humo) text-right">Accion</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (solicitud of solicitudes(); track solicitud.idSolicitud) {
+                <tr class="border-t border-(--ceniza-claro)">
+                  <td class="px-4 py-3">
+                    <span class="font-expediente text-sm text-(--carbon)">{{ solicitud.expediente }}</span>
+                  </td>
+                  <td class="max-w-90 px-4 py-3">
+                    <p class="truncate text-sm text-(--humo)" [title]="solicitud.asunto">{{ solicitud.asunto }}</p>
+                  </td>
+                  <td class="px-4 py-3 text-sm text-(--humo)">
+                    @if (solicitud.fechaLimite) {
+                      {{ solicitud.fechaLimite | date: 'dd/MM/yyyy' }}
+                    } @else {
+                      -
+                    }
+                  </td>
+                  <td class="px-4 py-3 text-sm font-semibold text-(--carbon)">
+                    @if (obtenerDiasRestantes(solicitud) !== null) {
+                      {{ obtenerDiasRestantes(solicitud) }}
+                    } @else {
+                      -
+                    }
+                  </td>
+                  <td class="px-4 py-3">
+                    <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold" [class]="obtenerSemaforoClase(solicitud)">
+                      {{ obtenerSemaforoEtiqueta(solicitud) }}
+                    </span>
+                  </td>
+                  <td class="px-4 py-3 text-xs font-semibold text-(--humo)">{{ solicitud.estado }}</td>
+                  <td class="px-4 py-3 text-right">
+                    <button
+                      type="button"
+                      class="btn-primary h-9 px-4 text-xs"
+                      [disabled]="!canResponder(solicitud)"
+                      [title]="canResponder(solicitud) ? 'Responder solicitud' : 'Deshabilitado por silencio administrativo o respuesta previa'"
+                    >
+                      Responder
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </section>
+</div>
