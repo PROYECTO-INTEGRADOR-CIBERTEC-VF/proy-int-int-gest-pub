@@ -27,6 +27,7 @@ export class LoginComponent implements OnInit {
 
   readonly loading = signal(false);
   readonly errorMessage = signal('');
+  readonly successMessage = signal('');
   readonly accessMode = signal<AccessMode>('citizen');
   readonly requiredRole = signal<TipoUsuario | null>(null);
 
@@ -37,6 +38,11 @@ export class LoginComponent implements OnInit {
     this.requiredRole.set(data.requiredRole ?? null);
 
     this.configureIdentificadorValidators();
+
+    if (this.route.snapshot.queryParamMap.get('registered') === '1') {
+      this.successMessage.set('Registro exitoso. Inicie sesión para continuar.');
+    }
+
     this.redirectIfSessionMatchesRoute();
   }
 
@@ -114,6 +120,7 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     this.errorMessage.set('');
+    this.successMessage.set('');
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();

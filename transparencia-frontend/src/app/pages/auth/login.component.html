@@ -44,6 +44,8 @@
         <p class="field-error" *ngIf="passwordError()">{{ passwordError() }}</p>
       </div>
 
+      <p class="alert success" *ngIf="successMessage()">{{ successMessage() }}</p>
+
       <p class="alert error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
 
       <button type="submit" class="btn-primary" [disabled]="loading()">

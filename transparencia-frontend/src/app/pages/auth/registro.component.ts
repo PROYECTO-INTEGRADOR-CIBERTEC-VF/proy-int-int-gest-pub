@@ -143,7 +143,7 @@ export class RegistroComponent {
         this.pasoActual.set(1);
 
         setTimeout(() => {
-          void this.router.navigate(['/login']);
+          void this.router.navigate(['/login'], { queryParams: { registered: '1' } });
         }, 1200);
       },
       error: (error: unknown) => {
