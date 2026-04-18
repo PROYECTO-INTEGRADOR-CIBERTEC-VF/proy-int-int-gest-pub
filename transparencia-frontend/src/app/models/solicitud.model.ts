@@ -1,3 +1,5 @@
+import { Respuesta } from './respuesta.model';
+
 export type EstadoSolicitud =
   | 'RECEPCIONADA'
   | 'EN_REVISION'
@@ -29,6 +31,7 @@ export interface Solicitud {
   entidadId?: number;
   ciudadanoNombre?: string;
   entidadNombre?: string;
+  respuesta?: Respuesta | null;
   diasRestantes?: number;
   semaforo?: SemaforoEstado;
 }
