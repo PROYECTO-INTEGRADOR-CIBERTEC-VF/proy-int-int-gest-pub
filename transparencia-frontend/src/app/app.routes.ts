@@ -18,6 +18,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/ciudadano/subsanacion.component').then(m => m.SubsanacionComponent)
   },
   {
+    path: 'funcionario',
+    loadComponent: () => import('./pages/funcionario/funcionario-dashboard.component').then(m => m.FuncionarioDashboardComponent)
+  },
+  {
     path: 'ttaip',
     loadComponent: () => import('./pages/ttaip/ttaip-dashboard.component').then(m => m.TtaipDashboardComponent)
   },
