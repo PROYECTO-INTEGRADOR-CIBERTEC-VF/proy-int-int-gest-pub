@@ -1,0 +1,72 @@
+<section class="auth-layout">
+  <div class="glow glow-left" aria-hidden="true"></div>
+  <div class="glow glow-right" aria-hidden="true"></div>
+
+  <article class="auth-card">
+    <header class="auth-header">
+      <p class="eyebrow">SAIP · Acceso</p>
+      <h1>Iniciar sesión</h1>
+      <p class="subtitle" *ngIf="accessMode() === 'citizen'">
+        Ingrese con DNI y contraseña para presentar su solicitud de acceso.
+      </p>
+      <p class="subtitle" *ngIf="accessMode() === 'internal'">
+        Ingreso interno habilitado para perfil {{ requiredRoleLabel() }}.
+      </p>
+    </header>
+
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <div class="form-row">
+        <label for="identificador">{{ identificadorLabel() }}</label>
+        <input
+          #identificadorInput
+          id="identificador"
+          formControlName="identificador"
+          [attr.maxlength]="accessMode() === 'citizen' ? 8 : null"
+          [attr.inputmode]="accessMode() === 'citizen' ? 'numeric' : 'email'"
+          [type]="accessMode() === 'internal' ? 'email' : 'text'"
+          autocomplete="username"
+          [placeholder]="identificadorPlaceholder()"
+          (input)="onIdentificadorInput(identificadorInput.value)"
+        />
+        <small class="hint" *ngIf="accessMode() === 'citizen'">Solo números, 8 dígitos.</small>
+        <p class="field-error" *ngIf="identificadorError()">{{ identificadorError() }}</p>
+      </div>
+
+      <div class="form-row">
+        <label for="password">Contraseña</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          autocomplete="current-password"
+          placeholder="Ingrese su contraseña"
+        />
+        <p class="field-error" *ngIf="passwordError()">{{ passwordError() }}</p>
+      </div>
+
+      <p class="alert error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+
+      <button type="submit" class="btn-primary" [disabled]="loading()">
+        {{ loading() ? 'Validando acceso...' : 'Ingresar' }}
+      </button>
+
+      <div class="auth-links" *ngIf="accessMode() === 'citizen'">
+        <span>¿Primera vez en SAIP?</span>
+        <a routerLink="/registro">Registrarse como ciudadano</a>
+      </div>
+
+      <div class="auth-links" *ngIf="accessMode() === 'internal'">
+        <a routerLink="/login">Volver al acceso ciudadano</a>
+      </div>
+    </form>
+
+    <footer class="role-switcher">
+      <p>Accesos internos</p>
+      <nav>
+        <a routerLink="/acceso-funcionario">Funcionario</a>
+        <a routerLink="/acceso-ttaip">TTAIP</a>
+        <a routerLink="/acceso-admin">Administrador</a>
+      </nav>
+    </footer>
+  </article>
+</section>
