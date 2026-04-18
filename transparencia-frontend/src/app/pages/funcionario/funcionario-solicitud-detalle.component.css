@@ -1,0 +1,78 @@
+:host {
+  display: block;
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border: 1px solid var(--ceniza-claro);
+  border-radius: 0.85rem;
+  background: var(--blanco);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.summary-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--niebla);
+}
+
+.summary-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.tab-bar {
+  display: flex;
+  overflow-x: auto;
+}
+
+.tab-button {
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--niebla);
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 0.85rem 1.15rem;
+  cursor: pointer;
+  transition: color 180ms ease, border-color 180ms ease;
+  white-space: nowrap;
+}
+
+.tab-button:hover {
+  color: var(--humo);
+}
+
+.tab-button.active {
+  color: var(--peru-rojo);
+  border-bottom-color: var(--peru-rojo);
+}
+
+.document-item {
+  align-items: center;
+  background: var(--nieve);
+  border: 1px solid var(--ceniza-claro);
+  border-radius: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem;
+}
+
+.icon-wrap {
+  align-items: center;
+  background: var(--blanco);
+  border: 1px solid var(--ceniza-claro);
+  border-radius: 0.65rem;
+  color: var(--peru-rojo);
+  display: flex;
+  height: 2.4rem;
+  justify-content: center;
+  width: 2.4rem;
+}

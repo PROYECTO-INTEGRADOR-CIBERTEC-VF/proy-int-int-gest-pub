@@ -22,6 +22,14 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/funcionario/funcionario-dashboard.component').then(m => m.FuncionarioDashboardComponent)
   },
   {
+    path: 'funcionario/solicitud/:expediente',
+    loadComponent: () => import('./pages/funcionario/funcionario-solicitud-detalle.component').then(m => m.FuncionarioSolicitudDetalleComponent)
+  },
+  {
+    path: 'funcionario/responder/:expediente',
+    loadComponent: () => import('./pages/funcionario/funcionario-responder.component').then(m => m.FuncionarioResponderComponent)
+  },
+  {
     path: 'ttaip',
     loadComponent: () => import('./pages/ttaip/ttaip-dashboard.component').then(m => m.TtaipDashboardComponent)
   },
