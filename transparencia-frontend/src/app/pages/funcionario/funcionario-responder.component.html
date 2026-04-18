@@ -161,7 +161,7 @@
                   <label class="label" for="causal">Causal de denegatoria <span class="text-(--estado-rojo)">*</span></label>
                   <select id="causal" class="input" formControlName="causalDenegatoria">
                     <option value="">Seleccione causal</option>
-                    @for (causal of causalesDenegacion; track causal) {
+                    @for (causal of causalesDenegacion(); track causal) {
                       <option [value]="causal">{{ causal }}</option>
                     }
                   </select>

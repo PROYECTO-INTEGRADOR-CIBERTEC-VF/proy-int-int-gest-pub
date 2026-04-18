@@ -1,21 +1,33 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  PLATFORM_ID,
   computed,
   inject,
   signal,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Solicitud } from '../../models/solicitud.model';
+import { CrearRespuestaRequest } from '../../models/respuesta.model';
+import { RespuestaService } from '../../services/respuesta.service';
 import { SolicitudService } from '../../services/solicitud.service';
+import {
+  canSendManualResponse,
+  isSilencioAdministrativo,
+} from '../../utils/silencio-administrativo.util';
 
 type DecisionFormulario = 'ACEPTAR' | 'DENEGAR';
 
 interface ArchivoPreview {
   nombre: string;
   tamano: string;
+}
+
+interface SesionFuncionario {
+  funcionarioId?: number;
+  usuarioId?: number;
 }
 
 @Component({
@@ -28,6 +40,8 @@ interface ArchivoPreview {
 export class FuncionarioResponderComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly solicitudService = inject(SolicitudService);
+  private readonly respuestaService = inject(RespuestaService);
+  private readonly platformId = inject(PLATFORM_ID);
   private readonly fb = inject(FormBuilder);
 
   readonly loading = signal(false);
@@ -37,7 +51,8 @@ export class FuncionarioResponderComponent {
   readonly solicitud = signal<Solicitud | null>(null);
   readonly archivosAdjuntos = signal<File[]>([]);
 
-  readonly causalesDenegacion = [
+  readonly causalesDenegacion = signal<string[]>([]);
+  private readonly causalesFallback = [
     'Informacion confidencial',
     'Informacion reservada',
     'Informacion secreta',
@@ -62,7 +77,7 @@ export class FuncionarioResponderComponent {
       return false;
     }
 
-    return !this.esSilencioAdministrativo(solicitud) && !this.tieneRespuesta(solicitud);
+    return canSendManualResponse(this.construirContexto(solicitud));
   });
 
   readonly previewArchivos = computed<ArchivoPreview[]>(() =>
@@ -78,6 +93,7 @@ export class FuncionarioResponderComponent {
     });
 
     this.actualizarValidacionesSegunDecision(this.formulario.controls.decision.value);
+    this.cargarCausalesDenegacion();
     this.cargarSolicitudDesdeRuta();
   }
 
@@ -97,6 +113,12 @@ export class FuncionarioResponderComponent {
     this.error.set(null);
     this.mensaje.set(null);
 
+    const solicitud = this.solicitud();
+    if (!solicitud) {
+      this.error.set('No se encontro la solicitud para registrar la respuesta.');
+      return;
+    }
+
     if (!this.puedeRegistrarRespuesta()) {
       this.error.set('No se permite registrar respuesta manual para esta solicitud.');
       return;
@@ -114,16 +136,61 @@ export class FuncionarioResponderComponent {
       return;
     }
 
+    const funcionarioId = this.obtenerFuncionarioIdDesdeSesion();
+    if (funcionarioId === null) {
+      this.error.set('No se pudo obtener el funcionario desde la sesion.');
+      return;
+    }
+
     this.loading.set(true);
 
-    setTimeout(() => {
-      this.loading.set(false);
-      this.mensaje.set(
-        this.formulario.controls.decision.value === 'ACEPTAR'
-          ? 'Respuesta de aceptacion validada. Lista para integracion con API en FE-03.'
-          : 'Respuesta de denegacion validada. Lista para integracion con API en FE-03.',
-      );
-    }, 450);
+    const contenido = this.formulario.controls.contenido.value.trim();
+    const decision = this.formulario.controls.decision.value;
+
+    if (decision === 'ACEPTAR') {
+      const payload: CrearRespuestaRequest = {
+        solicitudId: solicitud.idSolicitud,
+        funcionarioId,
+        tipoRespuesta: 'ENTREGA_TOTAL',
+        contenido,
+        formatoEntrega: 'DIGITAL',
+        plazoEntrega: 5,
+      };
+
+      this.respuestaService.aceptarSolicitud(payload).subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.mensaje.set('Respuesta de aceptacion enviada correctamente.');
+        },
+        error: (errorResponse) => {
+          this.loading.set(false);
+          const mensaje = errorResponse?.error?.mensaje as string | undefined;
+          this.error.set(mensaje ?? 'No se pudo enviar la respuesta de aceptacion.');
+        },
+      });
+      return;
+    }
+
+    const payload: CrearRespuestaRequest = {
+      solicitudId: solicitud.idSolicitud,
+      funcionarioId,
+      tipoRespuesta: 'DENEGACION_TOTAL',
+      contenido,
+      causalDenegatoria: this.formulario.controls.causalDenegatoria.value?.trim() || null,
+      fundamentoLegal: this.formulario.controls.fundamentoLegal.value?.trim() || null,
+    };
+
+    this.respuestaService.denegarSolicitud(payload).subscribe({
+      next: () => {
+        this.loading.set(false);
+        this.mensaje.set('Respuesta de denegacion enviada correctamente.');
+      },
+      error: (errorResponse) => {
+        this.loading.set(false);
+        const mensaje = errorResponse?.error?.mensaje as string | undefined;
+        this.error.set(mensaje ?? 'No se pudo enviar la respuesta de denegacion.');
+      },
+    });
   }
 
   obtenerEstadoClase(estado: string): string {
@@ -209,21 +276,64 @@ export class FuncionarioResponderComponent {
     });
   }
 
+  private cargarCausalesDenegacion(): void {
+    this.respuestaService.getCausalesDenegacion().subscribe({
+      next: (causales) => {
+        this.causalesDenegacion.set(causales.length > 0 ? causales : this.causalesFallback);
+      },
+      error: () => {
+        this.causalesDenegacion.set(this.causalesFallback);
+      },
+    });
+  }
+
   private tieneRespuesta(solicitud: Solicitud): boolean {
-    return (
-      solicitud.estado === 'RESPONDIDA' ||
-      solicitud.estado === 'DENEGADA' ||
-      solicitud.estado === 'CONCLUIDA'
-    );
+    if (solicitud.respuesta?.tipoRespuesta) {
+      return true;
+    }
+
+    return solicitud.estado === 'RESPONDIDA' || solicitud.estado === 'DENEGADA' || solicitud.estado === 'CONCLUIDA';
   }
 
   private esSilencioAdministrativo(solicitud: Solicitud): boolean {
-    const dias = this.obtenerDiasRestantes(solicitud);
-    const porEstado = solicitud.estado === 'VENCIDA';
-    const porDias = dias !== null && dias < 0;
-    const porSemaforo = solicitud.semaforo === 'NEGRO';
+    const porSemaforo = solicitud.semaforo === 'NEGRO' && !solicitud.respuesta?.tipoRespuesta;
+    return isSilencioAdministrativo(this.construirContexto(solicitud)) || porSemaforo;
+  }
 
-    return porEstado || porDias || porSemaforo;
+  private construirContexto(solicitud: Solicitud) {
+    return {
+      estado: solicitud.estado,
+      diasRestantes: solicitud.diasRestantes,
+      respuesta: solicitud.respuesta
+        ? {
+            tipoRespuesta: solicitud.respuesta.tipoRespuesta,
+          }
+        : null,
+    };
+  }
+
+  private obtenerFuncionarioIdDesdeSesion(): number | null {
+    if (!isPlatformBrowser(this.platformId)) {
+      return null;
+    }
+
+    const rawSesion = localStorage.getItem('usuario');
+    if (!rawSesion) {
+      return null;
+    }
+
+    try {
+      const sesion = JSON.parse(rawSesion) as SesionFuncionario;
+      if (typeof sesion.funcionarioId === 'number') {
+        return sesion.funcionarioId;
+      }
+      if (typeof sesion.usuarioId === 'number') {
+        return sesion.usuarioId;
+      }
+      return null;
+    } catch {
+      return null;
+    }
   }
 
   private formatearTamano(bytes: number): string {
