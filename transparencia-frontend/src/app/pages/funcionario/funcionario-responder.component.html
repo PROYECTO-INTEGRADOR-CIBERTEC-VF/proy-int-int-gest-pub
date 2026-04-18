@@ -1,0 +1,235 @@
+<div class="min-h-screen bg-(--nieve-calida)">
+  @if (loadingSolicitud()) {
+    <section class="bg-gradient-peru-hero px-4 pb-10 pt-24">
+      <div class="mx-auto max-w-7xl">
+        <h1 class="text-2xl font-semibold text-(--carbon)">Cargando formulario de respuesta...</h1>
+      </div>
+    </section>
+    <section class="mx-auto max-w-7xl px-4 py-14 text-center">
+      <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-(--ceniza) border-t-(--peru-rojo)"></div>
+    </section>
+  } @else if (error() && !solicitud()) {
+    <section class="bg-gradient-peru-hero px-4 pb-10 pt-24">
+      <div class="mx-auto max-w-7xl">
+        <a
+          routerLink="/funcionario"
+          class="inline-flex items-center gap-2 text-sm text-(--humo) transition hover:text-(--carbon)"
+          style="text-decoration: none;"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          Volver al Dashboard
+        </a>
+      </div>
+    </section>
+    <section class="mx-auto max-w-7xl px-4 pb-10">
+      <div class="alert-error">
+        <p>{{ error() }}</p>
+      </div>
+    </section>
+  } @else if (solicitud(); as solicitudData) {
+    <section class="bg-gradient-peru-hero px-4 pb-10 pt-24">
+      <div class="mx-auto max-w-7xl">
+        <a
+          [routerLink]="['/funcionario/solicitud', solicitudData.expediente]"
+          class="inline-flex items-center gap-2 text-sm text-(--humo) transition hover:text-(--carbon)"
+          style="text-decoration: none;"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          Volver al detalle
+        </a>
+
+        <div class="mt-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.08em] text-(--niebla)">HU-03 · FE-02</p>
+            <h1 class="mt-1 text-3xl font-extrabold text-(--carbon)">Responder Solicitud</h1>
+            <p class="mt-1 font-expediente text-sm text-(--humo)">{{ solicitudData.expediente }}</p>
+          </div>
+
+          <span class="inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold" [class]="obtenerEstadoClase(solicitudData.estado)">
+            {{ solicitudData.estado }}
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section class="mx-auto -mt-5 max-w-7xl px-4 pb-10">
+      <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <article class="summary-card">
+          <span class="summary-label">Fecha solicitud</span>
+          <span class="summary-value text-(--estado-azul)">
+            @if (solicitudData.fechaPresentacion) {
+              {{ solicitudData.fechaPresentacion | date: 'dd/MM/yyyy' }}
+            } @else {
+              -
+            }
+          </span>
+        </article>
+
+        <article class="summary-card">
+          <span class="summary-label">Fecha limite</span>
+          <span class="summary-value text-(--estado-ambar)">
+            @if (solicitudData.fechaLimite) {
+              {{ solicitudData.fechaLimite | date: 'dd/MM/yyyy' }}
+            } @else {
+              -
+            }
+          </span>
+        </article>
+
+        <article class="summary-card">
+          <span class="summary-label">Dias restantes</span>
+          <span class="summary-value" [class]="obtenerDiasRestantes(solicitudData) !== null && obtenerDiasRestantes(solicitudData)! < 0 ? 'text-(--estado-rojo)' : 'text-(--estado-verde)'">
+            {{ obtenerTextoDiasRestantes(solicitudData) }}
+          </span>
+        </article>
+
+        <article class="summary-card">
+          <span class="summary-label">Solicitante</span>
+          <span class="summary-value text-(--accent-violet)">
+            {{ solicitudData.ciudadanoNombre || 'Ciudadano' }}
+          </span>
+        </article>
+      </div>
+
+      @if (error()) {
+        <div class="alert-error mt-5">
+          <p>{{ error() }}</p>
+        </div>
+      }
+
+      @if (mensaje()) {
+        <div class="alert-success mt-5">
+          <p>{{ mensaje() }}</p>
+        </div>
+      }
+
+      <div class="card mt-5 overflow-hidden">
+        <div class="border-b border-(--ceniza-claro) px-5 py-4">
+          <h2 class="text-lg font-semibold text-(--carbon)">Formulario de respuesta</h2>
+          <p class="mt-1 text-sm text-(--niebla)">
+            Selector aceptar/denegar con campos condicionales y previsualizacion de archivos.
+          </p>
+        </div>
+
+        <div class="p-5 md:p-6">
+          @if (!puedeRegistrarRespuesta()) {
+            <div class="alert-warning">
+              <p>
+                No se permite registrar respuesta manual porque la solicitud esta vencida por silencio administrativo o ya fue atendida.
+              </p>
+            </div>
+          }
+
+          <form [formGroup]="formulario" class="space-y-5" (ngSubmit)="enviarRespuesta()">
+            <div class="space-y-3">
+              <p class="label mb-0!">Decision sobre la solicitud <span class="text-(--estado-rojo)">*</span></p>
+
+              <label class="decision-card" [class.active-accept]="formulario.controls.decision.value === 'ACEPTAR'">
+                <input type="radio" formControlName="decision" value="ACEPTAR" />
+                <div>
+                  <p class="decision-title">Aceptar</p>
+                  <p class="decision-desc">Se prepara entrega de informacion al ciudadano.</p>
+                </div>
+              </label>
+
+              <label class="decision-card" [class.active-deny]="formulario.controls.decision.value === 'DENEGAR'">
+                <input type="radio" formControlName="decision" value="DENEGAR" />
+                <div>
+                  <p class="decision-title">Denegar</p>
+                  <p class="decision-desc">Se requiere causal y fundamento legal obligatorio.</p>
+                </div>
+              </label>
+            </div>
+
+            <div class="space-y-2">
+              <label class="label" for="contenido">Contenido de respuesta <span class="text-(--estado-rojo)">*</span></label>
+              <textarea
+                id="contenido"
+                class="input"
+                rows="4"
+                formControlName="contenido"
+                placeholder="Describa la informacion que se entrega o la motivacion de la denegatoria..."
+              ></textarea>
+              @if (campoInvalido('contenido')) {
+                <p class="error-text">Ingrese una descripcion valida (minimo 20 caracteres).</p>
+              }
+            </div>
+
+            @if (mostrarCamposDenegacion()) {
+              <div class="space-y-4 rounded-xl border border-(--estado-rojo-borde) bg-(--estado-rojo-suave) p-4">
+                <div class="space-y-2">
+                  <label class="label" for="causal">Causal de denegatoria <span class="text-(--estado-rojo)">*</span></label>
+                  <select id="causal" class="input" formControlName="causalDenegatoria">
+                    <option value="">Seleccione causal</option>
+                    @for (causal of causalesDenegacion; track causal) {
+                      <option [value]="causal">{{ causal }}</option>
+                    }
+                  </select>
+                  @if (campoInvalido('causalDenegatoria')) {
+                    <p class="error-text">Seleccione una causal de denegatoria.</p>
+                  }
+                </div>
+
+                <div class="space-y-2">
+                  <label class="label" for="fundamento">Fundamento legal <span class="text-(--estado-rojo)">*</span></label>
+                  <textarea
+                    id="fundamento"
+                    class="input"
+                    rows="5"
+                    formControlName="fundamentoLegal"
+                    placeholder="Cite la base normativa que justifica la denegatoria..."
+                  ></textarea>
+                  @if (campoInvalido('fundamentoLegal')) {
+                    <p class="error-text">Ingrese fundamento legal (minimo 30 caracteres).</p>
+                  }
+                </div>
+              </div>
+            }
+
+            <div class="space-y-2">
+              <label class="label" for="archivos">Adjuntar archivos <span class="text-(--estado-rojo)">*</span></label>
+              <input
+                id="archivos"
+                type="file"
+                multiple
+                class="file-input"
+                (change)="onSeleccionArchivos($event)"
+              />
+              <p class="helper">Puede adjuntar uno o varios archivos para la respuesta.</p>
+
+              @if (previewArchivos().length > 0) {
+                <div class="space-y-2 pt-2">
+                  @for (archivo of previewArchivos(); track archivo.nombre + archivo.tamano; let i = $index) {
+                    <article class="file-preview-item">
+                      <div>
+                        <p class="text-sm font-semibold text-(--carbon)">{{ archivo.nombre }}</p>
+                        <p class="text-xs text-(--niebla)">{{ archivo.tamano }}</p>
+                      </div>
+                      <button type="button" class="btn-outline h-8 px-3 text-xs" (click)="quitarArchivo(i)">
+                        Quitar
+                      </button>
+                    </article>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="pt-2">
+              <button
+                type="submit"
+                class="btn-primary h-11 w-full"
+                [disabled]="loading() || !puedeRegistrarRespuesta()"
+              >
+                @if (loading()) {
+                  Enviando...
+                } @else {
+                  Validar respuesta
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  }
+</div>

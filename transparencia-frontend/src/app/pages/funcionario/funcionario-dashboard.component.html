@@ -100,14 +100,25 @@
                         Detalle
                       </a>
 
-                      <button
-                        type="button"
-                        class="btn-primary h-9 px-4 text-xs"
-                        [disabled]="!canResponder(solicitud)"
-                        [title]="canResponder(solicitud) ? 'Responder solicitud' : 'Deshabilitado por silencio administrativo o respuesta previa'"
-                      >
-                        Responder
-                      </button>
+                      @if (canResponder(solicitud)) {
+                        <a
+                          class="btn-primary h-9 px-4 text-xs"
+                          [routerLink]="['/funcionario/responder', solicitud.expediente]"
+                          style="text-decoration: none;"
+                          title="Responder solicitud"
+                        >
+                          Responder
+                        </a>
+                      } @else {
+                        <button
+                          type="button"
+                          class="btn-primary h-9 px-4 text-xs"
+                          [disabled]="true"
+                          title="Deshabilitado por silencio administrativo o respuesta previa"
+                        >
+                          Responder
+                        </button>
+                      }
                     </div>
                   </td>
                 </tr>
