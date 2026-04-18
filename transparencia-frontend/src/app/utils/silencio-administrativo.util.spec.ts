@@ -5,8 +5,25 @@ import {
 } from './silencio-administrativo.util';
 
 describe('silencio-administrativo util', () => {
+  it('retorna false cuando el contexto es null o undefined', () => {
+    expect(isSilencioAdministrativo(null)).toBe(false);
+    expect(isSilencioAdministrativo(undefined)).toBe(false);
+    expect(canSendManualResponse(null)).toBe(false);
+    expect(canSendManualResponse(undefined)).toBe(false);
+  });
+
   it('detecta silencio administrativo por estado VENCIDA', () => {
     expect(isSilencioAdministrativo({ estado: 'VENCIDA' })).toBe(true);
+  });
+
+  it('detecta silencio administrativo ignorando mayusculas/minusculas', () => {
+    expect(isSilencioAdministrativo({ estado: 'vencida' })).toBe(true);
+    expect(
+      isSilencioAdministrativo({
+        estado: 'respondida',
+        respuesta: { tipoRespuesta: 'silencio_administrativo' },
+      }),
+    ).toBe(true);
   });
 
   it('detecta silencio administrativo por diasRestantes negativos', () => {
@@ -52,5 +69,14 @@ describe('silencio-administrativo util', () => {
         respuesta: { tipoRespuesta: 'ENTREGA_TOTAL' },
       }),
     ).toBe(false);
+  });
+
+  it('permite respuesta manual si respuesta existe pero tipoRespuesta es vacio', () => {
+    expect(
+      canSendManualResponse({
+        estado: 'EN_REVISION',
+        respuesta: { tipoRespuesta: '' },
+      }),
+    ).toBe(true);
   });
 });

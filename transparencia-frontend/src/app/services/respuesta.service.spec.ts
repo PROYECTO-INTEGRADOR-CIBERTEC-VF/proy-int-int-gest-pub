@@ -111,4 +111,14 @@ describe('RespuestaService', () => {
     expect(req.request.method).toBe('GET');
     req.flush(causalesEsperadas);
   });
+
+  it('deberia retornar arreglo vacio cuando el backend no envia causales', () => {
+    service.getCausalesDenegacion().subscribe((causales) => {
+      expect(causales).toEqual([]);
+    });
+
+    const req = httpMock.expectOne(`${apiUrl}/causales-denegacion`);
+    expect(req.request.method).toBe('GET');
+    req.flush([]);
+  });
 });
