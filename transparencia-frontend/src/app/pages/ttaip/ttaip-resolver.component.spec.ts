@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing'; // 1. Importamos el simulador de rutas
+import { RouterTestingModule } from '@angular/router/testing';
 import { TtaipResolverComponent } from './ttaip-resolver.component';
+import { ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
 
 describe('TtaipResolverComponent', () => {
   let component: TtaipResolverComponent;
@@ -8,8 +10,16 @@ describe('TtaipResolverComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      // 2. Añadimos RouterTestingModule a los imports de la prueba
-      imports: [TtaipResolverComponent, RouterTestingModule]
+      imports: [TtaipResolverComponent, RouterTestingModule],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: { paramMap: { get: () => '00150-2025-JUS/TTAIP' } },
+            paramMap: of({ get: () => '00150-2025-JUS/TTAIP' })
+          }
+        }
+      ]
     })
       .compileComponents();
 

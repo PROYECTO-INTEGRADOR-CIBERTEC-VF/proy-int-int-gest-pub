@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TtaipService } from '../../services/ttaip.service';
 
 @Component({
   selector: 'app-ttaip-resolver',
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './ttaip-resolver.component.html',
-  styleUrl: './ttaip-resolver.component.css' // Asegúrate de tener este archivo o quitar esta línea si no usas CSS específico
+  styleUrl: './ttaip-resolver.component.css'
 })
 export class TtaipResolverComponent implements OnInit {
   expediente: string = '';
@@ -20,7 +21,7 @@ export class TtaipResolverComponent implements OnInit {
     correo: 'juan.perez&#64;example.com',
     expedienteSaip: 'SAIP-2025-00512',
     asuntoSaip: 'Información sobre presupuesto de infraestructura educativa 2025',
-    causalDenegatoria: 'Información Confidencial', // <--- Esta es la causal dinámica
+    causalDenegatoria: 'Información Confidencial',
     articuloLegal: 'Art. 17° de la Ley N° 27806',
     detalleCausal: 'La información relacionada con proyectos en etapa de planificación que no han sido oficialmente aprobados...',
     argumentoCiudadano: 'El ciudadano argumenta que la información solicitada corresponde a presupuesto ya ejecutado y aprobado en el ejercicio fiscal 2024...'
@@ -51,13 +52,13 @@ export class TtaipResolverComponent implements OnInit {
     { id: 'DESISTIMIENTO', titulo: 'CONCLUSIÓN POR DESISTIMIENTO', desc: 'El ciudadano desiste voluntariamente del recurso', tipo: 'alert' }
   ];
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  // Inyectamos el TtaipService aquí
+  constructor(private route: ActivatedRoute, private router: Router, private ttaipService: TtaipService) {}
 
   ngOnInit(): void {
     this.expediente = this.route.snapshot.paramMap.get('expediente') || '00150-2025-JUS/TTAIP';
   }
 
-  // Lógica Automática de Figma
   onCausalChange() {
     if (this.causalAplicada === 'REVOCAR') {
       this.decision = 'FUNDADO';
@@ -67,7 +68,33 @@ export class TtaipResolverComponent implements OnInit {
   }
 
   handleEmitResolution() {
-    alert('Resolución Final emitida exitosamente (Simulación).');
-    this.router.navigate(['/ttaip']);
+    const payload = {
+      fundamentos: this.fundamentos,
+      iniciarDisciplinario: this.iniciarProcesoDisciplinario
+    };
+
+    let peticion$;
+
+    switch (this.decision) {
+      case 'FUNDADO': peticion$ = this.ttaipService.declararFundado(this.expediente, payload); break;
+      case 'FUNDADO_PARTE': peticion$ = this.ttaipService.declararFundadoEnParte(this.expediente, payload); break;
+      case 'INFUNDADO': peticion$ = this.ttaipService.declararInfundado(this.expediente, payload); break;
+      case 'INFUNDADO_PARTE': peticion$ = this.ttaipService.declararInfundadoEnParte(this.expediente, payload); break;
+      case 'IMPROCEDENTE': peticion$ = this.ttaipService.declararImprocedente(this.expediente, payload); break;
+      case 'SUSTRACCION': peticion$ = this.ttaipService.declararSustraccionMateria(this.expediente, payload); break;
+      case 'DESISTIMIENTO': peticion$ = this.ttaipService.declararDesistimiento(this.expediente, payload); break;
+      default: alert('Decisión no válida'); return;
+    }
+
+    // Nos suscribimos al servicio Mock
+    peticion$.subscribe({
+      next: (response) => {
+        alert(`¡Éxito! ${response.mensaje}`);
+        this.router.navigate(['/ttaip']);
+      },
+      error: (err) => {
+        alert('Hubo un error al emitir la resolución.');
+      }
+    });
   }
 }

@@ -18,7 +18,7 @@ export const routes: Routes = [
   },
   {
     path: 'ttaip/resolver/:expediente',
-    loadComponent: () => import('./pages/ttaip/ttaip-resolver/ttaip-resolver.component').then(m => m.TtaipResolverComponent)
+    loadComponent: () => import('./pages/ttaip/ttaip-resolver.component').then(m => m.TtaipResolverComponent)
   },
   { path: '', redirectTo: 'ttaip', pathMatch: 'full' },
   { path: '**', redirectTo: 'ttaip' }
