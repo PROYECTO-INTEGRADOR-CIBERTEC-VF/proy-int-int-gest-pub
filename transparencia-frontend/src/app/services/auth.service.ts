@@ -21,6 +21,18 @@ export class AuthService {
     return this.http.post<RegistroResponse>(`${this.apiUrl}/registro`, data);
   }
 
+  verificarEmail(email: string): Observable<{ existe: boolean }> {
+    return this.http.get<{ existe: boolean }>(`${this.apiUrl}/verificar-email`, {
+      params: { email }
+    });
+  }
+
+  verificarDni(dni: string): Observable<{ existe: boolean }> {
+    return this.http.get<{ existe: boolean }>(`${this.apiUrl}/verificar-dni`, {
+      params: { dni }
+    });
+  }
+
   guardarSesion(data: LoginResponse): void {
     if (this.isBrowser && typeof localStorage !== 'undefined') {
       localStorage.setItem('usuario', JSON.stringify(data));
@@ -50,5 +62,10 @@ export class AuthService {
   getTipoUsuario(): string | null {
     const sesion = this.obtenerSesion();
     return sesion?.tipoUsuario ? String(sesion.tipoUsuario) : null;
+  }
+
+  getToken(): string | null {
+    const sesion = this.obtenerSesion();
+    return sesion?.token ?? null;
   }
 }

@@ -1,9 +1,18 @@
 export type TipoUsuario = 'CIUDADANO' | 'FUNCIONARIO' | 'TTAIP' | 'ADMINISTRADOR';
 
-export interface LoginRequest {
+export interface Usuario {
+  id: number;
+  email: string;
+  tipoUsuario: TipoUsuario;
+  activo: boolean;
+}
+
+export interface LoginRequestDTO {
   identificador: string;
   password: string;
 }
+
+export type LoginRequest = LoginRequestDTO;
 
 export interface LoginResponse {
   success: boolean;
@@ -23,7 +32,7 @@ export interface LoginResponse {
   redirectUrl?: string;
 }
 
-export interface RegistroRequest {
+export interface RegistroRequestDTO {
   email: string;
   password: string;
   dni: string;
@@ -31,6 +40,8 @@ export interface RegistroRequest {
   telefono?: string;
   direccion?: string;
 }
+
+export type RegistroRequest = RegistroRequestDTO;
 
 export interface RegistroResponse {
   success: boolean;
