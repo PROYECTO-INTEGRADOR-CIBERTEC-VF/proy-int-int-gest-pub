@@ -41,6 +41,10 @@ export const routes: Routes = [
     path: 'ttaip/segunda-calificacion/:expediente',
     loadComponent: () => import('./pages/ttaip/ttaip-segunda-calificacion.component').then(m => m.TtaipSegundaCalificacionComponent)
   },
+  {
+    path: 'ttaip/resolver/:expediente',
+    loadComponent: () => import('./pages/ttaip/ttaip-resolver/ttaip-resolver.component').then(m => m.TtaipResolverComponent)
+  },
   { path: '', redirectTo: 'ttaip', pathMatch: 'full' },
   { path: '**', redirectTo: 'ttaip' }
 ];
