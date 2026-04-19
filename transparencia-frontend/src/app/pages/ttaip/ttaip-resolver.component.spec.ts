@@ -1,12 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { TtaipResolverComponent } from './ttaip-resolver.component';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
+import { TtaipResolverComponent } from './ttaip-resolver.component';
+import { TtaipService } from '../../services/ttaip.service';
 
 describe('TtaipResolverComponent', () => {
   let component: TtaipResolverComponent;
   let fixture: ComponentFixture<TtaipResolverComponent>;
+
+  // Simulador del servicio
+  const mockTtaipService = {
+    declararFundado: () => of({ status: 'success' })
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -18,6 +24,10 @@ describe('TtaipResolverComponent', () => {
             snapshot: { paramMap: { get: () => '00150-2025-JUS/TTAIP' } },
             paramMap: of({ get: () => '00150-2025-JUS/TTAIP' })
           }
+        },
+        {
+          provide: TtaipService,
+          useValue: mockTtaipService
         }
       ]
     })
