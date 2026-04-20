@@ -15,9 +15,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   try {
-    const usuario = JSON.parse(usuarioData) as { token?: string };
-
-    if (!usuario.token) {
+    const usuario = JSON.parse(usuarioData);
+    if (
+      typeof usuario !== 'object' ||
+      usuario === null ||
+      !('token' in usuario) ||
+      typeof usuario.token !== 'string' ||
+      !usuario.token.trim()
+    ) {
       return next(req);
     }
 

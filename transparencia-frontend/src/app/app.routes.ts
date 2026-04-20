@@ -34,8 +34,7 @@ export const routes: Routes = [
   {
     path: 'ciudadano',
     redirectTo: 'ciudadano/nueva-saip',
-    pathMatch: 'full',
-    canActivate: [tipoUsuarioGuard('CIUDADANO')]
+    pathMatch: 'full'
   },
   {
     path: 'ciudadano/nueva-saip',
