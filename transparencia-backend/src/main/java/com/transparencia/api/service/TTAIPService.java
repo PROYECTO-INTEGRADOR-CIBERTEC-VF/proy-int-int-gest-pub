@@ -8,7 +8,9 @@ import com.transparencia.api.model.dto.CalificacionRequest;
 import com.transparencia.api.model.entity.Apelacion;
 import com.transparencia.api.model.entity.MiembroTTAIP;
 import com.transparencia.api.model.entity.Resolucion;
+import com.transparencia.api.util.DiasHabilesUtil;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -104,6 +106,10 @@ public class TTAIPService {
         Apelacion apelacion = buscarApelacion(apelacionId);
         boolean esSegundaCalificacion = apelacion.getEstado() == Apelacion.EstadoApelacion.EN_CALIFICACION_2;
 
+        if (!esSegundaCalificacion) {
+            validarPlazoPrimeraCalificacion(apelacion);
+        }
+
         Resolucion resolucion = crearResolucion(
             apelacion,
             esSegundaCalificacion
@@ -133,6 +139,8 @@ public class TTAIPService {
     @Transactional
     public ApelacionDTO requerirSubsanacion(Long apelacionId, CalificacionRequest request) {
         Apelacion apelacion = buscarApelacion(apelacionId);
+        validarPlazoPrimeraCalificacion(apelacion);
+
         int diasSubsanacion = request.diasSubsanacion() != null ? request.diasSubsanacion() : 2;
 
         Resolucion resolucion = crearResolucion(
@@ -158,6 +166,10 @@ public class TTAIPService {
     public ApelacionDTO inadmitirApelacion(Long apelacionId, CalificacionRequest request) {
         Apelacion apelacion = buscarApelacion(apelacionId);
         boolean esSegundaCalificacion = apelacion.getEstado() == Apelacion.EstadoApelacion.EN_CALIFICACION_2;
+
+        if (!esSegundaCalificacion) {
+            validarPlazoPrimeraCalificacion(apelacion);
+        }
 
         Resolucion resolucion = crearResolucion(
             apelacion,
@@ -206,6 +218,23 @@ public class TTAIPService {
     private Apelacion buscarApelacion(Long apelacionId) {
         return apelacionService.findById(apelacionId)
             .orElseThrow(() -> new RecursoNoEncontradoException("Apelacion no encontrada con ID: " + apelacionId));
+    }
+
+    private void validarPlazoPrimeraCalificacion(Apelacion apelacion) {
+        if (apelacion.getFechaApelacion() == null) {
+            throw new IllegalArgumentException("La apelacion no tiene fecha de apelacion registrada");
+        }
+
+        int diasHabilesTranscurridos = DiasHabilesUtil.contarDiasHabiles(
+            apelacion.getFechaApelacion().toLocalDate(),
+            LocalDate.now()
+        );
+
+        if (diasHabilesTranscurridos > 7) {
+            throw new IllegalArgumentException(
+                "El plazo de 7 dias habiles para la primera calificacion ha vencido"
+            );
+        }
     }
 
     private Resolucion crearResolucion(
