@@ -66,6 +66,6 @@ class SecurityConfigAuthorizationTest {
     void rutaTtaip_conRolPermitido_debePasarSeguridad() throws Exception {
         mockMvc.perform(get("/api/ttaip/estadisticas")
             .with(user("miembro@saip.gob.pe").roles("TTAIP")))
-            .andExpect(status().isNotFound());
+            .andExpect(status().isOk());
     }
 }
