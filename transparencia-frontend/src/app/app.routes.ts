@@ -76,4 +76,4 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/ttaip/ttaip-resolver.component').then(m => m.TtaipResolverComponent)
   },
   { path: '**', redirectTo: 'login' }
-];;
+];
