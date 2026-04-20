@@ -34,8 +34,7 @@ export const routes: Routes = [
   {
     path: 'ciudadano',
     redirectTo: 'ciudadano/nueva-saip',
-    pathMatch: 'full',
-    canActivate: [tipoUsuarioGuard('CIUDADANO')]
+    pathMatch: 'full'
   },
   {
     path: 'ciudadano/nueva-saip',
@@ -80,6 +79,11 @@ export const routes: Routes = [
   {
     path: 'ttaip/segunda-calificacion/:expediente',
     loadComponent: () => import('./pages/ttaip/ttaip-segunda-calificacion.component').then(m => m.TtaipSegundaCalificacionComponent),
+    canActivate: [tipoUsuarioGuard('TTAIP')]
+  },
+  {
+    path: 'ttaip/resolver/:expediente',
+    loadComponent: () => import('./pages/ttaip/ttaip-resolver.component').then(m => m.TtaipResolverComponent),
     canActivate: [tipoUsuarioGuard('TTAIP')]
   },
   { path: '**', redirectTo: 'login' }

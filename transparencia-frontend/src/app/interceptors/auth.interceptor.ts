@@ -5,7 +5,7 @@ import { inject, PLATFORM_ID } from '@angular/core';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const platformId = inject(PLATFORM_ID);
 
-  if (!isPlatformBrowser(platformId) || typeof localStorage === 'undefined') {
+  if (!isPlatformBrowser(platformId)) {
     return next(req);
   }
 
@@ -15,9 +15,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   try {
-    const usuario = JSON.parse(usuarioData) as { token?: string };
-
-    if (!usuario.token) {
+    const usuario = JSON.parse(usuarioData);
+    if (
+      typeof usuario !== 'object' ||
+      usuario === null ||
+      !('token' in usuario) ||
+      typeof usuario.token !== 'string' ||
+      !usuario.token.trim()
+    ) {
       return next(req);
     }
 
