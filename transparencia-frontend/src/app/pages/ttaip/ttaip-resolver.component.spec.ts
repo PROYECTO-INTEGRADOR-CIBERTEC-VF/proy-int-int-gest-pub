@@ -9,7 +9,7 @@ describe('TtaipResolverComponent', () => {
   let component: TtaipResolverComponent;
   let fixture: ComponentFixture<TtaipResolverComponent>;
 
-  // Simulador del servicio
+  // Simulador del servicio para engañar a la prueba
   const mockTtaipService = {
     declararFundado: () => of({ status: 'success' })
   };
