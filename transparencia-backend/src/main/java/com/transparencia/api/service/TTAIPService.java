@@ -107,6 +107,7 @@ public class TTAIPService {
         boolean esSegundaCalificacion = apelacion.getEstado() == Apelacion.EstadoApelacion.EN_CALIFICACION_2;
 
         if (!esSegundaCalificacion) {
+            validarEstadoPrimeraCalificacion(apelacion);
             validarPlazoPrimeraCalificacion(apelacion);
         }
 
@@ -139,6 +140,7 @@ public class TTAIPService {
     @Transactional
     public ApelacionDTO requerirSubsanacion(Long apelacionId, CalificacionRequest request) {
         Apelacion apelacion = buscarApelacion(apelacionId);
+        validarEstadoPrimeraCalificacion(apelacion);
         validarPlazoPrimeraCalificacion(apelacion);
 
         int diasSubsanacion = request.diasSubsanacion() != null ? request.diasSubsanacion() : 2;
@@ -168,6 +170,7 @@ public class TTAIPService {
         boolean esSegundaCalificacion = apelacion.getEstado() == Apelacion.EstadoApelacion.EN_CALIFICACION_2;
 
         if (!esSegundaCalificacion) {
+            validarEstadoPrimeraCalificacion(apelacion);
             validarPlazoPrimeraCalificacion(apelacion);
         }
 
@@ -218,6 +221,14 @@ public class TTAIPService {
     private Apelacion buscarApelacion(Long apelacionId) {
         return apelacionService.findById(apelacionId)
             .orElseThrow(() -> new RecursoNoEncontradoException("Apelacion no encontrada con ID: " + apelacionId));
+    }
+
+    private void validarEstadoPrimeraCalificacion(Apelacion apelacion) {
+        if (apelacion.getEstado() != Apelacion.EstadoApelacion.EN_CALIFICACION_1) {
+            throw new IllegalArgumentException(
+                "La apelacion debe estar en EN_CALIFICACION_1 para la primera calificacion"
+            );
+        }
     }
 
     private void validarPlazoPrimeraCalificacion(Apelacion apelacion) {
