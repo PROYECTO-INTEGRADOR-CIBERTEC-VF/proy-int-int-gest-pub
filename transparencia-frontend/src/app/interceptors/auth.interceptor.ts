@@ -5,7 +5,7 @@ import { inject, PLATFORM_ID } from '@angular/core';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const platformId = inject(PLATFORM_ID);
 
-  if (!isPlatformBrowser(platformId) || typeof localStorage === 'undefined') {
+  if (!isPlatformBrowser(platformId)) {
     return next(req);
   }
 
