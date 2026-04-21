@@ -86,5 +86,9 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/ttaip/ttaip-resolver.component').then(m => m.TtaipResolverComponent),
     canActivate: [tipoUsuarioGuard('TTAIP')]
   },
+  {
+    path: 'ttaip/resolucion/:expediente',
+    loadComponent: () => import('./pages/ttaip/ttaip-resolucion-detalle.component').then(m => m.TtaipResolucionDetalleComponent)
+  },
   { path: '**', redirectTo: 'login' }
 ];

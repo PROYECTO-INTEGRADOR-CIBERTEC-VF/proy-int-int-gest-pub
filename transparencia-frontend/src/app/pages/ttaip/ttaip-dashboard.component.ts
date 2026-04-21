@@ -16,6 +16,7 @@ interface ApelacionBandeja {
   asunto: string;
   fecha: string;
   estado: string;
+  diasHabiles?: string;
 }
 
 @Component({
@@ -36,7 +37,7 @@ export class TtaipDashboardComponent implements OnInit {
 
   readonly tabActivo = signal<TabId>('pendientes');
   readonly cargando = signal<boolean>(false);
-  readonly apelaciones = signal<ApelacionBandeja[]>([]);
+  readonly apelaciones = signal<ApelacionBandeja[]>([{ expediente: '00234-2025-JUS/TTAIP', ciudadano: 'Juan Carlos Pérez', entidad: 'MINEDU', asunto: 'Presupuesto', fecha: '2026-04-05', estado: 'RESUELTO' }]);
   readonly conteos = signal<Record<TabId, number>>({
     pendientes: 0,
     analisis: 0,
@@ -196,5 +197,9 @@ export class TtaipDashboardComponent implements OnInit {
       return ['/ttaip/resolver', apelacion.expediente];
     }
     return null;
+  }
+  obtenerNombreTabActual(): string {
+    const tab = this.tabs.find(t => t.id === this.tabActivo());
+    return tab && tab.label ? tab.label.toLowerCase() : 'esta sección';
   }
 }
