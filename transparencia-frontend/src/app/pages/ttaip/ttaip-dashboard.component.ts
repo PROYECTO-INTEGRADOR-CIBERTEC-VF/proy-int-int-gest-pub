@@ -16,6 +16,7 @@ interface ApelacionBandeja {
   asunto: string;
   fecha: string;
   estado: string;
+  diasHabiles?: string;
 }
 
 @Component({
