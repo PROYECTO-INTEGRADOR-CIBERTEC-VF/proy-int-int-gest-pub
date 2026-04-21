@@ -180,6 +180,9 @@ export class TtaipDashboardComponent implements OnInit {
   }
 
   textoAccion(estado: string): string {
+    if (estado === 'PENDIENTE_ELEVACION' || estado === 'EN_CALIFICACION_1') {
+      return 'Calificar';
+    }
     if (estado === 'EN_CALIFICACION_2') {
       return '2da calificación';
     }
@@ -190,6 +193,9 @@ export class TtaipDashboardComponent implements OnInit {
   }
 
   rutaAccion(apelacion: ApelacionBandeja): string[] | null {
+    if (apelacion.estado === 'PENDIENTE_ELEVACION' || apelacion.estado === 'EN_CALIFICACION_1') {
+      return ['/ttaip/calificar', apelacion.expediente];
+    }
     if (apelacion.estado === 'EN_CALIFICACION_2') {
       return ['/ttaip/segunda-calificacion', apelacion.expediente];
     }

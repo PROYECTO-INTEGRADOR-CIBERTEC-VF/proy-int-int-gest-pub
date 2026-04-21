@@ -72,6 +72,11 @@ export const routes: Routes = [
     canActivate: [tipoUsuarioGuard('TTAIP')]
   },
   {
+    path: 'ttaip/calificar/:expediente',
+    loadComponent: () => import('./pages/ttaip/ttaip-calificar.component').then(m => m.TtaipCalificarComponent),
+    canActivate: [tipoUsuarioGuard('TTAIP')]
+  },
+  {
     path: 'ttaip/segunda-calificacion',
     loadComponent: () => import('./pages/ttaip/ttaip-segunda-calificacion.component').then(m => m.TtaipSegundaCalificacionComponent),
     canActivate: [tipoUsuarioGuard('TTAIP')]
