@@ -1,17 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Apelacion } from '../../models/apelacion.model';
+import { ApelacionService } from '../../services/apelacion.service';
+import { TtaipService } from '../../services/ttaip.service';
 
 type DecisionCalificacion = 'admitir' | 'subsanar' | 'inadmitir' | '';
-
-interface CalificacionPayload {
-  expediente: string;
-  decision: 'admitir' | 'subsanar' | 'inadmitir';
-  fundamentos: string;
-  observaciones?: string;
-  diasSubsanacion?: number;
-}
 
 @Component({
   selector: 'app-ttaip-calificar',
@@ -28,24 +23,64 @@ export class TtaipCalificarComponent implements OnInit {
   observaciones = '';
   diasSubsanacion = 2;
 
+  readonly apelacion = signal<Apelacion | null>(null);
+  readonly loadingApelacion = signal<boolean>(false);
+  readonly loading = signal<boolean>(false);
   readonly error = signal<string>('');
   readonly mensaje = signal<string>('');
-  readonly payloadPreview = signal<CalificacionPayload | null>(null);
 
-  constructor(private readonly route: ActivatedRoute) {}
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly apelacionService: ApelacionService,
+    private readonly ttaipService: TtaipService
+  ) {}
 
   ngOnInit(): void {
-    this.expediente = this.route.snapshot.paramMap.get('expediente') ?? 'SIN-EXPEDIENTE';
+    const expedienteParam = this.route.snapshot.paramMap.get('expediente');
+    if (!expedienteParam) {
+      this.error.set('No se encontro el expediente para calificar.');
+      return;
+    }
+
+    this.expediente = expedienteParam;
+    this.cargarApelacion(expedienteParam);
   }
 
   esSubsanacion(): boolean {
     return this.decision === 'subsanar';
   }
 
+  private cargarApelacion(expediente: string): void {
+    this.loadingApelacion.set(true);
+    this.error.set('');
+
+    this.apelacionService.findByExpediente(expediente).subscribe({
+      next: (apelacion) => {
+        this.apelacion.set(apelacion);
+        this.expediente = apelacion.expediente;
+        this.loadingApelacion.set(false);
+      },
+      error: () => {
+        this.loadingApelacion.set(false);
+        this.error.set('No se pudo cargar la apelacion para calificar.');
+      }
+    });
+  }
+
   registrarCalificacion(): void {
+    if (this.loading()) {
+      return;
+    }
+
     this.error.set('');
     this.mensaje.set('');
-    this.payloadPreview.set(null);
+
+    const apelacionActual = this.apelacion();
+    if (!apelacionActual) {
+      this.error.set('No hay apelacion cargada para procesar.');
+      return;
+    }
 
     const fundamentosLimpios = this.fundamentos.trim();
     const observacionesLimpias = this.observaciones.trim();
@@ -70,18 +105,48 @@ export class TtaipCalificarComponent implements OnInit {
       return;
     }
 
-    const payload: CalificacionPayload = {
-      expediente: this.expediente,
-      decision: this.decision,
+    this.loading.set(true);
+
+    const requestBase = {
       fundamentos: fundamentosLimpios
     };
 
-    if (this.decision === 'subsanar') {
-      payload.observaciones = observacionesLimpias;
-      payload.diasSubsanacion = this.diasSubsanacion;
+    if (this.decision === 'admitir') {
+      this.ttaipService.admitirApelacion(apelacionActual.idApelacion, requestBase).subscribe({
+        next: () => this.procesarExito('Apelacion admitida correctamente.'),
+        error: (err: any) => this.procesarError(err)
+      });
+      return;
     }
 
-    this.payloadPreview.set(payload);
-    this.mensaje.set('Formulario de primera calificacion validado. Listo para integracion en FE-03.');
+    if (this.decision === 'subsanar') {
+      this.ttaipService.requerirSubsanacion(apelacionActual.idApelacion, {
+        ...requestBase,
+        observaciones: observacionesLimpias,
+        diasSubsanacion: this.diasSubsanacion
+      }).subscribe({
+        next: () => this.procesarExito('Subsanacion requerida correctamente.'),
+        error: (err: any) => this.procesarError(err)
+      });
+      return;
+    }
+
+    this.ttaipService.inadmitirApelacion(apelacionActual.idApelacion, requestBase).subscribe({
+      next: () => this.procesarExito('Apelacion inadmitida correctamente.'),
+      error: (err: any) => this.procesarError(err)
+    });
+  }
+
+  private procesarExito(mensaje: string): void {
+    this.loading.set(false);
+    this.mensaje.set(mensaje);
+    setTimeout(() => {
+      this.router.navigate(['/ttaip']);
+    }, 1800);
+  }
+
+  private procesarError(err: any): void {
+    this.loading.set(false);
+    this.error.set(err?.error?.mensaje ?? 'No se pudo registrar la calificacion.');
   }
 }
