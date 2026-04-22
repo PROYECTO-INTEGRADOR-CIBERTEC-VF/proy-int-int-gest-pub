@@ -33,6 +33,8 @@ public class Usuario {
     @Column(name = "id_usuario")
     private Long idUsuario;
 
+    public Long getIdUsuario() {
+        return this.idUsuario;
     @NotBlank(message = "El email no puede estar vacio")
     @Email(message = "Debe ser un email valido")
     @Column(nullable = false, unique = true, length = 100)

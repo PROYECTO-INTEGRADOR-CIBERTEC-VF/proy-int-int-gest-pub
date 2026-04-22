@@ -42,6 +42,9 @@ public class Ciudadano extends Usuario {
     @OneToMany(mappedBy = "ciudadano", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Solicitud> solicitudes;
 
+    @Column(length = 200)
+    private String email;
+
     public Long getId() {
         return this.getIdUsuario();
     }

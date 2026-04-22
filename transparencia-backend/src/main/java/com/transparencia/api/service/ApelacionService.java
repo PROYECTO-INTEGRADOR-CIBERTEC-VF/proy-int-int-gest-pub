@@ -1,57 +1,45 @@
 package com.transparencia.api.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.transparencia.api.model.entity.Apelacion;
+import com.transparencia.api.model.entity.EstadoApelacion;
 import com.transparencia.api.repository.ApelacionRepository;
+import com.transparencia.api.repository.CiudadanoRepository;
+import com.transparencia.api.repository.SolicitudRepository;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class ApelacionService {
 
-    private static final List<Apelacion.EstadoApelacion> ESTADOS_FINALES = List.of(
-        Apelacion.EstadoApelacion.RESUELTO,
-        Apelacion.EstadoApelacion.RESUELTO_FUNDADO,
-        Apelacion.EstadoApelacion.RESUELTO_FUNDADO_EN_PARTE,
-        Apelacion.EstadoApelacion.RESUELTO_INFUNDADO,
-        Apelacion.EstadoApelacion.RESUELTO_INFUNDADO_EN_PARTE,
-        Apelacion.EstadoApelacion.RESUELTO_IMPROCEDENTE,
-        Apelacion.EstadoApelacion.TENER_POR_NO_PRESENTADO,
-        Apelacion.EstadoApelacion.CONCLUSION_SUSTRACCION_MATERIA,
-        Apelacion.EstadoApelacion.CONCLUSION_DESISTIMIENTO
-    );
-
     private final ApelacionRepository apelacionRepository;
-
-    public ApelacionService(ApelacionRepository apelacionRepository) {
-        this.apelacionRepository = apelacionRepository;
-    }
+    private final CiudadanoRepository ciudadanoRepository;
+    private final SolicitudRepository solicitudRepository;
 
     @Transactional(readOnly = true)
-    public List<Apelacion> obtenerTodasLasApelaciones() {
+    public List<Apelacion> findAll() {
         return apelacionRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public Optional<Apelacion> obtenerApelacionPorId(Long id) {
-        return apelacionRepository.findById(id);
+    public Apelacion findById(Long id) {
+        return apelacionRepository.findById(id).orElseThrow(() -> new RuntimeException("Apelacion no encontrada"));
     }
 
     @Transactional(readOnly = true)
-    public Optional<Apelacion> obtenerApelacionPorExpediente(String expediente) {
-        return apelacionRepository.findByExpediente(expediente);
+    public Apelacion findByExpediente(String expediente) {
+        return apelacionRepository.findByExpediente(expediente).orElseThrow(() -> new RuntimeException("Apelacion no encontrada"));
     }
 
     @Transactional(readOnly = true)
-    public List<Apelacion> obtenerApelacionesPorEstado(Apelacion.EstadoApelacion estado) {
+    public List<Apelacion> findByEstado(EstadoApelacion estado) {
         return apelacionRepository.findByEstadoOrderByFechaApelacionDesc(estado);
-    }
-
-    @Transactional(readOnly = true)
-    public long contarApelacionesPorEstado(Apelacion.EstadoApelacion estado) {
-        return apelacionRepository.countByEstado(estado);
     }
 
     @Transactional(readOnly = true)
@@ -60,32 +48,121 @@ public class ApelacionService {
     }
 
     @Transactional(readOnly = true)
-    public List<Apelacion> findPendientes() {
-        return apelacionRepository.findPendientes(ESTADOS_FINALES);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Apelacion> findAll() {
-        return apelacionRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Apelacion> findById(Long id) {
-        return apelacionRepository.findById(id);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Apelacion> findByIdWithDetails(Long id) {
-        return apelacionRepository.findByIdWithDetails(id);
+    public Map<String, Long> getEstadisticas() {
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("total", apelacionRepository.count());
+        return stats;
     }
 
     @Transactional
     public Apelacion save(Apelacion apelacion) {
+        validarNuevaApelacion(apelacion);
+        if (apelacion.getExpediente() == null || apelacion.getExpediente().isEmpty()) {
+            apelacion.setExpediente(generarExpediente());
+        }
         return apelacionRepository.save(apelacion);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
+    public Apelacion actualizar(Long id, Apelacion apelacionDetalles) {
+        Apelacion apelacion = findById(id);
+        apelacion.setFundamentos(apelacionDetalles.getFundamentos());
+        return apelacionRepository.save(apelacion);
+    }
+
+    @Transactional
+    public Apelacion cambiarEstado(Long id, EstadoApelacion nuevoEstado) {
+        Apelacion apelacion = findById(id);
+        apelacion.setEstado(nuevoEstado);
+        return apelacionRepository.save(apelacion);
+    }
+
+    @Transactional
+    public Apelacion subsanar(Long id, String fundamentosAdicionales) {
+        Apelacion apelacion = findById(id);
+        if (apelacion.getEstado() != EstadoApelacion.EN_SUBSANACION) {
+            throw new RuntimeException("La apelacion no se encuentra en estado de subsanacion");
+        }
+        String nuevosFundamentos = apelacion.getFundamentos() + "\n\n--- SUBSANACIÓN ---\n" + fundamentosAdicionales;
+        apelacion.setFundamentos(nuevosFundamentos);
+        apelacion.setEstado(EstadoApelacion.EN_CALIFICACION_2);
+        return apelacionRepository.save(apelacion);
+    }
+
+    @Transactional
+    public void eliminar(Long id) {
+        apelacionRepository.deleteById(id);
+    }
+
+    private void validarNuevaApelacion(Apelacion apelacion) {
+        if (apelacion.getSolicitud() != null && apelacion.getSolicitud().getIdSolicitud() != null) {
+            boolean existePrevia = apelacionRepository.existsBySolicitud_IdSolicitud(apelacion.getSolicitud().getIdSolicitud());
+            if (existePrevia) {
+                throw new RuntimeException("La solicitud ya tiene una apelación en curso.");
+            }
+        }
+        if (apelacion.getCiudadano() != null && apelacion.getCiudadano().getIdUsuario() != null) {
+            ciudadanoRepository.findById(apelacion.getCiudadano().getIdUsuario())
+                    .orElseThrow(() -> new RuntimeException("El ciudadano no existe en el sistema."));
+        }
+    }
+
+    public String generarExpediente() {
+        long count = apelacionRepository.count();
+        int year = LocalDate.now().getYear();
+        return String.format("%05d-%d-JUS-TTAIP", count + 1, year);
+    }
+
+    public long countByEstado(EstadoApelacion estado) {
+        return apelacionRepository.countByEstado(estado);
+    }
+
+    // Compatibility wrappers used by existing tests
+    public List<Apelacion> obtenerTodasLasApelaciones() {
+        return findAll();
+    }
+
+    public java.util.Optional<Apelacion> obtenerApelacionPorId(Long id) {
+        return apelacionRepository.findById(id);
+    }
+
+    public java.util.Optional<Apelacion> obtenerApelacionPorExpediente(String expediente) {
+        return apelacionRepository.findByExpediente(expediente);
+    }
+
+    public List<Apelacion> obtenerApelacionesPorEstado(EstadoApelacion estado) {
+        return apelacionRepository.findByEstadoOrderByFechaApelacionDesc(estado);
+    }
+
+    public long contarApelacionesPorEstado(EstadoApelacion estado) {
+        return apelacionRepository.countByEstado(estado);
+    }
+
+    public List<Apelacion> findPendientes() {
+        // Define estados finales que se consideran resueltos
+        List<EstadoApelacion> finales = List.of(
+                EstadoApelacion.RESUELTO,
+                EstadoApelacion.RESUELTO_FUNDADO,
+                EstadoApelacion.RESUELTO_FUNDADO_EN_PARTE,
+                EstadoApelacion.RESUELTO_INFUNDADO,
+                EstadoApelacion.RESUELTO_INFUNDADO_EN_PARTE,
+                EstadoApelacion.RESUELTO_IMPROCEDENTE,
+                EstadoApelacion.TENER_POR_NO_PRESENTADO,
+                EstadoApelacion.CONCLUSION_SUSTRACCION_MATERIA,
+                EstadoApelacion.CONCLUSION_DESISTIMIENTO
+        );
+        return apelacionRepository.findPendientes(finales);
+    }
+
+    public void eliminarApelacion(Long id) {
+        eliminar(id);
+    }
+
     public long count() {
         return apelacionRepository.count();
+    }
+
+    public long countByCiudadanoId(Long ciudadanoId) {
+        return apelacionRepository.findByCiudadano_IdUsuarioOrderByFechaApelacionDesc(ciudadanoId).size();
     }
 }

@@ -1,28 +1,41 @@
-<main class="min-h-screen bg-[var(--nieve)] text-[var(--carbon)] p-4 md:p-6">
-  <section class="max-w-5xl mx-auto space-y-5">
-    <header class="card-elevated p-5 md:p-6">
-      <a routerLink="/" class="text-sm text-[var(--niebla)] hover:text-[var(--carbon)]">Volver</a>
-      <h1 class="mt-3 text-2xl font-bold tracking-tight">Nueva Apelacion</h1>
-      <p class="text-sm text-[var(--niebla)] mt-1">
-        Adjunte los 3 documentos requeridos para presentar su apelacion ante TTAIP.
-      </p>
-    </header>
+<div class="min-h-screen bg-[#F8F9FB] p-6">
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-4">
+      <a routerLink="/ciudadano" class="text-sm text-gray-600">← Volver al Dashboard</a>
+    </div>
 
-    <section class="card-elevated p-5 md:p-6 space-y-4">
-      <div class="section-header">
-        <div class="section-index">1</div>
-        <h2 class="section-title">Documentos requeridos</h2>
+    <div *ngIf="loadingSolicitud()" class="p-6 bg-white rounded shadow text-center">Cargando...</div>
+
+    <div *ngIf="modoSeleccion() && !solicitud()" class="space-y-4">
+      <h2 class="text-lg font-semibold">Expedientes Apelables</h2>
+      <div *ngIf="error()" class="text-sm text-red-600">{{ error() }}</div>
+      <div *ngIf="solicitudesApelables().length === 0" class="text-sm text-gray-500">No hay expedientes apelables.</div>
+      <ul class="space-y-2">
+        <li *ngFor="let s of solicitudesApelables()" class="p-3 bg-white rounded border flex justify-between items-center">
+          <div>
+            <div class="text-sm font-mono">{{ s.expediente }}</div>
+            <div class="text-xs text-gray-500">{{ s.entidadNombre }} — {{ s.asunto }}</div>
+          </div>
+          <button (click)="seleccionarSolicitud(s)" class="px-3 py-1 bg-[#C8102E] text-white rounded">Seleccionar</button>
+        </li>
+      </ul>
+    </div>
+
+    <div *ngIf="solicitud()" class="space-y-4">
+      <h2 class="text-xl font-semibold">Apelar: {{ solicitud()!.expediente }}</h2>
+
+      <div *ngIf="error()" class="text-sm text-red-600">{{ error() }}</div>
+      <div *ngIf="mensaje()" class="text-sm text-green-600">{{ mensaje() }}</div>
+
+      <div class="bg-white rounded p-4">
+        <label class="block text-sm font-medium">Fundamentos</label>
+        <textarea [(ngModel)]="fundamentos" rows="6" class="w-full mt-2 p-2 border rounded"></textarea>
       </div>
 
-      <app-file-upload [maxFiles]="3" (filesChanged)="onFilesChanged($event)"></app-file-upload>
-
-      <div class="rounded-xl border border-[var(--ceniza-claro)] bg-[var(--nieve)] p-3 text-sm text-[var(--niebla)]">
-        Estado de carga: {{ documentos().length }} de 3 archivos.
+      <div class="flex gap-3">
+        <button (click)="crearApelacion()" [disabled]="loading()" class="px-4 py-2 bg-[#C8102E] text-white rounded">Presentar Apelación</button>
+        <button (click)="volverASeleccion()" class="px-4 py-2 border rounded">Volver</button>
       </div>
-
-      <button type="button" class="btn-primary h-11 w-full" [disabled]="documentos().length < 3">
-        Continuar con fundamentos
-      </button>
-    </section>
-  </section>
-</main>
+    </div>
+  </div>
+</div>

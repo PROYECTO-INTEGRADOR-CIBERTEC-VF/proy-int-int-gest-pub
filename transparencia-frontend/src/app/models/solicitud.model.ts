@@ -1,49 +1,12 @@
-import { Respuesta } from './respuesta.model';
-
-export type EstadoSolicitud =
-  | 'RECEPCIONADA'
-  | 'EN_REVISION'
-  | 'PENDIENTE_INFORMACION'
-  | 'RESPONDIDA'
-  | 'DENEGADA'
-  | 'CONCLUIDA'
-  | 'VENCIDA';
-
-export type Prioridad = 'BAJA' | 'NORMAL' | 'MEDIA' | 'ALTA' | 'URGENTE';
-
-export type SemaforoEstado = 'VERDE' | 'AMBAR' | 'ROJO' | 'NEGRO';
+import { Apelacion } from './apelacion.model';
 
 export interface Solicitud {
-  idSolicitud: number;
+  id: number;
   expediente: string;
+  entidadNombre: string;
   asunto: string;
-  descripcion: string;
-  fechaPresentacion?: string;
-  fechaLimite?: string;
-  estado: EstadoSolicitud;
-  prioridad?: Prioridad;
-  tipoInformacion?: string | null;
-  formatoDigital?: boolean;
-  formatoFisico?: boolean;
-  copiaSimple?: boolean;
-  copiaCertificada?: boolean;
-  ciudadanoId?: number;
-  entidadId?: number;
-  ciudadanoNombre?: string;
-  entidadNombre?: string;
-  respuesta?: Respuesta | null;
-  diasRestantes?: number;
-  semaforo?: SemaforoEstado;
-}
-
-export interface SolicitudCreate {
-  asunto: string;
-  descripcion: string;
-  ciudadanoId: number;
-  entidadId: number;
-  tipoInformacion?: string;
-  formatoDigital?: boolean;
-  formatoFisico?: boolean;
-  copiaSimple?: boolean;
-  copiaCertificada?: boolean;
+  fechaPresentacion: string; // ISO date string
+  estado: string;
+  // in some responses this may be an object; allow flexible typing for now
+  apelacion?: any;
 }
