@@ -2,18 +2,21 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TtaipService } from './ttaip.service';
 
-describe('TtaipService - Calificación Final (FE-03)', () => {
+describe('TtaipService', () => {
   let service: TtaipService;
   let httpMock: HttpTestingController;
 
+  // Variables de las pruebas (HU-08)
   const mockExpediente = 'EXP-2026-TEST';
   const mockData = {
     decision: '',
     fundamentos: 'Estos son fundamentos de prueba obligatorios',
     iniciarProcesoDisciplinario: false
   };
-
   const baseUrl = '/api/ttaip/resolucion';
+
+  // Variables de pruebas de develop
+  const apiUrl = 'http://localhost:8080/api/ttaip';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -25,9 +28,55 @@ describe('TtaipService - Calificación Final (FE-03)', () => {
   });
 
   afterEach(() => {
-    // Verifica que no haya peticiones HTTP pendientes
     httpMock.verify();
   });
+
+
+  // PRUEBAS DE DEVELOP DEL EQUIPO
+
+  it('deberia ser creado', () => {
+    expect(service).toBeTruthy();
+  });
+
+  it('deberia obtener estadisticas', () => {
+    service.getEstadisticas().subscribe((response: any) => {
+      expect(response['pendientesAdmision']).toBe(3);
+      expect(response['resueltas']).toBe(5);
+    });
+
+    const req = httpMock.expectOne(`${apiUrl}/estadisticas`);
+    expect(req.request.method).toBe('GET');
+    req.flush({ pendientesAdmision: 3, enProceso: 2, enSubsanacion: 1, resueltas: 5 });
+  });
+
+  it('deberia requerir subsanacion', () => {
+    const payload = {
+      fundamentos: 'Falta documentacion',
+      observaciones: 'Adjuntar sustento',
+      diasSubsanacion: 2
+    };
+
+    service.requerirSubsanacion(10, payload).subscribe();
+
+    const req = httpMock.expectOne(`${apiUrl}/calificacion/10/subsanar`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush({});
+  });
+
+  it('deberia inadmitir apelacion', () => {
+    const payload = { fundamentos: 'No corresponde por causal de improcedencia' };
+
+    service.inadmitirApelacion(10, payload).subscribe();
+
+    const req = httpMock.expectOne(`${apiUrl}/calificacion/10/inadmitir`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush({});
+  });
+
+
+  // PRUEBAS DE RESOLUCIÓN FINAL (HU-08)
 
   it('debe enviar la decisión FUNDADO correctamente', () => {
     mockData.decision = 'FUNDADO';
