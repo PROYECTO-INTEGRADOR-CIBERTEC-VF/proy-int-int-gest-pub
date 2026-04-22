@@ -1,104 +1,137 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Apelacion } from '../../models/apelacion.model';
 import { TtaipService } from '../../services/ttaip.service';
 
 @Component({
   selector: 'app-ttaip-resolver',
-  standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './ttaip-resolver.component.html'
+  templateUrl: './ttaip-resolver.component.html',
+  styleUrl: './ttaip-resolver.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TtaipResolverComponent implements OnInit {
-  expediente: string = '';
-  tabActivo: string = 'apelacion';
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly ttaipService = inject(TtaipService);
 
-  // Variables del formulario (las que usa tu HTML con ngModel)
-  causalAplicada: string = '';
-  decision: string = '';
-  iniciarProcesoDisciplinario: boolean = false;
-  fundamentos: string = '';
+  apelacion = signal<Apelacion | null>(null);
+  loading = signal<boolean>(false);
+  loadingApelacion = signal<boolean>(true);
+  error = signal<string>('');
+  mensaje = signal<string>('');
 
-  // Datos mock para la vista (Trazabilidad)
-  apelacionData = {
-    ciudadano: 'Juan Carlos Pérez Mendoza',
-    causalDenegatoria: 'Información Confidencial',
-    articuloLegal: 'Art. 17° Ley N° 27806',
-    detalleCausal: 'La información relacionada con proyectos en etapa de planificación no es pública.',
-    argumentoCiudadano: 'El presupuesto ya fue aprobado mediante Ley de Presupuesto, por lo que no es planificación.'
-  };
-
-  adjuntos = [
-    { nombre: 'Recurso_Fundamentado.pdf', tamano: '1.2 MB' },
-    { nombre: 'Respuesta_Denegatoria.pdf', tamano: '450 KB' }
-  ];
-
-  // Las 7 opciones exactas que pide el Backlog
-  opcionesFallo = [
-    { id: 'FUNDADO', tipo: 'check', titulo: 'FUNDADO', desc: 'Revoca la denegatoria. La entidad debe entregar la información.' },
-    { id: 'FUNDADO_PARTE', tipo: 'check', titulo: 'FUNDADO EN PARTE', desc: 'Revoca parcialmente. Se entrega solo una parte de lo solicitado.' },
-    { id: 'INFUNDADO', tipo: 'x', titulo: 'INFUNDADO', desc: 'Confirma la denegatoria de la entidad. No procede la entrega.' },
-    { id: 'INFUNDADO_PARTE', tipo: 'x', titulo: 'INFUNDADO EN PARTE', desc: 'Confirma parcialmente la denegatoria de la entidad.' },
-    { id: 'IMPROCEDENTE', tipo: 'alert', titulo: 'IMPROCEDENTE', desc: 'El recurso no cumple con los requisitos de fondo para ser evaluado.' },
-    { id: 'SUSTRACCION', tipo: 'alert', titulo: 'CONCLUSIÓN: Sustracción de la Materia', desc: 'La entidad entregó la información durante el proceso de apelación.' },
-    { id: 'DESISTIMIENTO', tipo: 'alert', titulo: 'CONCLUSIÓN: Desistimiento', desc: 'El ciudadano se retiró voluntariamente del proceso.' }
-  ];
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private ttaipService: TtaipService // Inyecta el servicio que arreglamos
-  ) {}
+  decision = '';
+  fundamentos = '';
+  iniciarProcesoDisciplinario = false;
 
   ngOnInit(): void {
-    this.expediente = this.route.snapshot.paramMap.get('expediente') || '00234-2025-JUS/TTAIP';
-  }
-
-  onCausalChange() {
-    // Si la causal está mal aplicada, sugerimos Fundado. Si está bien, sugerimos Infundado.
-    if (this.causalAplicada === 'REVOCAR') {
-      this.decision = 'FUNDADO';
-    } else if (this.causalAplicada === 'CONFIRMAR') {
-      this.decision = 'INFUNDADO';
-      this.iniciarProcesoDisciplinario = false;
+    const expediente = this.route.snapshot.paramMap.get('expediente');
+    if (expediente) {
+      this.cargarApelacion(expediente);
+      return;
     }
+
+    this.loadingApelacion.set(false);
+    this.error.set('No se encontro el expediente para resolver.');
   }
 
-  handleEmitResolution() {
-    if (!this.decision || this.fundamentos.length < 15) return;
+  cargarApelacion(expediente: string): void {
+    this.loadingApelacion.set(true);
+    this.error.set('');
 
-    // Arma el objeto con los datos que espera el backend
-    const data = {
-      decision: this.decision,
-      fundamentos: this.fundamentos,
-      iniciarProcesoDisciplinario: this.iniciarProcesoDisciplinario
-    };
+    this.ttaipService.getApelacionPorExpediente(expediente).subscribe({
+      next: (data) => {
+        if (!data) {
+          this.error.set('No se encontro la apelacion para el expediente indicado.');
+          this.loadingApelacion.set(false);
+          return;
+        }
 
-    // servicio simulado de la tarea anterior
-    this.ttaipService.declararFundado(this.expediente, data).subscribe({
-      next: () => {
-        alert('¡Resolución Final emitida con éxito!');
-        this.router.navigate(['/ttaip']); // Regresa al dashboard tras guardar
+        this.apelacion.set(data);
+        this.loadingApelacion.set(false);
       },
-      error: (err) => {
-        console.error('Error al emitir resolución', err);
-        alert('Ocurrió un error al intentar guardar la resolución.');
-      }
+      error: () => {
+        this.error.set('Error al cargar la apelacion');
+        this.loadingApelacion.set(false);
+      },
     });
   }
-  descargarResolucionFinal() {
-    // Simular la creación y descarga de un PDF
-    const contenido = `Resolución Final del expediente: ${this.expediente}\nDecisión: ${this.decision}`;
-    const blob = new Blob([contenido], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
 
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Resolucion_${this.expediente}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+  enviarResolucion(): void {
+    const ap = this.apelacion();
+    if (!ap) {
+      return;
+    }
+
+    const apelacionId = ap.idApelacion ?? ap.id;
+    if (!apelacionId) {
+      this.error.set('No se pudo identificar la apelacion para emitir la resolucion.');
+      return;
+    }
+
+    if (!this.decision) {
+      this.error.set('Debe seleccionar una decision');
+      return;
+    }
+
+    if (!this.fundamentos.trim()) {
+      this.error.set('Los fundamentos son obligatorios');
+      return;
+    }
+
+    this.loading.set(true);
+    this.error.set('');
+
+    const request = {
+      fundamentos: this.fundamentos.trim(),
+      iniciarProcesoDisciplinario: this.iniciarProcesoDisciplinario,
+    };
+
+    const serviceMap: Record<string, () => void> = {
+      fundado: () => this.ttaipService.declararFundado(apelacionId, request).subscribe({ next: () => this.exito('Apelacion declarada FUNDADA'), error: (err) => this.errorHandler(err) }),
+      fundado_en_parte: () => this.ttaipService.declararFundadoEnParte(apelacionId, request).subscribe({ next: () => this.exito('Apelacion declarada FUNDADA EN PARTE'), error: (err) => this.errorHandler(err) }),
+      infundado: () => this.ttaipService.declararInfundado(apelacionId, { fundamentos: this.fundamentos.trim() }).subscribe({ next: () => this.exito('Apelacion declarada INFUNDADA'), error: (err) => this.errorHandler(err) }),
+      infundado_en_parte: () => this.ttaipService.declararInfundadoEnParte(apelacionId, { fundamentos: this.fundamentos.trim() }).subscribe({ next: () => this.exito('Apelacion declarada INFUNDADA EN PARTE'), error: (err) => this.errorHandler(err) }),
+      improcedente: () => this.ttaipService.declararImprocedente(apelacionId, { fundamentos: this.fundamentos.trim() }).subscribe({ next: () => this.exito('Apelacion declarada IMPROCEDENTE'), error: (err) => this.errorHandler(err) }),
+      sustraccion_materia: () => this.ttaipService.declararSustraccionMateria(apelacionId, { fundamentos: this.fundamentos.trim() }).subscribe({ next: () => this.exito('Conclusion por sustraccion de la materia'), error: (err) => this.errorHandler(err) }),
+      desistimiento: () => this.ttaipService.declararDesistimiento(apelacionId, { fundamentos: this.fundamentos.trim() }).subscribe({ next: () => this.exito('Conclusion por desistimiento'), error: (err) => this.errorHandler(err) }),
+    };
+
+    const handler = serviceMap[this.decision];
+    if (handler) {
+      handler();
+      return;
+    }
+
+    this.loading.set(false);
+    this.error.set('Decision no valida');
+  }
+
+  private exito(msg: string): void {
+    this.loading.set(false);
+    this.mensaje.set(msg);
+    setTimeout(() => this.router.navigate(['/ttaip']), 2000);
+  }
+
+  private errorHandler(err: any): void {
+    this.loading.set(false);
+    this.error.set(err?.error?.mensaje || 'Error al procesar la resolucion');
+  }
+
+  getDecisionLabel(): string {
+    const labels: Record<string, string> = {
+      fundado: 'FUNDADA',
+      fundado_en_parte: 'FUNDADA EN PARTE',
+      infundado: 'INFUNDADA',
+      infundado_en_parte: 'INFUNDADA EN PARTE',
+      improcedente: 'IMPROCEDENTE',
+      sustraccion_materia: 'SUSTRACCION DE MATERIA',
+      desistimiento: 'DESISTIMIENTO',
+    };
+
+    return labels[this.decision] || '';
   }
 }

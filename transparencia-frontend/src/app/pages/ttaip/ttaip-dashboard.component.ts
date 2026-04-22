@@ -1,211 +1,127 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-
-type TabId = 'pendientes' | 'analisis' | 'subsanacion' | 'segunda' | 'resueltas';
-
-interface TabConfig {
-  id: TabId;
-  label: string;
-}
-
-interface ApelacionBandeja {
-  expediente: string;
-  ciudadano: string;
-  entidad: string;
-  asunto: string;
-  fecha: string;
-  estado: string;
-  diasHabiles?: string;
-}
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Apelacion } from '../../models/apelacion.model';
+import { TtaipService } from '../../services/ttaip.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-ttaip-dashboard',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterLink, FormsModule, DatePipe],
   templateUrl: './ttaip-dashboard.component.html',
-  styleUrl: './ttaip-dashboard.component.css'
+  styleUrl: './ttaip-dashboard.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TtaipDashboardComponent implements OnInit {
-  readonly tabs: ReadonlyArray<TabConfig> = [
-    { id: 'pendientes', label: 'Pendientes' },
-    { id: 'analisis', label: 'En análisis' },
-    { id: 'subsanacion', label: 'Subsanación' },
-    { id: 'segunda', label: 'Segunda calificación' },
-    { id: 'resueltas', label: 'Resueltas' }
-  ];
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly ttaipService = inject(TtaipService);
 
-  readonly tabActivo = signal<TabId>('pendientes');
-  readonly cargando = signal<boolean>(false);
-  readonly apelaciones = signal<ApelacionBandeja[]>([{ expediente: '00234-2025-JUS/TTAIP', ciudadano: 'Juan Carlos Pérez', entidad: 'MINEDU', asunto: 'Presupuesto', fecha: '2026-04-05', estado: 'RESUELTO' }]);
-  readonly conteos = signal<Record<TabId, number>>({
-    pendientes: 0,
-    analisis: 0,
-    subsanacion: 0,
-    segunda: 0,
-    resueltas: 0
-  });
+  apelaciones = signal<Apelacion[]>([]);
+  loading = signal<boolean>(true);
+  error = signal<string>('');
 
-  private readonly cache = new Map<TabId, ApelacionBandeja[]>();
+  pendientesAdmision = signal<number>(0);
+  enSegundaCalificacion = signal<number>(0);
+  enProceso = signal<number>(0);
+  enSubsanacion = signal<number>(0);
+  resueltos = signal<number>(0);
 
-  private readonly datosPorTab: Record<TabId, ApelacionBandeja[]> = {
-    pendientes: [
-      {
-        expediente: '00237-2026-JUS/TTAIP',
-        ciudadano: 'Carlos Ruiz Rojas',
-        entidad: 'MINEDU',
-        asunto: 'Solicitud de información de contratos de infraestructura escolar',
-        fecha: '2026-04-14',
-        estado: 'PENDIENTE_ELEVACION'
-      },
-      {
-        expediente: '00241-2026-JUS/TTAIP',
-        ciudadano: 'Ana Torres Díaz',
-        entidad: 'MINSA',
-        asunto: 'Entrega de reportes de abastecimiento de medicamentos',
-        fecha: '2026-04-15',
-        estado: 'EN_CALIFICACION_1'
-      }
-    ],
-    analisis: [
-      {
-        expediente: '00225-2026-JUS/TTAIP',
-        ciudadano: 'Luis Mendoza Vega',
-        entidad: 'PRODUCE',
-        asunto: 'Acceso a expedientes de fiscalización del año 2025',
-        fecha: '2026-04-10',
-        estado: 'EN_CALIFICACION_1'
-      },
-      {
-        expediente: '00227-2026-JUS/TTAIP',
-        ciudadano: 'María Salazar Quispe',
-        entidad: 'MTC',
-        asunto: 'Transparencia sobre cronograma de ejecución vial',
-        fecha: '2026-04-11',
-        estado: 'EN_CALIFICACION_1'
-      }
-    ],
-    subsanacion: [
-      {
-        expediente: '00216-2026-JUS/TTAIP',
-        ciudadano: 'Pedro Fernández Ramos',
-        entidad: 'SUNAT',
-        asunto: 'Solicitud de criterios internos de clasificación documental',
-        fecha: '2026-04-08',
-        estado: 'EN_SUBSANACION'
-      }
-    ],
-    segunda: [
-      {
-        expediente: '00209-2026-JUS/TTAIP',
-        ciudadano: 'Elena Paredes Soto',
-        entidad: 'MEF',
-        asunto: 'Revisión de respuesta parcial sobre presupuesto público',
-        fecha: '2026-04-07',
-        estado: 'EN_CALIFICACION_2'
-      },
-      {
-        expediente: '00212-2026-JUS/TTAIP',
-        ciudadano: 'Jorge Huamán Ríos',
-        entidad: 'RENIEC',
-        asunto: 'Rectificación de denegatoria por reserva de información',
-        fecha: '2026-04-08',
-        estado: 'EN_CALIFICACION_2'
-      }
-    ],
-    resueltas: [
-      {
-        expediente: '00198-2026-JUS/TTAIP',
-        ciudadano: 'Rosario Gutiérrez León',
-        entidad: 'MINEM',
-        asunto: 'Acceso a estudios técnicos de impacto ambiental',
-        fecha: '2026-04-03',
-        estado: 'RESUELTO_FUNDADO'
-      },
-      {
-        expediente: '00201-2026-JUS/TTAIP',
-        ciudadano: 'Manuel Rojas Castro',
-        entidad: 'OSINERGMIN',
-        asunto: 'Entrega de informes de supervisión anual',
-        fecha: '2026-04-04',
-        estado: 'RESUELTO_IMPROCEDENTE'
-      }
-    ]
-  };
+  filtroActual = signal<string>('pendientes');
 
   ngOnInit(): void {
-    this.conteos.set({
-      pendientes: this.datosPorTab.pendientes.length,
-      analisis: this.datosPorTab.analisis.length,
-      subsanacion: this.datosPorTab.subsanacion.length,
-      segunda: this.datosPorTab.segunda.length,
-      resueltas: this.datosPorTab.resueltas.length
+    this.cargarEstadisticas();
+    this.cargarPendientes();
+  }
+
+  cargarEstadisticas(): void {
+    this.ttaipService.getEstadisticas().subscribe({
+      next: (data) => {
+        this.pendientesAdmision.set(data.pendientesAdmision ?? data.pendientes ?? 0);
+        this.enProceso.set(data.enProceso ?? 0);
+        this.enSubsanacion.set(data.enSubsanacion ?? 0);
+        this.resueltos.set(data.resueltas ?? 0);
+      },
+      error: () => {
+        this.pendientesAdmision.set(0);
+        this.enProceso.set(0);
+        this.enSubsanacion.set(0);
+        this.resueltos.set(0);
+      },
     });
 
-    this.seleccionarTab('pendientes');
+    this.ttaipService.getSegundaCalificacion().subscribe({
+      next: (data) => this.enSegundaCalificacion.set(data.length),
+      error: () => this.enSegundaCalificacion.set(0),
+    });
   }
 
-  seleccionarTab(tab: TabId): void {
-    this.tabActivo.set(tab);
-
-    // Carga lazy por pestaña: cada lista se calcula una sola vez y queda en cache.
-    if (!this.cache.has(tab)) {
-      this.cargando.set(true);
-      this.cache.set(tab, this.datosPorTab[tab]);
-      this.cargando.set(false);
-    }
-
-    this.apelaciones.set(this.cache.get(tab) ?? []);
+  cargarPendientes(): void {
+    this.cargarLista('pendientes', () => this.ttaipService.getPendientes());
   }
 
-  obtenerConteo(tab: TabId): number {
-    return this.conteos()[tab];
+  cargarEnAnalisis(): void {
+    this.cargarLista('analisis', () => this.ttaipService.getEnAnalisis());
   }
 
-  getEstadoClass(estado: string): string {
+  cargarSubsanacion(): void {
+    this.cargarLista('subsanacion', () => this.ttaipService.getSubsanacion());
+  }
+
+  cargarSegundaCalificacion(): void {
+    this.cargarLista('segunda', () => this.ttaipService.getSegundaCalificacion());
+  }
+
+  cargarResueltas(): void {
+    this.cargarLista('resueltas', () => this.ttaipService.getResueltas());
+  }
+
+  private cargarLista(filtro: string, loader: () => ReturnType<TtaipService['getPendientes']>): void {
+    this.loading.set(true);
+    this.error.set('');
+    this.filtroActual.set(filtro);
+
+    loader().subscribe({
+      next: (data) => {
+        this.apelaciones.set(data);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.error.set(err?.error?.mensaje ?? 'Error al cargar apelaciones');
+      },
+    });
+  }
+
+  getEstadoBadgeClass(estado: string): string {
     const clases: Record<string, string> = {
-      PENDIENTE_ELEVACION: 'bg-amber-100 text-amber-800',
-      EN_CALIFICACION_1: 'bg-indigo-100 text-indigo-800',
-      EN_SUBSANACION: 'bg-rose-100 text-rose-800',
-      EN_CALIFICACION_2: 'bg-orange-100 text-orange-800',
-      EN_RESOLUCION: 'bg-violet-100 text-violet-800',
-      RESUELTO_FUNDADO: 'bg-emerald-100 text-emerald-800',
-      RESUELTO_FUNDADO_EN_PARTE: 'bg-emerald-100 text-emerald-800',
-      RESUELTO_INFUNDADO: 'bg-slate-100 text-slate-800',
-      RESUELTO_INFUNDADO_EN_PARTE: 'bg-slate-100 text-slate-800',
-      RESUELTO_IMPROCEDENTE: 'bg-red-100 text-red-800'
+      PENDIENTE_ELEVACION: 'badge-warning',
+      EN_CALIFICACION_1: 'badge-warning',
+      EN_CALIFICACION_2: 'badge-warning',
+      EN_SUBSANACION: 'badge-warning',
+      NOTIFICACION_SEGUNDA_CALIFICACION: 'badge-in-process',
+      EN_RESOLUCION: 'badge-in-process',
+      RESUELTO: 'badge-success',
+      RESUELTO_FUNDADO: 'badge-success',
+      RESUELTO_FUNDADO_EN_PARTE: 'badge-success',
+      RESUELTO_INFUNDADO: 'badge-muted',
+      RESUELTO_INFUNDADO_EN_PARTE: 'badge-muted',
+      RESUELTO_IMPROCEDENTE: 'badge-danger',
+      TENER_POR_NO_PRESENTADO: 'badge-danger',
+      CONCLUSION_SUSTRACCION_MATERIA: 'badge-success',
+      CONCLUSION_DESISTIMIENTO: 'badge-muted',
     };
 
-    return clases[estado] ?? 'bg-slate-100 text-slate-700';
+    return clases[estado] || 'badge-muted';
   }
 
-  textoAccion(estado: string): string {
-    if (estado === 'PENDIENTE_ELEVACION' || estado === 'EN_CALIFICACION_1') {
-      return 'Calificar';
-    }
-    if (estado === 'EN_CALIFICACION_2') {
-      return '2da calificación';
-    }
-    if (estado === 'EN_RESOLUCION') {
-      return 'Resolver';
-    }
-    return 'En revisión';
+  getSolicitudReferencia(apelacion: Apelacion): string {
+    return apelacion.solicitudExpediente || 'Sin expediente SAIP';
   }
 
-  rutaAccion(apelacion: ApelacionBandeja): string[] | null {
-    if (apelacion.estado === 'PENDIENTE_ELEVACION' || apelacion.estado === 'EN_CALIFICACION_1') {
-      return ['/ttaip/calificar', apelacion.expediente];
-    }
-    if (apelacion.estado === 'EN_CALIFICACION_2') {
-      return ['/ttaip/segunda-calificacion', apelacion.expediente];
-    }
-    if (apelacion.estado === 'EN_RESOLUCION') {
-      return ['/ttaip/resolver', apelacion.expediente];
-    }
-    return null;
-  }
-  obtenerNombreTabActual(): string {
-    const tab = this.tabs.find(t => t.id === this.tabActivo());
-    return tab && tab.label ? tab.label.toLowerCase() : 'esta sección';
+  cerrarSesion(): void {
+    this.authService.cerrarSesion();
+    void this.router.navigate(['/acceso-ttaip']);
   }
 }

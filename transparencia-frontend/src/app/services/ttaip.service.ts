@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { forkJoin, map } from 'rxjs';
 import { Apelacion } from '../models/apelacion.model';
 
 interface CalificacionRequest {
@@ -10,21 +11,31 @@ interface CalificacionRequest {
   diasSubsanacion?: number;
 }
 
+interface ResolucionRequest {
+  fundamentos: string;
+  iniciarProcesoDisciplinario?: boolean;
+}
+
+interface TtaipEstadisticasResponse {
+  total?: number;
+  pendientes?: number;
+  pendientesAdmision?: number;
+  enProceso?: number;
+  enSubsanacion?: number;
+  resueltas?: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class TtaipService {
-  // Combinamos ambas URLs para que funcionen las peticiones de ambos
   private readonly apiUrl = 'http://localhost:8080/api/ttaip';
-  private baseUrl = '/api/ttaip/resolucion';
+  private readonly resolucionUrl = `${this.apiUrl}/resolucion`;
 
   constructor(private readonly http: HttpClient) { }
 
-  // ==========================================
-  // MÉTODOS DE TUS COMPAÑEROS (develop)
-  // ==========================================
-  getEstadisticas(): Observable<Record<string, number>> {
-    return this.http.get<Record<string, number>>(`${this.apiUrl}/estadisticas`);
+  getEstadisticas(): Observable<TtaipEstadisticasResponse> {
+    return this.http.get<TtaipEstadisticasResponse>(`${this.apiUrl}/estadisticas`);
   }
 
   getPendientes(): Observable<Apelacion[]> {
@@ -39,6 +50,31 @@ export class TtaipService {
     return this.http.get<Apelacion[]>(`${this.apiUrl}/subsanacion`);
   }
 
+  getSegundaCalificacion(): Observable<Apelacion[]> {
+    return this.http.get<Apelacion[]>(`${this.apiUrl}/segunda-calificacion`);
+  }
+
+  getEnResolucion(): Observable<Apelacion[]> {
+    return this.http.get<Apelacion[]>(`${this.apiUrl}/en-resolucion`);
+  }
+
+  getResueltas(): Observable<Apelacion[]> {
+    return this.http.get<Apelacion[]>(`${this.apiUrl}/resueltas`);
+  }
+
+  getApelacionPorExpediente(expediente: string): Observable<Apelacion | null> {
+    return forkJoin([
+      this.getPendientes(),
+      this.getEnAnalisis(),
+      this.getSubsanacion(),
+      this.getSegundaCalificacion(),
+      this.getEnResolucion(),
+      this.getResueltas(),
+    ]).pipe(
+      map((listas) => listas.flat().find((apelacion) => apelacion.expediente === expediente) ?? null)
+    );
+  }
+
   admitirApelacion(id: number, data: CalificacionRequest): Observable<Apelacion> {
     return this.http.post<Apelacion>(`${this.apiUrl}/calificacion/${id}/admitir`, data);
   }
@@ -51,42 +87,35 @@ export class TtaipService {
     return this.http.post<Apelacion>(`${this.apiUrl}/calificacion/${id}/inadmitir`, data);
   }
 
-  // ==========================================
-  // TUS MÉTODOS DE RESOLUCIÓN FINAL (HU-08)
-  // ==========================================
-  declararFundado(id: string, data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/fundado`, data);
+  declararFundado(apelacionId: number, data: ResolucionRequest): Observable<Apelacion> {
+    return this.http.post<Apelacion>(`${this.resolucionUrl}/${apelacionId}/fundado`, data);
   }
 
-  declararInfundado(id: string, data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/infundado`, data);
+  declararInfundado(apelacionId: number, data: ResolucionRequest): Observable<Apelacion> {
+    return this.http.post<Apelacion>(`${this.resolucionUrl}/${apelacionId}/infundado`, data);
   }
 
-  declararFundadoEnParte(id: string, data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/fundado-en-parte`, data);
+  declararFundadoEnParte(apelacionId: number, data: ResolucionRequest): Observable<Apelacion> {
+    return this.http.post<Apelacion>(`${this.resolucionUrl}/${apelacionId}/fundado-en-parte`, data);
   }
 
-  declararInfundadoEnParte(id: string, data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/infundado-en-parte`, data);
+  declararInfundadoEnParte(apelacionId: number, data: ResolucionRequest): Observable<Apelacion> {
+    return this.http.post<Apelacion>(`${this.resolucionUrl}/${apelacionId}/infundado-en-parte`, data);
   }
 
-  declararImprocedente(id: string, data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/improcedente`, data);
+  declararImprocedente(apelacionId: number, data: ResolucionRequest): Observable<Apelacion> {
+    return this.http.post<Apelacion>(`${this.resolucionUrl}/${apelacionId}/improcedente`, data);
   }
 
-  declararSustraccionMateria(id: string, data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/sustraccion-materia`, data);
+  declararSustraccionMateria(apelacionId: number, data: ResolucionRequest): Observable<Apelacion> {
+    return this.http.post<Apelacion>(`${this.resolucionUrl}/${apelacionId}/sustraccion-materia`, data);
   }
 
-  declararDesistimiento(id: string, data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/desistimiento`, data);
+  declararDesistimiento(apelacionId: number, data: ResolucionRequest): Observable<Apelacion> {
+    return this.http.post<Apelacion>(`${this.resolucionUrl}/${apelacionId}/desistimiento`, data);
   }
 
-  declararNoPresentado(id: string, data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${id}/no-presentado`, data);
-  }
-
-  notificarSegundaCalificacion(id: string): Observable<any> {
-    return this.http.post(`/api/ttaip/segunda-calificacion/${id}/notificar`, {});
+  declararNoPresentado(apelacionId: number, data: ResolucionRequest): Observable<Apelacion> {
+    return this.http.post<Apelacion>(`${this.resolucionUrl}/${apelacionId}/no-presentado`, data);
   }
 }

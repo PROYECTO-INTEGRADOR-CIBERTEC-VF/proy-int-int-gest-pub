@@ -6,7 +6,11 @@ describe('TtaipSegundaCalificacionService', () => {
   let service: TtaipSegundaCalificacionService;
   let httpMock: HttpTestingController;
 
-  const apiUrl = 'http://localhost:8080/api/ttaip/segunda-calificacion';
+  const apiUrl = 'http://localhost:8080/api/ttaip/calificacion';
+  const payload = {
+    fundamentos: 'Fundamentos de prueba',
+    miembroId: 10
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -28,57 +32,43 @@ describe('TtaipSegundaCalificacionService', () => {
 
   it('debería admitir segunda calificación', () => {
     const mockResponse = { mensaje: 'Admitido correctamente' };
-    const expediente = 'EXP-2026-001';
+    const apelacionId = 25;
 
-    // 1. Llamada al método del servicio
-    service.admitirSegundaCalificacion(expediente).subscribe(res => {
+    service.admitirSegundaCalificacion(apelacionId, payload).subscribe(res => {
       expect(res).toEqual(mockResponse);
     });
 
-    // 2. Comprobar que el servicio intentó ir a la URL correcta usando POST
-    const req = httpMock.expectOne(`${apiUrl}/${expediente}/admitir`);
+    const req = httpMock.expectOne(`${apiUrl}/${apelacionId}/admitir`);
     expect(req.request.method).toBe('POST');
-
-    // 3. Simular que el backend respondió exitosamente
+    expect(req.request.body).toEqual(payload);
     req.flush(mockResponse);
   });
 
   it('debería rechazar segunda calificación', () => {
     const mockResponse = { mensaje: 'Rechazado correctamente' };
-    const expediente = 'EXP-2026-001';
+    const apelacionId = 25;
 
-    service.rechazarSegundaCalificacion(expediente).subscribe(res => {
+    service.rechazarSegundaCalificacion(apelacionId, payload).subscribe(res => {
       expect(res).toEqual(mockResponse);
     });
 
-    const req = httpMock.expectOne(`${apiUrl}/${expediente}/rechazar`);
+    const req = httpMock.expectOne(`${apiUrl}/${apelacionId}/inadmitir`);
     expect(req.request.method).toBe('POST');
-    req.flush(mockResponse);
-  });
-
-  it('debería notificar', () => {
-    const mockResponse = { mensaje: 'Notificado correctamente' };
-    const expediente = 'EXP-2026-001';
-
-    service.notificar(expediente).subscribe(res => {
-      expect(res).toEqual(mockResponse);
-    });
-
-    const req = httpMock.expectOne(`${apiUrl}/${expediente}/notificar`);
-    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(payload);
     req.flush(mockResponse);
   });
 
   it('debería declarar tener por no presentado', () => {
     const mockResponse = { mensaje: 'Declarado como no presentado' };
-    const expediente = 'EXP-2026-001';
+    const apelacionId = 25;
 
-    service.declararTenerPorNoPresentado(expediente).subscribe(res => {
+    service.declararTenerPorNoPresentado(apelacionId, payload).subscribe(res => {
       expect(res).toEqual(mockResponse);
     });
 
-    const req = httpMock.expectOne(`${apiUrl}/${expediente}/no-presentado`);
+    const req = httpMock.expectOne(`${apiUrl}/${apelacionId}/no-presentado`);
     expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(payload);
     req.flush(mockResponse);
   });
 });

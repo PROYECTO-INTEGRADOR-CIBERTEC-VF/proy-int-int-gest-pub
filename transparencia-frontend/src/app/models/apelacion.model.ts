@@ -23,19 +23,50 @@ export enum CalificacionApelacion {
   ADMITIDO = 'ADMITIDO'
 }
 
+export interface DocumentoApelacion {
+  id?: number;
+  nombreArchivo?: string;
+  rutaArchivo?: string;
+  tipoArchivo?: string;
+}
+
+export interface ResolucionApelacion {
+  idResolucion?: number;
+  numeroResolucion?: string;
+  tipoResolucion?: string;
+  decision?: string;
+  fundamentos?: string;
+  observaciones?: string;
+  fechaResolucion?: string;
+  miembroId?: number;
+  miembroNombre?: string;
+  miembroTTAIPNombre?: string;
+}
+
 export interface Apelacion {
   idApelacion: number;
+  id?: number;
   expediente: string;
-  solicitudId: number;
-  ciudadanoId: number;
-  fundamentos: string;
-  fechaApelacion: string;
+  solicitudId?: number;
+  ciudadanoId?: number;
+  fundamentos?: string;
+  fechaApelacion?: string;
   estado: EstadoApelacion;
   calificacionPrimera?: CalificacionApelacion;
   calificacionSegunda?: CalificacionApelacion;
   fechaSubsanacion?: string;
   diasSubsanacion?: number;
   resultado?: string;
+  ciudadanoNombre?: string;
+  solicitudExpediente?: string;
+  entidadNombre?: string;
+  solicitudAsunto?: string;
+  resolucion?: ResolucionApelacion;
+  resolucionPrimeraCalificacion?: ResolucionApelacion;
+  resolucionSegundaCalificacion?: ResolucionApelacion;
+  documentos?: DocumentoApelacion[];
+  fundamentosSubsanacion?: string;
+  documentosSubsanacion?: DocumentoApelacion[];
 }
 
 export interface ApelacionCreate {

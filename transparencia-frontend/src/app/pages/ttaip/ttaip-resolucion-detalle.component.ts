@@ -1,58 +1,87 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Apelacion } from '../../models/apelacion.model';
+import { TtaipService } from '../../services/ttaip.service';
 
 @Component({
   selector: 'app-ttaip-resolucion-detalle',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './ttaip-resolucion-detalle.component.html'
+  imports: [CommonModule, RouterLink],
+  templateUrl: './ttaip-resolucion-detalle.component.html',
+  styleUrl: './ttaip-resolucion-detalle.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TtaipResolucionDetalleComponent implements OnInit {
-  expediente: string = '';
-  activeTab: string = 'apelacion'; // Controla las pestañas
+  private readonly route = inject(ActivatedRoute);
+  private readonly ttaipService = inject(TtaipService);
 
-  // Flag para mostrar el banner de proceso disciplinario (Requerimiento del Backlog)
-  aplicaProcesoDisciplinario: boolean = true;
-
-  // Línea de tiempo con las 3 resoluciones
-  timeline = [
-    {
-      title: '1ra Calificación - ADMISIBLE',
-      datetime: '08/09/2025 10:15',
-      description: 'La apelación cumple con los requisitos formales. Se procedió con el análisis de fondo.',
-      status: 'completed'
-    },
-    {
-      title: '2da Calificación - EVALUACIÓN',
-      datetime: '15/09/2025 11:30',
-      description: 'Revisión de descargos de la entidad y evaluación de la materia de transparencia.',
-      status: 'completed'
-    },
-    {
-      title: 'Resolución Final - FUNDADO',
-      datetime: '20/09/2025 16:45',
-      description: 'Se acepta la apelación. Se ordena a la entidad entregar la información en 10 días hábiles.',
-      status: 'current'
-    }
-  ];
-
-  attachments = [
-    { name: 'SAIP_Original.pdf', meta: 'PDF • 345 KB' },
-    { name: 'Respuesta_Entidad.pdf', meta: 'PDF • 512 KB' },
-    { name: 'Recurso_Fundamentado.pdf', meta: 'PDF • 876 KB' },
-    { name: 'Resolucion_Final.pdf', meta: 'PDF • 1.2 MB' }
-  ];
-
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  apelacion = signal<Apelacion | null>(null);
+  loading = signal<boolean>(true);
+  error = signal<string>('');
+  activeTab = signal<string>('resolucion');
 
   ngOnInit(): void {
-    // Obtenemos el expediente de la URL
-    this.expediente = this.route.snapshot.paramMap.get('expediente') || '00234-2025-JUS/TTAIP';
+    const expediente = this.route.snapshot.paramMap.get('expediente');
+    if (expediente) {
+      this.cargarApelacion(expediente);
+      return;
+    }
+
+    this.loading.set(false);
+    this.error.set('No se encontro el expediente para visualizar.');
   }
 
-  volver(): void {
-    // Regresa al dashboard (puedes ajustarlo si el botón está en el dashboard del ciudadano)
-    this.router.navigate(['/ttaip']);
+  cargarApelacion(expediente: string): void {
+    this.loading.set(true);
+    this.error.set('');
+
+    this.ttaipService.getApelacionPorExpediente(expediente).subscribe({
+      next: (data) => {
+        if (!data) {
+          this.error.set('No se encontro la apelacion para el expediente indicado.');
+          this.loading.set(false);
+          return;
+        }
+
+        this.apelacion.set(data);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.error.set('Error al cargar la apelacion');
+        this.loading.set(false);
+      },
+    });
+  }
+
+  cambiarTab(tab: string): void {
+    this.activeTab.set(tab);
+  }
+
+  getResultadoClass(resultado: string | undefined): string {
+    if (!resultado) {
+      return 'bg-white/20 text-white';
+    }
+
+    if (resultado === 'FUNDADO' || resultado === 'FUNDADO_EN_PARTE') {
+      return 'bg-[var(--estado-verde-suave)] text-[var(--estado-verde)]';
+    }
+
+    if (resultado === 'INFUNDADO' || resultado === 'INFUNDADO_EN_PARTE') {
+      return 'bg-[var(--estado-rojo-suave)] text-[var(--estado-rojo)]';
+    }
+
+    if (resultado === 'IMPROCEDENTE') {
+      return 'bg-[var(--estado-ambar-suave)] text-[var(--estado-ambar)]';
+    }
+
+    if (resultado === 'CONCLUSION_SUSTRACCION_MATERIA') {
+      return 'bg-[var(--estado-azul-suave)] text-[var(--estado-azul)]';
+    }
+
+    if (resultado === 'CONCLUSION_DESISTIMIENTO' || resultado === 'TENER_POR_NO_PRESENTADO') {
+      return 'bg-[var(--nieve)] text-[var(--humo)]';
+    }
+
+    return 'bg-white/20 text-white';
   }
 }
