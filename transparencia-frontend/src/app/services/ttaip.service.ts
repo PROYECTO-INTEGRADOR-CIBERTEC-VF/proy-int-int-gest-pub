@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { Apelacion } from '../models/apelacion.model';
 
 interface CalificacionRequest {
@@ -15,10 +14,15 @@ interface CalificacionRequest {
   providedIn: 'root'
 })
 export class TtaipService {
+  // Combinamos ambas URLs para que funcionen las peticiones de ambos
   private readonly apiUrl = 'http://localhost:8080/api/ttaip';
+  private baseUrl = '/api/ttaip/resolucion';
 
   constructor(private readonly http: HttpClient) { }
 
+  // ==========================================
+  // MÉTODOS DE TUS COMPAÑEROS (develop)
+  // ==========================================
   getEstadisticas(): Observable<Record<string, number>> {
     return this.http.get<Record<string, number>>(`${this.apiUrl}/estadisticas`);
   }
@@ -35,14 +39,6 @@ export class TtaipService {
     return this.http.get<Apelacion[]>(`${this.apiUrl}/subsanacion`);
   }
 
-  getSegundaCalificacion(): Observable<Apelacion[]> {
-    return this.http.get<Apelacion[]>(`${this.apiUrl}/segunda-calificacion`);
-  }
-
-  getResueltas(): Observable<Apelacion[]> {
-    return this.http.get<Apelacion[]>(`${this.apiUrl}/resueltas`);
-  }
-
   admitirApelacion(id: number, data: CalificacionRequest): Observable<Apelacion> {
     return this.http.post<Apelacion>(`${this.apiUrl}/calificacion/${id}/admitir`, data);
   }
@@ -55,40 +51,42 @@ export class TtaipService {
     return this.http.post<Apelacion>(`${this.apiUrl}/calificacion/${id}/inadmitir`, data);
   }
 
-  // Métodos
+  // ==========================================
+  // TUS MÉTODOS DE RESOLUCIÓN FINAL (HU-08)
+  // ==========================================
   declararFundado(id: string, data: any): Observable<any> {
-    return of({ status: 'success', mensaje: `Expediente ${id} declarado FUNDADO.` }).pipe(delay(800));
+    return this.http.post(`${this.baseUrl}/${id}/fundado`, data);
   }
 
   declararInfundado(id: string, data: any): Observable<any> {
-    return of({ status: 'success', mensaje: `Expediente ${id} declarado INFUNDADO.` }).pipe(delay(800));
+    return this.http.post(`${this.baseUrl}/${id}/infundado`, data);
   }
 
   declararFundadoEnParte(id: string, data: any): Observable<any> {
-    return of({ status: 'success', mensaje: `Expediente ${id} declarado FUNDADO EN PARTE.` }).pipe(delay(800));
+    return this.http.post(`${this.baseUrl}/${id}/fundado-en-parte`, data);
   }
 
   declararInfundadoEnParte(id: string, data: any): Observable<any> {
-    return of({ status: 'success', mensaje: `Expediente ${id} declarado INFUNDADO EN PARTE.` }).pipe(delay(800));
+    return this.http.post(`${this.baseUrl}/${id}/infundado-en-parte`, data);
   }
 
   declararImprocedente(id: string, data: any): Observable<any> {
-    return of({ status: 'success', mensaje: `Expediente ${id} declarado IMPROCEDENTE.` }).pipe(delay(800));
+    return this.http.post(`${this.baseUrl}/${id}/improcedente`, data);
   }
 
   declararSustraccionMateria(id: string, data: any): Observable<any> {
-    return of({ status: 'success', mensaje: `Expediente ${id} concluido por SUSTRACCIÓN DE MATERIA.` }).pipe(delay(800));
+    return this.http.post(`${this.baseUrl}/${id}/sustraccion-materia`, data);
   }
 
   declararDesistimiento(id: string, data: any): Observable<any> {
-    return of({ status: 'success', mensaje: `Expediente ${id} concluido por DESISTIMIENTO.` }).pipe(delay(800));
+    return this.http.post(`${this.baseUrl}/${id}/desistimiento`, data);
   }
 
   declararNoPresentado(id: string, data: any): Observable<any> {
-    return of({ status: 'success', mensaje: `Expediente ${id} declarado NO PRESENTADO.` }).pipe(delay(800));
+    return this.http.post(`${this.baseUrl}/${id}/no-presentado`, data);
   }
 
   notificarSegundaCalificacion(id: string): Observable<any> {
-    return of({ status: 'success', mensaje: `Notificación enviada para expediente ${id}.` }).pipe(delay(800));
+    return this.http.post(`/api/ttaip/segunda-calificacion/${id}/notificar`, {});
   }
 }

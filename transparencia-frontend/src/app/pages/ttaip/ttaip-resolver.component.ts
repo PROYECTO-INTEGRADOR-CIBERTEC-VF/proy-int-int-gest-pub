@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // <--- OBLIGATORIO PARA EL ngModel
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TtaipService } from '../../services/ttaip.service';
 
@@ -86,5 +86,19 @@ export class TtaipResolverComponent implements OnInit {
         alert('Ocurrió un error al intentar guardar la resolución.');
       }
     });
+  }
+  descargarResolucionFinal() {
+    // Simular la creación y descarga de un PDF
+    const contenido = `Resolución Final del expediente: ${this.expediente}\nDecisión: ${this.decision}`;
+    const blob = new Blob([contenido], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Resolucion_${this.expediente}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   }
 }
