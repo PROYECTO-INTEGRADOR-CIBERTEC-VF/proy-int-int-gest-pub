@@ -1,272 +1,192 @@
-<div class="min-h-screen bg-[#f6f8fb] text-[#1f2937]">
-  <div class="border-b border-[#e5e7eb] bg-[#f3f6fa] px-4 pt-24 pb-10">
-    <div class="mx-auto max-w-6xl">
-      <a [routerLink]="['/ttaip']" class="mb-4 flex items-center gap-2 w-fit text-sm text-[#6b7280] transition hover:text-[#111827] cursor-pointer" style="text-decoration: none;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-        Volver al Panel Base
+<div class="saip-page min-h-screen bg-[var(--nieve)]">
+  <div class="bg-gradient-peru-hero pt-28 pb-10 px-4 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-[400px] h-[400px] rounded-full border border-[var(--ceniza-claro)]"></div>
+    <div class="max-w-7xl mx-auto">
+      <a routerLink="/ttaip" class="flex items-center gap-1.5 text-[var(--carbon)]/70 hover:text-[var(--carbon)] text-sm mb-4 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="m12 19-7-7 7-7"/><path stroke-width="2" d="M19 12H5"/></svg>
+        Volver al Panel TTAIP
       </a>
-
-      <h1 class="text-4xl font-medium tracking-tight text-[#111827] m-0">
-        Segunda Calificacion
-      </h1>
-      <p class="mt-2 text-lg text-[#64748b]">
-        Expediente: {{ expediente }}
-      </p>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-white/15 backdrop-blur-sm rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-[var(--carbon)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <div class="text-[var(--carbon)]">
+          <h1 class="text-2xl md:text-3xl">2da Calificacion de Apelacion</h1>
+          @if (apelacion()) {
+            <p class="text-[var(--carbon)]/70">
+              Expediente {{ apelacion()!.expediente }}
+              @if (apelacion()!.ciudadanoNombre) {
+                - {{ apelacion()!.ciudadanoNombre }}
+              }
+            </p>
+          }
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="mx-auto -mt-5 max-w-6xl px-4 pb-16">
-    <div class="mb-6 flex items-start gap-3 rounded-2xl border border-[#eceff3] bg-white px-5 py-4 shadow-sm">
-      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#fff7ed]">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#f97316]"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+  <div class="max-w-7xl mx-auto px-4 -mt-6 pb-16">
+    <div class="mb-6 bg-[var(--estado-ambar-suave)] border border-[var(--estado-ambar-borde)] shadow-sm rounded-xl p-4 flex items-start gap-3">
+      <div class="w-9 h-9 rounded-lg bg-[var(--estado-ambar-suave)] flex items-center justify-center flex-shrink-0">
+        <svg class="h-4 w-4 text-[var(--estado-ambar)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       </div>
-
       <div>
-        <p class="text-[15px] font-medium text-[#1f2937] m-0">Verificacion de subsanacion</p>
-        <p class="mt-1 text-sm text-[#64748b] m-0">
-          El ciudadano presento documentacion complementaria. Verifique si cumple con los requisitos para ser Admitido a Tramite o si resulta Improcedente.
-        </p>
+        <p class="text-sm text-[var(--estado-ambar)] mb-0.5 font-medium">Verificacion de subsanacion</p>
+        <p class="text-sm text-[var(--estado-ambar)]">El ciudadano presento documentacion complementaria. Verifique si cumple con los requisitos para ser Admitido a Tramite o si resulta Improcedente.</p>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <div>
-        <div class="mb-4 grid grid-cols-2 rounded-xl bg-[#eef2f7] p-1">
-          <button type="button" (click)="activeTab = 'subsanacion'" [ngClass]="activeTab === 'subsanacion' ? 'bg-white text-[#111827] shadow-sm' : 'text-[#374151]'" class="rounded-xl px-4 py-2 text-sm font-medium transition border-0 cursor-pointer">
-            Subsanacion
-          </button>
-          <button type="button" (click)="activeTab = 'adjuntos'" [ngClass]="activeTab === 'adjuntos' ? 'bg-white text-[#111827] shadow-sm' : 'text-[#374151]'" class="rounded-xl px-4 py-2 text-sm font-medium transition border-0 cursor-pointer">
-            Adjuntos
-          </button>
-        </div>
-
-        @if (activeTab === 'subsanacion') {
-          <div class="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
-            <div class="border-b border-[#e5e7eb] px-6 py-5">
-              <h2 class="text-[15px] font-medium m-0">Documentos de Subsanacion</h2>
-            </div>
-            <div class="space-y-4 px-6 py-5">
-              <div class="rounded-xl border border-[#bfdbfe] bg-[#eff6ff] p-4">
-                <p class="mb-2 text-sm font-semibold text-[#1d4ed8] m-0">Observaciones de 1ra Calificacion:</p>
-                <ul class="space-y-1 text-xs text-[#1e40af] m-0 pl-4">
-                  <li>Falta fundamentacion legal especifica del articulo vulnerado</li>
-                  <li>No se adjunta copia de la respuesta denegatoria de la entidad</li>
-                  <li>Falta indicar el domicilio procesal</li>
-                </ul>
-              </div>
-
-              <div class="border-t border-[#e5e7eb] pt-4">
-                <p class="mb-3 text-sm font-semibold text-[#111827]">Documentos presentados en subsanacion:</p>
-                <div class="space-y-3">
-                  <div class="rounded-xl border border-[#d1fae5] bg-[#ecfdf5] p-4">
-                    <div class="flex items-center justify-between gap-3">
-                      <div class="flex items-center gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#16a34a]"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                        <div>
-                          <p class="text-sm font-semibold text-[#1f2937] m-0">Escrito_Fundamentado.pdf</p>
-                          <p class="text-xs text-[#6b7280] m-0">Presentado el 10/09/2025 - 450 KB</p>
-                        </div>
-                      </div>
-                      <button type="button" class="rounded-lg p-2 text-[#374151] transition hover:bg-white border-0 bg-transparent cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="rounded-xl border border-[#d1fae5] bg-[#ecfdf5] p-4">
-                    <div class="flex items-center justify-between gap-3">
-                      <div class="flex items-center gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#16a34a]"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                        <div>
-                          <p class="text-sm font-semibold text-[#1f2937] m-0">Respuesta_Denegatoria.pdf</p>
-                          <p class="text-xs text-[#6b7280] m-0">Presentado el 10/09/2025 - 320 KB</p>
-                        </div>
-                      </div>
-                      <button type="button" class="rounded-lg p-2 text-[#374151] transition hover:bg-white border-0 bg-transparent cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="rounded-xl border border-[#d1fae5] bg-[#ecfdf5] p-4">
-                    <div class="flex items-center justify-between gap-3">
-                      <div class="flex items-center gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#16a34a]"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                        <div>
-                          <p class="text-sm font-semibold text-[#1f2937] m-0">Declaracion_Domicilio.pdf</p>
-                          <p class="text-xs text-[#6b7280] m-0">Presentado el 10/09/2025 - 180 KB</p>
-                        </div>
-                      </div>
-                      <button type="button" class="rounded-lg p-2 text-[#374151] transition hover:bg-white border-0 bg-transparent cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="rounded-lg bg-[#f3f4f6] p-3 text-xs text-[#6b7280]">
-                <p class="m-0"><strong>Fecha limite de subsanacion:</strong> 11/09/2025</p>
-                <p class="mt-1 m-0"><strong>Fecha de presentacion:</strong> 10/09/2025 (dentro del plazo)</p>
-              </div>
-            </div>
-          </div>
-        } @else {
-          <div class="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
-            <div class="border-b border-[#e5e7eb] px-6 py-5">
-              <h2 class="text-[15px] font-medium m-0">Documentos del Expediente</h2>
-            </div>
-            <div class="space-y-3 px-6 py-5">
-              <div class="flex items-center justify-between rounded-xl border border-[#e5e7eb] p-4 transition hover:bg-[#f8fafc]">
-                <div class="flex items-center gap-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#334155]"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
-                  <span class="text-sm text-[#1f2937]">Apelacion_Original.pdf</span>
-                </div>
-                <button type="button" class="rounded-lg p-2 text-[#374151] transition hover:bg-[#f1f5f9] border-0 bg-transparent cursor-pointer">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                </button>
-              </div>
-              <div class="flex items-center justify-between rounded-xl border border-[#e5e7eb] p-4 transition hover:bg-[#f8fafc]">
-                <div class="flex items-center gap-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#334155]"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
-                  <span class="text-sm text-[#1f2937]">1ra_Calificacion_Inadmisible.pdf</span>
-                </div>
-                <button type="button" class="rounded-lg p-2 text-[#374151] transition hover:bg-[#f1f5f9] border-0 bg-transparent cursor-pointer">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                </button>
-              </div>
-              <div class="flex items-center justify-between rounded-xl border border-[#e5e7eb] p-4 transition hover:bg-[#f8fafc]">
-                <div class="flex items-center gap-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#334155]"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
-                  <span class="text-sm text-[#1f2937]">Notificacion_Subsanacion.pdf</span>
-                </div>
-                <button type="button" class="rounded-lg p-2 text-[#374151] transition hover:bg-[#f1f5f9] border-0 bg-transparent cursor-pointer">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        }
+    @if (loadingApelacion()) {
+      <div class="text-center py-20">
+        <div class="w-8 h-8 border-3 border-[var(--peru-rojo)] border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <p class="mt-4 text-[var(--niebla)] text-sm">Cargando apelacion...</p>
       </div>
-
-      <div class="space-y-5">
-        <div class="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
-          <div class="border-b border-[#e5e7eb] px-6 py-5">
-            <h2 class="text-[15px] font-medium m-0">Resultado de Verificacion</h2>
-            <p class="mt-2 text-sm text-[#64748b] m-0">Seleccione el resultado tras verificar la subsanacion</p>
-          </div>
-
-          <div class="space-y-3 px-6 py-5">
-            <button type="button" (click)="decision = 'admitido'" [ngClass]="decision === 'admitido' ? 'border-[#10b981] bg-[#f0fdf4]' : 'border-[#e5e7eb] bg-white hover:border-[#cbd5e1]'" class="flex w-full items-center gap-3 rounded-xl border-2 p-4 text-left transition cursor-pointer">
-              <div class="h-4 w-4 rounded-full border flex items-center justify-center" [ngClass]="decision === 'admitido' ? 'border-[#334155]' : 'border-[#cbd5e1]'">
-                @if (decision === 'admitido') { <div class="h-2 w-2 rounded-full bg-[#334155]"></div> }
-              </div>
-              <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#10b981]"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                <div>
-                  <p class="text-sm font-semibold text-[#111827] m-0">ADMITIDO A TRAMITE</p>
-                  <p class="text-xs text-[#64748b] m-0">Subsanacion aprobada → Pasa a Resolucion Final</p>
-                </div>
-              </div>
-            </button>
-
-            <button type="button" (click)="decision = 'improcedente'" [ngClass]="decision === 'improcedente' ? 'border-[#9ca3af] bg-[#f9fafb]' : 'border-[#e5e7eb] bg-white hover:border-[#cbd5e1]'" class="flex w-full items-center gap-3 rounded-xl border-2 p-4 text-left transition cursor-pointer">
-              <div class="h-4 w-4 rounded-full border flex items-center justify-center" [ngClass]="decision === 'improcedente' ? 'border-[#334155]' : 'border-[#cbd5e1]'">
-                @if (decision === 'improcedente') { <div class="h-2 w-2 rounded-full bg-[#334155]"></div> }
-              </div>
-              <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#6b7280]"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
-                <div>
-                  <p class="text-sm font-semibold text-[#111827] m-0">IMPROCEDENTE</p>
-                  <p class="text-xs text-[#64748b] m-0">Subsanacion insuficiente → Proceso termina</p>
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        @if (decision === 'admitido') {
-          <div class="rounded-2xl border border-[#10b981] bg-[#f0fdf4] p-4">
-            <div class="flex items-start gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 text-[#10b981]"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-              <div>
-                <p class="font-semibold text-[#065f46] m-0">Admitido a Tramite</p>
-                <p class="mt-1 text-sm text-[#065f46] m-0">
-                  La subsanacion cumple con todos los requisitos. El expediente pasara a la etapa de Resolucion Final donde se emitira un fallo de Fundado o Infundado.
-                </p>
-              </div>
+    } @else if (error() && !apelacion()) {
+      <div class="bg-[var(--peru-rojo-suave)] border border-[var(--estado-rojo-borde)] rounded-xl p-6 text-center">
+        <svg class="w-10 h-10 text-[var(--estado-rojo)] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+        <p class="text-[var(--estado-rojo)] font-medium mb-1">{{ error() }}</p>
+        <a routerLink="/ttaip" class="inline-flex items-center gap-1.5 px-4 py-2 bg-[var(--peru-rojo)] text-[var(--carbon)] rounded-lg text-sm font-medium hover:bg-[var(--peru-rojo-hover)] transition-colors">Volver al Panel TTAIP</a>
+      </div>
+    } @else if (apelacion()) {
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card overflow-hidden">
+          <div class="border-b border-[var(--ceniza-claro)]">
+            <div class="flex">
+              <button (click)="cambiarTab('subsanacion')" class="px-6 py-3 text-sm font-medium transition-colors" [class]="activeTab() === 'subsanacion' ? 'border-b-2 border-[var(--peru-rojo)] text-[var(--peru-rojo)]' : 'text-[var(--niebla)] hover:text-[var(--humo)]'">Subsanacion</button>
+              <button (click)="cambiarTab('adjuntos')" class="px-6 py-3 text-sm font-medium transition-colors" [class]="activeTab() === 'adjuntos' ? 'border-b-2 border-[var(--peru-rojo)] text-[var(--peru-rojo)]' : 'text-[var(--niebla)] hover:text-[var(--humo)]'">Adjuntos</button>
             </div>
           </div>
-        }
 
-        @if (decision === 'improcedente') {
-          <div class="rounded-2xl border border-[#9ca3af] bg-[#f3f4f6] p-4">
-            <div class="flex items-start gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 text-[#6b7280]"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
-              <div>
-                <p class="font-semibold text-[#374151] m-0">Apelacion Improcedente</p>
-                <p class="mt-1 text-sm text-[#374151] m-0">
-                  La subsanacion presentada no cumple con los requisitos establecidos. El proceso se archiva y no continua a siguientes etapas.
-                </p>
-              </div>
-            </div>
-          </div>
-        }
+          <div class="p-6">
+            @if (activeTab() === 'subsanacion') {
+              <h3 class="text-base font-semibold text-[var(--carbon)] mb-4">Revision de Subsanacion</h3>
 
-        <div class="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
-          <div class="border-b border-[#e5e7eb] px-6 py-5">
-            <h2 class="text-[15px] font-medium m-0">Fundamentos de la Verificacion</h2>
-          </div>
-          <div class="px-6 py-5">
-            <label for="fundamentos" class="mb-2 block text-sm font-medium text-[#111827]">
-              Fundamentos <span class="text-red-600">*</span>
-            </label>
-            <textarea id="fundamentos" rows="5" [(ngModel)]="fundamentos" placeholder="Describa el analisis de la subsanacion y los fundamentos de la decision..." class="w-full rounded-xl border border-[#d1d5db] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#94a3b8] box-border"></textarea>
-            <p class="mt-2 text-xs text-[#6b7280] m-0">{{ fundamentos.length }} caracteres</p>
-          </div>
-        </div>
-
-        <button type="button" (click)="showPreview = !showPreview" class="flex w-full items-center justify-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 py-3 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb] cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
-          {{ showPreview ? 'Ocultar' : 'Previsualizar' }} PDF de 2da Calificacion
-        </button>
-
-        @if (showPreview) {
-          <div class="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
-            <div class="text-center">
-              <h3 class="text-lg font-bold m-0">TRIBUNAL DE TRANSPARENCIA Y ACCESO A LA INFORMACION PUBLICA</h3>
-              <h4 class="mt-2 font-semibold m-0">2DA CALIFICACION N° {{ expediente }}-C2</h4>
-            </div>
-            <div class="mt-6 space-y-4 text-sm leading-6 text-[#111827]">
-              <div>
-                <p class="font-bold m-0">EXPEDIENTE:</p>
-                <p class="m-0">{{ expediente }}</p>
-              </div>
-              <div>
-                <p class="font-bold m-0">VISTOS:</p>
-                <p class="m-0">La subsanacion presentada por el administrado dentro del plazo otorgado.</p>
-              </div>
-              <div>
-                <p class="font-bold m-0">CONSIDERANDOS:</p>
-                <p class="m-0">{{ fundamentos || '[Fundamentos de la verificacion...]' }}</p>
-              </div>
-              <div>
-                <p class="font-bold m-0">SE RESUELVE:</p>
-                <p class="m-0">Declarar <strong>{{ decision ? decision.toUpperCase() : '[DECISION]' }}</strong> el recurso de apelacion.</p>
-                @if (decision === 'admitido') {
-                  <p class="mt-2 m-0">La subsanacion presentada cumple con los requisitos. El expediente pasa a la etapa de Resolucion Final.</p>
-                }
-                @if (decision === 'improcedente') {
-                  <p class="mt-2 m-0">Archivese el expediente por no cumplir con los requisitos legales establecidos tras la subsanacion.</p>
+              <div class="bg-[var(--estado-azul-suave)] border border-[var(--estado-azul-borde)] rounded-lg p-4 mb-4">
+                <p class="font-semibold text-[var(--estado-azul)] text-sm mb-2">Observaciones de 1ra Calificacion:</p>
+                @if (getObservaciones().length > 0) {
+                  <ul class="text-sm text-[var(--estado-azul)] list-disc list-inside space-y-1">
+                    @for (obs of getObservaciones(); track obs) {
+                      <li>{{ obs }}</li>
+                    }
+                  </ul>
+                } @else {
+                  <p class="text-sm text-[var(--estado-azul)] italic">Sin observaciones registradas en backend.</p>
                 }
               </div>
+
+              <div class="mb-4">
+                <p class="font-semibold text-[var(--carbon)] text-sm mb-2">Fundamentos de Subsanacion:</p>
+                <div class="bg-[var(--estado-verde-suave)] border border-[var(--estado-verde-borde)] rounded-lg p-4">
+                  @if (apelacion()?.fundamentosSubsanacion) {
+                    <p class="text-sm text-[var(--estado-verde)] whitespace-pre-wrap">{{ apelacion()!.fundamentosSubsanacion }}</p>
+                  } @else if ((apelacion()?.fundamentos || '').includes('--- SUBSANACION ---')) {
+                    <p class="text-sm text-[var(--estado-verde)] whitespace-pre-wrap">{{ getSubsanacionFromFundamentos() }}</p>
+                  } @else {
+                    <p class="text-sm text-[var(--niebla)] italic">No se registraron fundamentos adicionales de subsanacion.</p>
+                  }
+                </div>
+              </div>
+
+              <div class="bg-[var(--nieve-calida)] rounded-lg p-3 mb-4">
+                <p class="text-xs text-[var(--humo)]">
+                  <strong>Fecha de solicitud de subsanacion:</strong> {{ apelacion()?.fechaSubsanacion | date:'dd/MM/yyyy' }}<br>
+                  <strong>Plazo otorgado:</strong> {{ apelacion()?.diasSubsanacion || 2 }} dias habiles
+                </p>
+              </div>
+
+              <div class="border-t pt-4 mt-4">
+                <p class="font-semibold text-[var(--carbon)] text-sm mb-2">Fundamentos Originales:</p>
+                <div class="bg-[var(--nieve-calida)] border border-[var(--ceniza-claro)] rounded-lg p-4">
+                  <p class="text-sm text-[var(--humo)] whitespace-pre-wrap">{{ getOriginalFundamentos() || 'No disponible en el estado actual del backend.' }}</p>
+                </div>
+              </div>
+            }
+
+            @if (activeTab() === 'adjuntos') {
+              <h3 class="text-base font-semibold text-[var(--carbon)] mb-4">Documentos Adjuntos</h3>
+              @if (apelacion()!.documentos && apelacion()!.documentos!.length > 0) {
+                <div class="space-y-2">
+                  @for (doc of apelacion()!.documentos; track doc.id) {
+                    <div class="flex items-center justify-between p-3 bg-[var(--nieve-calida)] rounded-lg">
+                      <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-[var(--niebla)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                        <div>
+                          <p class="font-medium text-sm text-[var(--carbon)]">{{ doc.nombreArchivo || 'Documento' }}</p>
+                          <p class="text-xs text-[var(--niebla)]">{{ doc.tipoArchivo || 'Tipo no especificado' }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="text-[var(--niebla)] text-center py-4">No hay documentos adjuntos registrados.</p>
+              }
+            }
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="card overflow-hidden">
+            <div class="border-b border-[var(--ceniza-claro)] px-6 py-4">
+              <h3 class="font-semibold text-[var(--carbon)]">Decision de 2da Calificacion</h3>
+              <p class="text-sm text-[var(--niebla)] mt-1">Seleccione la decision tras revisar la subsanacion</p>
+            </div>
+
+            <div class="p-6 space-y-4">
+              @if (error()) {
+                <div class="bg-[var(--peru-rojo-suave)] border border-[var(--estado-rojo-borde)] rounded-lg p-3">
+                  <p class="text-sm text-[var(--estado-rojo)]">{{ error() }}</p>
+                </div>
+              }
+              @if (mensaje()) {
+                <div class="bg-[var(--estado-verde-suave)] border border-[var(--estado-verde-borde)] rounded-lg p-3">
+                  <p class="text-sm text-[var(--estado-verde)]">{{ mensaje() }}</p>
+                </div>
+              }
+
+              <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'admitir' ? 'border-[var(--estado-verde)] bg-[var(--estado-verde-suave)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
+                <input type="radio" [(ngModel)]="decision" name="decision" value="admitir" class="sr-only">
+                <svg class="w-5 h-5 text-[var(--estado-verde)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div>
+                  <p class="font-semibold text-[var(--estado-verde)]">ADMITIDO A TRAMITE</p>
+                  <p class="text-xs text-[var(--niebla)]">Pasa a etapa de resolucion</p>
+                </div>
+              </label>
+
+              <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'improcedente' ? 'border-[var(--niebla)] bg-[var(--nieve)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
+                <input type="radio" [(ngModel)]="decision" name="decision" value="improcedente" class="sr-only">
+                <svg class="w-5 h-5 text-[var(--niebla)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div>
+                  <p class="font-semibold text-[var(--humo)]">IMPROCEDENTE</p>
+                  <p class="text-xs text-[var(--niebla)]">No cumple requisitos tras la subsanacion</p>
+                </div>
+              </label>
             </div>
           </div>
-        }
 
-        <button type="button" (click)="handleEmitir()" [disabled]="!decision || !fundamentos.trim()" class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#6b7280] px-4 py-4 text-sm font-medium text-white shadow-md transition hover:bg-[#4b5563] disabled:cursor-not-allowed disabled:opacity-50 border-0 cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          Emitir 2da Calificacion
-        </button>
+          <div class="card overflow-hidden">
+            <div class="border-b border-[var(--ceniza-claro)] px-6 py-4">
+              <h3 class="font-semibold text-[var(--carbon)]">Fundamentos</h3>
+            </div>
+            <div class="p-6">
+              <label class="block text-sm font-medium text-[var(--humo)] mb-1">Fundamentos <span class="text-[var(--peru-rojo)]">*</span></label>
+              <textarea [(ngModel)]="fundamentos" name="fundamentos" rows="6" class="w-full px-4 py-3 border border-[var(--ceniza-claro)] rounded-xl focus:ring-2 focus:ring-[var(--peru-rojo)]/20 focus:border-[var(--peru-rojo)] outline-none text-sm" placeholder="Fundamente su decision sobre la subsanacion presentada..."></textarea>
+            </div>
+          </div>
+
+          <div class="flex gap-4">
+            <button (click)="enviarCalificacion()" [disabled]="loading() || !decision" class="flex-1 py-3 bg-[var(--peru-rojo)] hover:bg-[var(--peru-rojo-hover)] text-[var(--carbon)] font-medium rounded-xl disabled:opacity-50 flex items-center justify-center gap-2 transition-colors">
+              @if (loading()) {
+                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Procesando...
+              } @else {
+                Registrar Decision
+              }
+            </button>
+            <a routerLink="/ttaip" class="px-6 py-3 border border-[var(--ceniza-claro)] text-[var(--humo)] rounded-xl hover:bg-[var(--nieve)] transition-colors text-center">Cancelar</a>
+          </div>
+        </div>
       </div>
-    </div>
+    }
   </div>
 </div>

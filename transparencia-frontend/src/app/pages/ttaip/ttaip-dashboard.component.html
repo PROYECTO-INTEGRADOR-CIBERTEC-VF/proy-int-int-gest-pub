@@ -1,105 +1,157 @@
-<div class="min-h-screen bg-slate-50 text-slate-800">
-  <div class="bg-gradient-to-r from-[#920f24] via-[#b4172f] to-[#d63a4f] text-white">
-    <div class="mx-auto max-w-7xl px-6 py-10">
-      <p class="text-xs uppercase tracking-[0.2em] text-white/80">HU-05 · Primera Calificación</p>
-      <h2 class="mt-2 text-3xl font-semibold tracking-tight">Dashboard TTAIP</h2>
-      <p class="mt-2 text-sm text-white/85">Bandeja con pestañas y contadores para gestionar apelaciones por etapa.</p>
+<div class="saip-page min-h-screen">
+  <div class="bg-gradient-peru-hero pt-28 pb-14 px-4 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-[400px] h-[400px] rounded-full border border-[var(--ceniza-claro)]"></div>
+    <div class="max-w-7xl mx-auto relative z-10">
+      <div class="flex flex-wrap items-start justify-between gap-3 mb-1">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-black/[0.03] backdrop-blur-md rounded-xl flex items-center justify-center border border-white/[0.08]">
+            <svg class="w-6 h-6 text-[var(--carbon)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M3 6l3 1m0 0l-3 9a5 5 0 006 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5 5 0 006 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
+          </div>
+          <div class="text-[var(--carbon)]">
+            <p class="text-[var(--carbon)]/40 text-sm font-medium">Panel del Tribunal</p>
+            <h1 class="text-2xl md:text-3xl tracking-tight font-extrabold">Panel TTAIP</h1>
+            <p class="text-[var(--carbon)]/50 text-sm">Tribunal de Transparencia y Acceso a la Informacion Publica</p>
+          </div>
+        </div>
+        <button type="button" class="btn-outline h-10 px-4 text-sm" (click)="cerrarSesion()">
+          Cerrar sesion
+        </button>
+      </div>
     </div>
   </div>
 
-  <div class="mx-auto max-w-7xl px-6 py-8">
-    <div class="grid grid-cols-1 gap-3 md:grid-cols-5">
-      <button
-        *ngFor="let tab of tabs"
-        type="button"
-        (click)="seleccionarTab(tab.id)"
-        class="rounded-xl border px-4 py-3 text-left transition-all duration-200"
-        [ngClass]="tabActivo() === tab.id ? 'border-[#b4172f] bg-[#fff6f8] shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'">
-        <p class="text-sm font-medium text-slate-700">{{ tab.label }}</p>
-        <p class="mt-1 text-2xl font-semibold text-[#b4172f]">{{ obtenerConteo(tab.id) }}</p>
+  <div class="max-w-7xl mx-auto px-4 -mt-6 pb-16 relative z-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+      <button (click)="cargarPendientes()" class="metric-card metric-card-warning text-left transition-all" [style.box-shadow]="filtroActual() === 'pendientes' ? '0 0 0 2px var(--estado-ambar)' : ''">
+        <div class="icon-container icon-container-sm icon-container-warning rounded-lg mb-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+        <div class="metric-value text-[var(--estado-ambar)]">{{ pendientesAdmision() }}</div>
+        <div class="metric-label">Pendientes</div>
+      </button>
+
+      <button (click)="cargarEnAnalisis()" class="metric-card metric-card-info text-left transition-all" [style.box-shadow]="filtroActual() === 'analisis' ? '0 0 0 2px var(--estado-azul)' : ''">
+        <div class="icon-container icon-container-sm icon-container-info rounded-lg mb-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+        <div class="metric-value text-[var(--estado-azul)]">{{ enProceso() }}</div>
+        <div class="metric-label">En Proceso</div>
+      </button>
+
+      <button (click)="cargarSubsanacion()" class="metric-card metric-card-primary text-left transition-all" [style.box-shadow]="filtroActual() === 'subsanacion' ? '0 0 0 2px var(--peru-rojo)' : ''">
+        <div class="icon-container icon-container-sm icon-container-primary rounded-lg mb-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div>
+        <div class="metric-value text-[var(--peru-rojo)]">{{ enSubsanacion() }}</div>
+        <div class="metric-label">En Subsanacion</div>
+      </button>
+
+      <button (click)="cargarSegundaCalificacion()" class="metric-card metric-card-oro text-left transition-all" [style.box-shadow]="filtroActual() === 'segunda' ? '0 0 0 2px var(--peru-oro-profundo)' : ''">
+        <div class="icon-container icon-container-sm icon-container-oro rounded-lg mb-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+        <div class="metric-value text-[var(--peru-oro-profundo)]">{{ enSegundaCalificacion() }}</div>
+        <div class="metric-label">2da Calificacion</div>
+      </button>
+
+      <button (click)="cargarResueltas()" class="metric-card metric-card-success text-left transition-all" [style.box-shadow]="filtroActual() === 'resueltas' ? '0 0 0 2px var(--estado-verde)' : ''">
+        <div class="icon-container icon-container-sm icon-container-success rounded-lg mb-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+        <div class="metric-value text-[var(--estado-verde)]">{{ resueltos() }}</div>
+        <div class="metric-label">Resueltas</div>
       </button>
     </div>
 
-    <div class="mt-3 text-xs text-slate-500">Carga lazy por pestaña: los datos se cargan al abrir cada pestaña por primera vez.</div>
+    <div class="card overflow-hidden mb-6 border-t-4 border-t-[var(--estado-azul)]">
+      <div class="p-5">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="icon-container icon-container-sm icon-container-info rounded-lg"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <h3 class="text-[var(--carbon)] font-semibold">Flujo del Proceso TTAIP</h3>
+        </div>
+        <div class="grid md:grid-cols-4 gap-3">
+          <div class="bg-[var(--nieve)] p-4 rounded-xl border border-[var(--ceniza-claro)]">
+            <div class="flex items-center gap-2 mb-1.5">
+              <div class="w-6 h-6 rounded-lg bg-[var(--estado-azul-suave)] flex items-center justify-center"><span class="text-[10px] text-[var(--estado-azul)] font-bold">1</span></div>
+              <span class="text-sm text-[var(--carbon)] font-medium">Primera Calificacion</span>
+            </div>
+            <p class="text-xs text-[var(--niebla)]">Se evalua admisibilidad, subsanacion o improcedencia.</p>
+          </div>
+          <div class="bg-[var(--nieve)] p-4 rounded-xl border border-[var(--ceniza-claro)]">
+            <div class="flex items-center gap-2 mb-1.5">
+              <div class="w-6 h-6 rounded-lg bg-[var(--estado-ambar-suave)] flex items-center justify-center"><span class="text-[10px] text-[var(--estado-ambar)] font-bold">2</span></div>
+              <span class="text-sm text-[var(--carbon)] font-medium">Subsanacion</span>
+            </div>
+            <p class="text-xs text-[var(--niebla)]">El ciudadano completa requisitos observados por el tribunal.</p>
+          </div>
+          <div class="bg-[var(--nieve)] p-4 rounded-xl border border-[var(--ceniza-claro)]">
+            <div class="flex items-center gap-2 mb-1.5">
+              <div class="w-6 h-6 rounded-lg bg-[var(--peru-rojo-suave)] flex items-center justify-center"><span class="text-[10px] text-[var(--peru-rojo)] font-bold">3</span></div>
+              <span class="text-sm text-[var(--carbon)] font-medium">Segunda Calificacion</span>
+            </div>
+            <p class="text-xs text-[var(--niebla)]">Se determina admision a tramite o improcedencia final.</p>
+          </div>
+          <div class="bg-[var(--nieve)] p-4 rounded-xl border border-[var(--ceniza-claro)]">
+            <div class="flex items-center gap-2 mb-1.5">
+              <div class="w-6 h-6 rounded-lg bg-[var(--estado-verde-suave)] flex items-center justify-center"><span class="text-[10px] text-[var(--estado-verde)] font-bold">4</span></div>
+              <span class="text-sm text-[var(--carbon)] font-medium">Resolucion</span>
+            </div>
+            <p class="text-xs text-[var(--niebla)]">Se emite la decision definitiva del expediente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div class="border-b border-slate-200 px-6 py-4">
-        <h3 class="text-sm font-semibold text-slate-700">Expedientes en {{ obtenerNombreTabActual() }}</h3>
+    <div class="card overflow-hidden">
+      <div class="border-b border-[var(--ceniza-claro)] px-5 py-4 flex items-center justify-between">
+        <h3 class="text-[var(--carbon)] font-semibold flex items-center gap-2">
+          <div class="icon-container icon-container-sm icon-container-primary rounded-lg"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M3 6l3 1m0 0l-3 9a5 5 0 006 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5 5 0 006 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg></div>
+          Apelaciones en Tramite
+        </h3>
       </div>
 
-      <div *ngIf="cargando()" class="px-6 py-12 text-center text-sm text-slate-500">
-        Cargando información...
-      </div>
+      @if (error()) {
+        <div class="alert alert-error m-5"><p class="text-sm">{{ error() }}</p></div>
+      }
 
-      <div *ngIf="!cargando() && apelaciones().length === 0" class="px-6 py-12 text-center text-sm text-slate-500">
-        No hay apelaciones para esta pestaña.
-      </div>
-
-      <div *ngIf="!cargando() && apelaciones().length > 0" class="overflow-x-auto">
-        <table class="w-full table-fixed divide-y divide-gray-300 text-left">
-          <thead class="bg-gray-50">
-          <tr>
-            <th scope="col" class="w-2/12 px-4 py-3 text-sm font-semibold text-gray-900 truncate">Expediente</th>
-            <th scope="col" class="w-3/12 px-4 py-3 text-sm font-semibold text-gray-900 truncate">Ciudadano</th>
-            <th scope="col" class="w-2/12 px-4 py-3 text-sm font-semibold text-gray-900 truncate">Fecha</th>
-            <th scope="col" class="w-2/12 px-4 py-3 text-sm font-semibold text-gray-900 truncate">Estado</th>
-            <th scope="col" class="w-2/12 px-4 py-3 text-sm font-semibold text-gray-900 truncate">Días Hábiles</th>
-            <th scope="col" class="w-2/12 px-4 py-3 text-sm font-semibold text-gray-900 text-center truncate">Acciones</th>
-          </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-          <tr *ngFor="let ap of apelaciones()" class="hover:bg-gray-50 transition-colors">
-
-            <td class="px-4 py-4 text-sm text-gray-700 font-mono truncate">{{ ap.expediente }}</td>
-            <td class="px-4 py-4 text-sm text-gray-700 truncate">{{ ap.ciudadano }}</td>
-            <td class="px-4 py-4 text-sm text-gray-700 truncate">{{ ap.fecha }}</td>
-
-            <td class="px-4 py-4 text-sm text-gray-700">
-          <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
-                [ngClass]="{
-                  'bg-yellow-50 text-yellow-800 ring-yellow-600/20': ap.estado === 'EN_CALIFICACION_2',
-                  'bg-blue-50 text-blue-800 ring-blue-600/20': ap.estado === 'EN_RESOLUCION',
-                  'bg-green-50 text-green-800 ring-green-600/20': ap.estado === 'RESUELTO',
-                  'bg-gray-50 text-gray-600 ring-gray-500/10': ap.estado !== 'EN_CALIFICACION_2' && ap.estado !== 'EN_RESOLUCION' && ap.estado !== 'RESUELTO'
-                }">
-            {{ ap.estado }}
-          </span>
-            </td>
-
-            <td class="px-4 py-4 text-sm text-gray-700 truncate">
-          <span class="flex items-center gap-1" [ngClass]="{'text-green-700': ap.diasHabiles === 'Completado'}">
-            <svg *ngIf="ap.diasHabiles !== 'Completado'" class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            {{ ap.diasHabiles }}
-          </span>
-            </td>
-
-            <td class="px-4 py-4 text-sm font-medium flex justify-center gap-2">
-
-              <a *ngIf="ap.estado === 'EN_CALIFICACION_2'"
-                 [routerLink]="['/ttaip/segunda-calificacion', ap.expediente]"
-                 class="text-[#A72525] hover:text-red-900 font-bold no-underline cursor-pointer flex items-center gap-1">
-                Evaluar
-              </a>
-
-              <a *ngIf="ap.estado === 'EN_RESOLUCION'"
-                 [routerLink]="['/ttaip/resolver', ap.expediente]"
-                 class="bg-[#A72525] text-white px-3 py-1.5 rounded text-xs hover:bg-red-800 flex items-center gap-1 font-medium transition-colors cursor-pointer shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                Resolver
-              </a>
-
-              <a *ngIf="ap.estado === 'RESUELTO'"
-                 [routerLink]="['/ttaip/resolucion', ap.expediente]"
-                 class="text-green-600 hover:text-green-800 font-bold no-underline cursor-pointer flex items-center gap-1">
-                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                Ver Resolución
-              </a>
-
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
+      @if (loading()) {
+        <div class="text-center py-16"><div class="spinner spinner-lg mx-auto"></div><p class="mt-4 text-sm text-[var(--niebla)]">Cargando apelaciones...</p></div>
+      } @else if (apelaciones().length === 0) {
+        <div class="text-center py-16">
+          <div class="w-14 h-14 bg-[var(--nieve)] rounded-2xl flex items-center justify-center mx-auto mb-4"><svg class="w-7 h-7 text-[var(--niebla)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+          <h3 class="text-[var(--carbon)] mb-1.5 font-semibold">No se encontraron apelaciones</h3>
+          <p class="text-sm text-[var(--niebla)]">Selecciona otra categoria para buscar</p>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>N. Expediente</th>
+                <th>Ciudadano</th>
+                <th>Expediente SAIP</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+                <th class="text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (apelacion of apelaciones(); track apelacion.expediente) {
+                <tr>
+                  <td><span class="font-expediente text-sm text-[var(--carbon)]">{{ apelacion.expediente }}</span></td>
+                  <td class="text-sm text-[var(--carbon)]">{{ apelacion.ciudadanoNombre || 'Ciudadano' }}</td>
+                  <td class="text-sm text-[var(--humo)]">{{ getSolicitudReferencia(apelacion) }}</td>
+                  <td><span [class]="'badge ' + getEstadoBadgeClass(apelacion.estado)">{{ apelacion.estado }}</span></td>
+                  <td class="text-sm text-[var(--niebla)]">{{ apelacion.fechaApelacion | date:'dd/MM/yyyy' }}</td>
+                  <td class="text-right">
+                    @if (apelacion.estado === 'PENDIENTE_ELEVACION' || apelacion.estado === 'EN_CALIFICACION_1') {
+                      <a [routerLink]="['/ttaip/calificar', apelacion.expediente]" class="btn-primary h-8 px-3 text-xs gap-1">Calificar</a>
+                    } @else if (apelacion.estado === 'EN_CALIFICACION_2') {
+                      <a [routerLink]="['/ttaip/segunda-calificacion', apelacion.expediente]" class="h-8 px-3 rounded-lg inline-flex items-center gap-1 bg-[var(--estado-ambar)] hover:bg-[var(--peru-oro-profundo)] text-[var(--carbon)] text-xs font-medium transition-colors">2da Calificacion</a>
+                    } @else if (apelacion.estado === 'EN_RESOLUCION' || apelacion.estado === 'NOTIFICACION_SEGUNDA_CALIFICACION') {
+                      <a [routerLink]="['/ttaip/resolver', apelacion.expediente]" class="h-8 px-3 rounded-lg inline-flex items-center gap-1 bg-[var(--peru-rojo)] hover:bg-[var(--peru-rojo-hover)] text-white text-xs font-medium transition-colors">Resolver</a>
+                    } @else if (apelacion.estado.startsWith('RESUELTO') || apelacion.estado === 'TENER_POR_NO_PRESENTADO' || apelacion.estado.startsWith('CONCLUSION')) {
+                      <a [routerLink]="['/ttaip/resolucion', apelacion.expediente]" class="text-[var(--peru-rojo)] hover:text-[var(--peru-rojo-hover)] text-xs font-medium inline-flex items-center gap-1 transition-colors">Ver Resolucion</a>
+                    } @else {
+                      <span class="badge badge-muted text-xs">Sin accion</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
     </div>
   </div>
 </div>

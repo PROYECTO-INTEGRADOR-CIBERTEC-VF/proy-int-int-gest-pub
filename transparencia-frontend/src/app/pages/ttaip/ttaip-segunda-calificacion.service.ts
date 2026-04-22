@@ -1,29 +1,30 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
+interface CalificacionRequest {
+  fundamentos: string;
+  miembroId?: number;
+  observaciones?: string;
+  diasSubsanacion?: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class TtaipSegundaCalificacionService {
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = 'http://localhost:8080/api/ttaip/calificacion';
 
-  private apiUrl = 'http://localhost:8080/api/ttaip/segunda-calificacion';
-
-  constructor(private http: HttpClient) { }
-
-  admitirSegundaCalificacion(expediente: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${expediente}/admitir`, {});
+  admitirSegundaCalificacion(apelacionId: number, data: CalificacionRequest): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${apelacionId}/admitir`, data);
   }
 
-  rechazarSegundaCalificacion(expediente: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${expediente}/rechazar`, {});
+  rechazarSegundaCalificacion(apelacionId: number, data: CalificacionRequest): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${apelacionId}/inadmitir`, data);
   }
 
-  notificar(expediente: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${expediente}/notificar`, {});
-  }
-
-  declararTenerPorNoPresentado(expediente: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${expediente}/no-presentado`, {});
+  declararTenerPorNoPresentado(apelacionId: number, data: CalificacionRequest): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${apelacionId}/no-presentado`, data);
   }
 }

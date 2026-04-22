@@ -9,9 +9,26 @@ describe('TtaipResolverComponent - FE-03 (Trazabilidad y Decisiones)', () => {
   let fixture: ComponentFixture<TtaipResolverComponent>;
 
   beforeEach(async () => {
-
     const ttaipMock = {
-      declararFundado: () => { return { subscribe: () => {} }; }
+      getApelacionPorExpediente: () => {
+        return {
+          subscribe: ({ next }: { next: (value: any) => void }) => {
+            next({
+              idApelacion: 10,
+              expediente: 'EXP-2026-TEST',
+              estado: 'EN_RESOLUCION',
+              ciudadanoNombre: 'Ciudadano Prueba',
+            });
+          }
+        };
+      },
+      declararFundado: () => ({ subscribe: () => {} }),
+      declararFundadoEnParte: () => ({ subscribe: () => {} }),
+      declararInfundado: () => ({ subscribe: () => {} }),
+      declararInfundadoEnParte: () => ({ subscribe: () => {} }),
+      declararImprocedente: () => ({ subscribe: () => {} }),
+      declararSustraccionMateria: () => ({ subscribe: () => {} }),
+      declararDesistimiento: () => ({ subscribe: () => {} }),
     };
 
     const routerMock = {
@@ -36,13 +53,16 @@ describe('TtaipResolverComponent - FE-03 (Trazabilidad y Decisiones)', () => {
   });
 
   // PRUEBA 1: COMBOBOX DE DECISIONES
-  it('debe permitir seleccionar todas las opciones de decisiones en el combobox', () => {
+  it('debe permitir seleccionar todas las opciones de decisiones', () => {
     const decisionesEsperadas = [
-      'FUNDADO', 'FUNDADO_PARTE', 'INFUNDADO', 'INFUNDADO_PARTE',
-      'IMPROCEDENTE', 'SUSTRACCION', 'DESISTIMIENTO'
+      'fundado',
+      'fundado_en_parte',
+      'infundado',
+      'infundado_en_parte',
+      'improcedente',
+      'sustraccion_materia',
+      'desistimiento',
     ];
-
-    expect(component.opcionesFallo.length).toBe(7);
 
     decisionesEsperadas.forEach(decision => {
       component.decision = decision;
@@ -50,9 +70,8 @@ describe('TtaipResolverComponent - FE-03 (Trazabilidad y Decisiones)', () => {
     });
   });
 
-  // PRUEBA 2: DESCARGA DE RESOLUCIÓN EN TRAZABILIDAD
-  it('debe tener la función de descarga de resolución final implementada', () => {
-
-    expect(typeof component.descargarResolucionFinal).toBe('function');
+  // PRUEBA 2: FLUJO PRINCIPAL DISPONIBLE
+  it('debe tener la funcion enviarResolucion implementada', () => {
+    expect(typeof component.enviarResolucion).toBe('function');
   });
 });

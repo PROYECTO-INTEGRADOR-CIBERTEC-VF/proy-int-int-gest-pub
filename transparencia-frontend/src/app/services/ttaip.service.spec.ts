@@ -7,13 +7,13 @@ describe('TtaipService', () => {
   let httpMock: HttpTestingController;
 
   // Variables de las pruebas (HU-08)
-  const mockExpediente = 'EXP-2026-TEST';
+  const mockApelacionId = 10;
   const mockData = {
     decision: '',
     fundamentos: 'Estos son fundamentos de prueba obligatorios',
     iniciarProcesoDisciplinario: false
   };
-  const baseUrl = '/api/ttaip/resolucion';
+  const baseUrl = 'http://localhost:8080/api/ttaip/resolucion';
 
   // Variables de pruebas de develop
   const apiUrl = 'http://localhost:8080/api/ttaip';
@@ -80,10 +80,10 @@ describe('TtaipService', () => {
 
   it('debe enviar la decisión FUNDADO correctamente', () => {
     mockData.decision = 'FUNDADO';
-    service.declararFundado(mockExpediente, mockData).subscribe(res => {
+    service.declararFundado(mockApelacionId, mockData).subscribe(res => {
       expect(res).toBeTruthy();
     });
-    const req = httpMock.expectOne(`${baseUrl}/${mockExpediente}/fundado`);
+    const req = httpMock.expectOne(`${baseUrl}/${mockApelacionId}/fundado`);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(mockData);
     req.flush({ success: true });
@@ -91,10 +91,10 @@ describe('TtaipService', () => {
 
   it('debe enviar la decisión INFUNDADO correctamente', () => {
     mockData.decision = 'INFUNDADO';
-    service.declararInfundado(mockExpediente, mockData).subscribe(res => {
+    service.declararInfundado(mockApelacionId, mockData).subscribe(res => {
       expect(res).toBeTruthy();
     });
-    const req = httpMock.expectOne(`${baseUrl}/${mockExpediente}/infundado`);
+    const req = httpMock.expectOne(`${baseUrl}/${mockApelacionId}/infundado`);
     expect(req.request.method).toBe('POST');
     req.flush({ success: true });
   });
@@ -102,10 +102,10 @@ describe('TtaipService', () => {
   it('debe enviar la decisión FUNDADO EN PARTE correctamente', () => {
     mockData.decision = 'FUNDADO_PARTE';
     mockData.iniciarProcesoDisciplinario = true;
-    service.declararFundadoEnParte(mockExpediente, mockData).subscribe(res => {
+    service.declararFundadoEnParte(mockApelacionId, mockData).subscribe(res => {
       expect(res).toBeTruthy();
     });
-    const req = httpMock.expectOne(`${baseUrl}/${mockExpediente}/fundado-en-parte`);
+    const req = httpMock.expectOne(`${baseUrl}/${mockApelacionId}/fundado-en-parte`);
     expect(req.request.method).toBe('POST');
     expect(req.request.body.iniciarProcesoDisciplinario).toBe(true);
     req.flush({ success: true });
@@ -113,50 +113,50 @@ describe('TtaipService', () => {
 
   it('debe enviar la decisión INFUNDADO EN PARTE correctamente', () => {
     mockData.decision = 'INFUNDADO_PARTE';
-    service.declararInfundadoEnParte(mockExpediente, mockData).subscribe(res => {
+    service.declararInfundadoEnParte(mockApelacionId, mockData).subscribe(res => {
       expect(res).toBeTruthy();
     });
-    const req = httpMock.expectOne(`${baseUrl}/${mockExpediente}/infundado-en-parte`);
+    const req = httpMock.expectOne(`${baseUrl}/${mockApelacionId}/infundado-en-parte`);
     expect(req.request.method).toBe('POST');
     req.flush({ success: true });
   });
 
   it('debe enviar la decisión IMPROCEDENTE correctamente', () => {
     mockData.decision = 'IMPROCEDENTE';
-    service.declararImprocedente(mockExpediente, mockData).subscribe(res => {
+    service.declararImprocedente(mockApelacionId, mockData).subscribe(res => {
       expect(res).toBeTruthy();
     });
-    const req = httpMock.expectOne(`${baseUrl}/${mockExpediente}/improcedente`);
+    const req = httpMock.expectOne(`${baseUrl}/${mockApelacionId}/improcedente`);
     expect(req.request.method).toBe('POST');
     req.flush({ success: true });
   });
 
   it('debe enviar la decisión CONCLUSIÓN POR SUSTRACCIÓN DE MATERIA correctamente', () => {
     mockData.decision = 'SUSTRACCION';
-    service.declararSustraccionMateria(mockExpediente, mockData).subscribe(res => {
+    service.declararSustraccionMateria(mockApelacionId, mockData).subscribe(res => {
       expect(res).toBeTruthy();
     });
-    const req = httpMock.expectOne(`${baseUrl}/${mockExpediente}/sustraccion-materia`);
+    const req = httpMock.expectOne(`${baseUrl}/${mockApelacionId}/sustraccion-materia`);
     expect(req.request.method).toBe('POST');
     req.flush({ success: true });
   });
 
   it('debe enviar la decisión CONCLUSIÓN POR DESISTIMIENTO correctamente', () => {
     mockData.decision = 'DESISTIMIENTO';
-    service.declararDesistimiento(mockExpediente, mockData).subscribe(res => {
+    service.declararDesistimiento(mockApelacionId, mockData).subscribe(res => {
       expect(res).toBeTruthy();
     });
-    const req = httpMock.expectOne(`${baseUrl}/${mockExpediente}/desistimiento`);
+    const req = httpMock.expectOne(`${baseUrl}/${mockApelacionId}/desistimiento`);
     expect(req.request.method).toBe('POST');
     req.flush({ success: true });
   });
 
   it('debe enviar la decisión NO PRESENTADO correctamente', () => {
     mockData.decision = 'NO_PRESENTADO';
-    service.declararNoPresentado(mockExpediente, mockData).subscribe(res => {
+    service.declararNoPresentado(mockApelacionId, mockData).subscribe(res => {
       expect(res).toBeTruthy();
     });
-    const req = httpMock.expectOne(`${baseUrl}/${mockExpediente}/no-presentado`);
+    const req = httpMock.expectOne(`${baseUrl}/${mockApelacionId}/no-presentado`);
     expect(req.request.method).toBe('POST');
     req.flush({ success: true });
   });

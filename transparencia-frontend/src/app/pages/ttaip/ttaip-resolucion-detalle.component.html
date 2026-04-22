@@ -1,181 +1,197 @@
-<div class="min-h-screen bg-[#f8fafc] p-6 md:p-8">
-  <div class="max-w-6xl mx-auto">
+<div class="saip-page min-h-screen bg-[var(--nieve)]">
+  <div class="bg-gradient-peru-hero pt-28 pb-10 px-4 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-[400px] h-[400px] rounded-full border border-[var(--ceniza-claro)]"></div>
+    <div class="max-w-7xl mx-auto">
+      <a routerLink="/ttaip" class="flex items-center gap-1.5 text-[var(--carbon)]/70 hover:text-[var(--carbon)] text-sm mb-4 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="m12 19-7-7 7-7"/><path stroke-width="2" d="M19 12H5"/></svg>
+        Volver al Panel TTAIP
+      </a>
 
-    <button (click)="volver()" class="mb-6 flex items-center gap-2 text-sm text-slate-600 transition-colors hover:text-slate-900">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-      Volver al Panel
-    </button>
-
-    <div class="mb-6">
-      <div class="flex items-center justify-between">
-        <h1 class="text-3xl font-normal text-slate-900">Detalle de Resolución Final</h1>
-        <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700 border border-green-200">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-          CASO CONCLUIDO
-        </span>
-      </div>
-      <p class="mt-2 text-slate-500">Expediente: {{ expediente }}</p>
-    </div>
-
-    <div *ngIf="aplicaProcesoDisciplinario" class="mb-8 rounded-2xl border border-red-100 bg-red-50/50 p-5 flex items-start gap-3">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-500 shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <div>
-        <h3 class="font-medium text-slate-800">Proceso Disciplinario Iniciado</h3>
-        <p class="mt-1 text-sm text-slate-600">
-          Al declararse FUNDADO y comprobarse negligencia por parte de la entidad, el TTAIP ha notificado a la Secretaría Técnica de las Autoridades del Procedimiento Administrativo Disciplinario (PAD) para que inicie las acciones correspondientes contra los funcionarios responsables.
-        </p>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-3 mb-8">
-      <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-slate-50 border border-slate-100">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-        </div>
-        <div class="text-xl font-medium text-slate-800">SAIP-2025-00512</div>
-        <p class="mt-1 text-sm text-slate-500">Expediente SAIP Inicial</p>
-      </div>
-
-      <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-slate-50 border border-slate-100">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-violet-600"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-        </div>
-        <div class="text-xl font-medium text-slate-800">05/09/2025</div>
-        <p class="mt-1 text-sm text-slate-500">Fecha de Apelación</p>
-      </div>
-
-      <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-slate-50 border border-slate-100">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-600"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>
-        </div>
-        <div class="text-xl font-medium text-slate-800 truncate">Ministerio de Educación</div>
-        <p class="mt-1 text-sm text-slate-500">Entidad Demandada</p>
-      </div>
-    </div>
-
-    <div class="rounded-2xl border border-slate-200 bg-white shadow-sm mb-8">
-      <div class="p-6">
-        <h2 class="text-lg font-medium text-slate-800 mb-6">Línea de Tiempo del Proceso</h2>
-        <div class="space-y-6">
-          <div *ngFor="let item of timeline; let i = index; let isLast = last" class="relative pl-8">
-            <span *ngIf="!isLast" class="absolute left-[9px] top-6 h-full w-px bg-slate-200"></span>
-            <span class="absolute left-0 top-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-slate-200 bg-white">
-              <span class="h-2 w-2 rounded-full" [ngClass]="item.status === 'current' ? 'bg-slate-800' : 'bg-slate-400'"></span>
+      @if (apelacion()) {
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/15 backdrop-blur-sm rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-[var(--carbon)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <div class="text-[var(--carbon)]">
+              <h1 class="text-2xl md:text-3xl">Expediente {{ apelacion()!.expediente }}</h1>
+              <p class="text-[var(--carbon)]/70">{{ apelacion()!.ciudadanoNombre || 'Ciudadano no identificado' }}</p>
+            </div>
+          </div>
+          <div>
+            <span class="px-3 py-1.5 text-sm font-semibold rounded-full" [class]="getResultadoClass(apelacion()!.resultado)">
+              {{ apelacion()!.resultado || apelacion()!.estado }}
             </span>
-            <div class="flex items-center gap-2">
-              <h3 class="text-base font-medium text-slate-800">{{ item.title }}</h3>
-              <span class="text-sm text-slate-500">{{ item.datetime }}</span>
-            </div>
-            <p class="mt-1 text-sm text-slate-600">{{ item.description }}</p>
           </div>
         </div>
-      </div>
-    </div>
-
-    <div class="w-full">
-      <div class="flex gap-4 mb-6">
-        <button (click)="activeTab = 'apelacion'"
-                [ngClass]="activeTab === 'apelacion' ? 'bg-white border-slate-200 shadow-sm text-slate-800' : 'bg-transparent border-transparent text-slate-500 hover:bg-slate-200/50'"
-                class="px-8 py-2.5 rounded-xl border text-sm font-medium transition-all">
-          Detalle del Caso
-        </button>
-        <button (click)="activeTab = 'adjuntos'"
-                [ngClass]="activeTab === 'adjuntos' ? 'bg-white border-slate-200 shadow-sm text-slate-800' : 'bg-transparent border-transparent text-slate-500 hover:bg-slate-200/50'"
-                class="px-8 py-2.5 rounded-xl border text-sm font-medium transition-all">
-          Documentos Adjuntos
-        </button>
-      </div>
-
-      <div *ngIf="activeTab === 'apelacion'" class="rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div class="p-6 space-y-8">
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <p class="text-sm text-slate-500 mb-1">Ciudadano Apelante</p>
-              <p class="font-medium text-slate-800">Juan Carlos Pérez Mendoza</p>
-            </div>
-            <div>
-              <p class="text-sm text-slate-500 mb-1">DNI</p>
-              <p class="font-medium text-slate-800">45678912</p>
-            </div>
-            <div>
-              <p class="text-sm text-slate-500 mb-1">Correo Electrónico</p>
-              <p class="font-medium text-slate-800">juan.perez&#64;example.com</p>
-            </div>
-            <div>
-              <p class="text-sm text-slate-500 mb-1">Teléfono</p>
-              <p class="font-medium text-slate-800">+51 987 654 321</p>
-            </div>
-          </div>
-
-          <div class="border-t border-slate-100 pt-6">
-            <p class="text-sm text-slate-500 mb-2">Asunto SAIP Original</p>
-            <p class="text-lg font-medium text-slate-800">Información sobre presupuesto de infraestructura educativa 2025</p>
-          </div>
-
-          <div class="border-t border-slate-100 pt-6">
-            <p class="text-sm text-slate-500 mb-3">Causal de Denegatoria (Entidad)</p>
-            <div class="rounded-xl border border-red-100 bg-red-50/50 p-4">
-              <p class="font-medium text-red-800">Información Confidencial</p>
-              <p class="mt-1 text-sm text-red-600/90">
-                Artículo 17° de la Ley N° 27806 - La información relacionada con proyectos en etapa de
-                planificación que no han sido oficialmente aprobados se encuentra exceptuada del acceso público.
-              </p>
-            </div>
-          </div>
-
-          <div class="border-t border-slate-100 pt-6">
-            <p class="text-sm text-slate-500 mb-3">Fundamentos de la Apelación</p>
-            <div class="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
-              <p class="text-sm text-blue-900/80 leading-relaxed">
-                Considero que la denegatoria no está debidamente fundamentada. El presupuesto 2025 ya fue
-                aprobado mediante Ley de Presupuesto Público, por lo que no se encuentra en etapa de
-                planificación. La información solicitada es pública y de interés ciudadano para fiscalización.
-              </p>
-            </div>
-          </div>
-
-          <div class="border-t border-slate-100 pt-6">
-            <p class="text-sm text-slate-500 mb-3">Resolución Final</p>
-            <div class="rounded-xl border border-green-200 bg-green-50 p-4 flex gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 shrink-0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-              <div>
-                <p class="font-medium text-green-800">Apelación Declarada FUNDADA</p>
-                <p class="mt-1 text-sm text-green-700">
-                  Tras la 1ra y 2da calificación, el tribunal determina que la información solicitada es de carácter público. Se revoca la denegatoria de la entidad y se le otorga un plazo improrrogable de 10 días hábiles para la entrega de la misma al ciudadano.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="border-t border-slate-100 pt-6">
-            <button class="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-              Descargar Resolución Final (PDF)
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div *ngIf="activeTab === 'adjuntos'" class="rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div class="p-6">
-          <h2 class="text-lg font-medium text-slate-800 mb-4">Documentos del Expediente</h2>
-          <div class="space-y-3">
-            <div *ngFor="let file of attachments" class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50/50 p-4">
-              <div class="flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                <div>
-                  <p class="font-medium text-slate-700 text-sm">{{ file.name }}</p>
-                  <p class="text-xs text-slate-500 mt-0.5">{{ file.meta }}</p>
-                </div>
-              </div>
-              <button class="p-2 text-slate-400 hover:text-slate-700 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      }
     </div>
   </div>
+
+  @if (loading()) {
+    <div class="text-center py-20">
+      <div class="w-8 h-8 border-3 border-[var(--peru-rojo)] border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <p class="mt-4 text-[var(--niebla)] text-sm">Cargando expediente...</p>
+    </div>
+  } @else if (error()) {
+    <div class="max-w-7xl mx-auto px-4 -mt-6 pb-16">
+      <div class="bg-[var(--peru-rojo-suave)] border border-[var(--estado-rojo-borde)] rounded-xl p-6 text-center">
+        <p class="text-[var(--estado-rojo)]">{{ error() }}</p>
+      </div>
+    </div>
+  } @else if (apelacion()) {
+    <div class="max-w-7xl mx-auto px-4 -mt-6 pb-16">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="card overflow-hidden p-5">
+          <div class="w-9 h-9 rounded-lg bg-[var(--estado-azul-suave)] flex items-center justify-center mb-2">
+            <svg class="w-4 h-4 text-[var(--estado-azul)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <div class="text-lg font-mono text-[var(--estado-azul)] truncate">{{ apelacion()!.solicitudExpediente || 'N/A' }}</div>
+          <div class="text-sm text-[var(--niebla)]">Expediente SAIP</div>
+        </div>
+        <div class="card overflow-hidden p-5">
+          <div class="w-9 h-9 rounded-lg bg-[var(--accent-violet-soft)] flex items-center justify-center mb-2">
+            <svg class="w-4 h-4 text-[var(--accent-violet)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="text-lg text-[var(--accent-violet)]">{{ apelacion()!.fechaApelacion | date:'dd/MM/yyyy' }}</div>
+          <div class="text-sm text-[var(--niebla)]">Fecha de Apelacion</div>
+        </div>
+        <div class="card overflow-hidden p-5">
+          <div class="w-9 h-9 rounded-lg bg-[var(--estado-ambar-suave)] flex items-center justify-center mb-2">
+            <svg class="w-4 h-4 text-[var(--estado-ambar)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div class="text-lg text-[var(--estado-ambar)] truncate">{{ apelacion()!.estado }}</div>
+          <div class="text-sm text-[var(--niebla)]">Estado Actual</div>
+        </div>
+      </div>
+
+      <div class="card overflow-hidden">
+        <div class="flex border-b border-[var(--ceniza-claro)]">
+          <button (click)="cambiarTab('resolucion')" class="px-6 py-4 text-sm font-medium transition-colors" [class]="activeTab() === 'resolucion' ? 'border-b-2 border-[var(--peru-rojo)] text-[var(--peru-rojo)]' : 'text-[var(--niebla)] hover:text-[var(--humo)]'">Resolucion</button>
+          <button (click)="cambiarTab('apelacion')" class="px-6 py-4 text-sm font-medium transition-colors" [class]="activeTab() === 'apelacion' ? 'border-b-2 border-[var(--peru-rojo)] text-[var(--peru-rojo)]' : 'text-[var(--niebla)] hover:text-[var(--humo)]'">Apelacion</button>
+          <button (click)="cambiarTab('solicitud')" class="px-6 py-4 text-sm font-medium transition-colors" [class]="activeTab() === 'solicitud' ? 'border-b-2 border-[var(--peru-rojo)] text-[var(--peru-rojo)]' : 'text-[var(--niebla)] hover:text-[var(--humo)]'">Solicitud Original</button>
+          <button (click)="cambiarTab('documentos')" class="px-6 py-4 text-sm font-medium transition-colors" [class]="activeTab() === 'documentos' ? 'border-b-2 border-[var(--peru-rojo)] text-[var(--peru-rojo)]' : 'text-[var(--niebla)] hover:text-[var(--humo)]'">Documentos</button>
+        </div>
+
+        <div class="p-6">
+          @if (activeTab() === 'resolucion') {
+            <div class="space-y-8">
+              @if (apelacion()!.resolucionPrimeraCalificacion) {
+                <div>
+                  <h3 class="text-lg font-semibold text-[var(--carbon)] mb-4 flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-[var(--estado-azul-suave)] text-[var(--estado-azul)] flex items-center justify-center text-xs font-bold">1</span>
+                    Primera Calificacion
+                  </h3>
+                  <div class="bg-[var(--estado-azul-suave)] border border-[var(--estado-azul-borde)] rounded-xl p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-[var(--niebla)]">Decision</span>
+                      <span class="font-semibold text-[var(--estado-azul)]">{{ apelacion()!.resolucionPrimeraCalificacion!.decision }}</span>
+                    </div>
+                    <div>
+                      <span class="text-sm text-[var(--niebla)]">Fundamentos</span>
+                      <p class="text-sm text-[var(--carbon)] whitespace-pre-wrap mt-1">{{ apelacion()!.resolucionPrimeraCalificacion!.fundamentos }}</p>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              @if (apelacion()!.resolucionSegundaCalificacion) {
+                <div>
+                  <h3 class="text-lg font-semibold text-[var(--carbon)] mb-4 flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-[var(--estado-ambar-suave)] text-[var(--estado-ambar)] flex items-center justify-center text-xs font-bold">2</span>
+                    Segunda Calificacion
+                  </h3>
+                  <div class="bg-[var(--estado-ambar-suave)] border border-[var(--estado-ambar-borde)] rounded-xl p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-[var(--niebla)]">Decision</span>
+                      <span class="font-semibold text-[var(--estado-ambar)]">{{ apelacion()!.resolucionSegundaCalificacion!.decision }}</span>
+                    </div>
+                    <div>
+                      <span class="text-sm text-[var(--niebla)]">Fundamentos</span>
+                      <p class="text-sm text-[var(--carbon)] whitespace-pre-wrap mt-1">{{ apelacion()!.resolucionSegundaCalificacion!.fundamentos }}</p>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              @if (apelacion()!.resolucion) {
+                <div>
+                  <h3 class="text-lg font-semibold text-[var(--carbon)] mb-4">Resolucion Final</h3>
+                  <div class="bg-[var(--nieve-calida)] border border-[var(--ceniza-claro)] rounded-xl p-5 space-y-4">
+                    <div class="flex items-center justify-between text-sm">
+                      <span class="text-[var(--niebla)]">Decision</span>
+                      <span class="font-semibold text-[var(--carbon)]">{{ apelacion()!.resolucion!.decision }}</span>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-[var(--niebla)] mb-2">Fundamentos</label>
+                      <p class="text-[var(--carbon)] whitespace-pre-wrap text-sm">{{ apelacion()!.resolucion!.fundamentos }}</p>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              @if (!apelacion()!.resolucion && !apelacion()!.resolucionPrimeraCalificacion && !apelacion()!.resolucionSegundaCalificacion) {
+                <div class="text-center py-12 text-[var(--niebla)]">
+                  <svg class="w-12 h-12 mx-auto mb-3 text-[var(--ceniza)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-width="2" d="M12 8v4m0 4h.01"/></svg>
+                  <p>Aun no se han registrado resoluciones para esta apelacion.</p>
+                </div>
+              }
+            </div>
+          }
+
+          @if (activeTab() === 'apelacion') {
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-[var(--niebla)] mb-1">Apelante</label>
+                <p class="text-[var(--carbon)]">{{ apelacion()!.ciudadanoNombre || 'No disponible' }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-[var(--niebla)] mb-1">Fundamentos de la Apelacion</label>
+                <div class="bg-[var(--estado-azul-suave)] border border-[var(--estado-azul-borde)] rounded-lg p-4">
+                  <p class="text-[var(--carbon)] whitespace-pre-wrap text-sm">{{ apelacion()!.fundamentos || 'No disponibles en el estado actual del backend.' }}</p>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (activeTab() === 'solicitud') {
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-[var(--niebla)] mb-1">Expediente SAIP</label>
+                <p class="text-[var(--carbon)] font-mono">{{ apelacion()!.solicitudExpediente || 'No disponible' }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-[var(--niebla)] mb-1">Asunto</label>
+                <p class="text-[var(--carbon)]">{{ apelacion()!.solicitudAsunto || 'No disponible' }}</p>
+              </div>
+            </div>
+          }
+
+          @if (activeTab() === 'documentos') {
+            @if (apelacion()!.documentos && apelacion()!.documentos!.length > 0) {
+              <div class="space-y-3">
+                @for (doc of apelacion()!.documentos; track doc.id) {
+                  <div class="flex items-center justify-between p-4 border border-[var(--ceniza-claro)] rounded-xl hover:bg-[var(--nieve)] transition-colors">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 bg-[var(--estado-rojo-suave)] rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-[var(--peru-rojo)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                      </div>
+                      <div>
+                        <p class="font-medium text-[var(--carbon)]">{{ doc.nombreArchivo || 'Documento' }}</p>
+                        <p class="text-xs text-[var(--niebla)]">{{ doc.tipoArchivo || 'Tipo no especificado' }}</p>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="text-center py-8 text-[var(--niebla)]">
+                <p>No hay documentos adjuntos.</p>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
 </div>
