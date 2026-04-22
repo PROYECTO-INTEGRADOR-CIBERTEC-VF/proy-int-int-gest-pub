@@ -1,0 +1,277 @@
+<div class="min-h-screen bg-[#F8F9FB]">
+  <!-- Gradient Header -->
+  <div class="bg-gradient-to-br from-[#C8102E] via-[#A00D24] to-[#8B0D20] pt-28 pb-16 px-4 relative overflow-hidden">
+    <div class="absolute top-[-20%] right-[-5%] w-[500px] h-[500px] rounded-full bg-white/[0.03]"></div>
+    <div class="absolute bottom-[-30%] left-[-10%] w-[400px] h-[400px] rounded-full bg-white/[0.03]"></div>
+    <div class="max-w-6xl mx-auto relative z-10">
+      <div class="flex items-start justify-between">
+        <div>
+          <a routerLink="/" class="inline-flex items-center gap-1.5 text-white/60 hover:text-white text-sm mb-4 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-width="2" d="m12 19-7-7 7-7"/><path stroke-width="2" d="M19 12H5"/>
+            </svg>
+            Volver
+          </a>
+          <h1 class="text-3xl font-bold text-white mb-1">Mis Solicitudes SAIP</h1>
+          <p class="text-white/60">Gestiona y consulta el estado de tus solicitudes</p>
+        </div>
+        <div class="flex gap-2">
+          @if (tieneApelables()) {
+            <a routerLink="/ciudadano/nueva-apelacion" class="h-10 px-4 rounded-xl inline-flex items-center gap-2 border border-white/20 text-white hover:bg-white/10 transition-colors text-sm font-medium">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"/>
+              </svg>
+              Apelar
+            </a>
+          }
+          <a routerLink="/ciudadano/nueva-saip" class="h-10 px-5 rounded-xl inline-flex items-center gap-2 bg-white text-[#C8102E] hover:bg-gray-50 transition-colors text-sm font-semibold shadow-lg shadow-black/10">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-width="2" d="M5 12h14"/><path stroke-width="2" d="M12 5v14"/>
+            </svg>
+            Nueva SAIP
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-4 -mt-8 pb-12 relative z-10">
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="text-2xl font-bold text-[#1a1a2e]">{{ totalSolicitudes() }}</div>
+        <div class="text-xs text-gray-500 mt-0.5">Total Solicitudes</div>
+      </div>
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="text-2xl font-bold text-blue-600">{{ enProceso() }}</div>
+        <div class="text-xs text-gray-500 mt-0.5">En Proceso</div>
+      </div>
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="text-2xl font-bold text-green-600">{{ respondidas() }}</div>
+        <div class="text-xs text-gray-500 mt-0.5">Respondidas</div>
+      </div>
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
+            <svg class="w-5 h-5 text-[#C8102E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="text-2xl font-bold text-[#C8102E]">{{ denegadas() }}</div>
+        <div class="text-xs text-gray-500 mt-0.5">Denegadas</div>
+      </div>
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="text-2xl font-bold text-amber-600">{{ vencidas() }}</div>
+        <div class="text-xs text-gray-500 mt-0.5">Vencidas</div>
+      </div>
+    </div>
+
+    <!-- Subsanación Alert -->
+    @if (apelacionesSubsanacion().length > 0) {
+      <div class="bg-white border border-orange-200 border-t-4 border-t-orange-500 rounded-2xl p-6 mb-6 shadow-sm animate-fade-in">
+        <div class="flex items-start gap-4 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-width="2" d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/>
+              <path stroke-width="2" d="M12 9v4"/><path stroke-width="2" d="M12 17h.01"/>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-[#1a1a2e] font-semibold mb-1">
+              {{ apelacionesSubsanacion().length }} apelación(es) con subsanación pendiente
+            </h3>
+            <p class="text-sm text-gray-500">Debe completar la subsanación dentro del plazo establecido.</p>
+          </div>
+        </div>
+
+        @for (apelacion of apelacionesSubsanacion(); track apelacion.id) {
+          <div class="bg-[#F8F9FB] rounded-xl p-4 mb-2 last:mb-0 border border-orange-100">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-mono font-semibold text-[#1a1a2e]">{{ apelacion.expediente }}</span>
+                  <span class="text-xs text-gray-400">({{ apelacion.solicitudExpediente }})</span>
+                </div>
+                <p class="text-sm text-gray-500">{{ apelacion.entidadNombre }}</p>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="text-center">
+                  <div class="text-2xl font-bold" [class]="calcularDiasRestantesSubsanacion(apelacion) <= 0 ? 'text-[#C8102E]' : 'text-orange-500'">
+                    {{ calcularDiasRestantesSubsanacion(apelacion) }}
+                  </div>
+                  <div class="text-xs text-gray-400">días restantes</div>
+                </div>
+                <a [routerLink]="['/ciudadano/subsanacion', apelacion.expediente]"
+                   class="h-10 px-4 rounded-xl inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-width="2" d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+                    <path stroke-width="2" d="M14 2v4a2 2 0 0 0 2 2h4"/>
+                  </svg>
+                  Subsanar
+                </a>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="bg-white rounded-2xl shadow-sm p-4 mb-5">
+      <div class="flex flex-col md:flex-row gap-3">
+        <div class="flex-1 relative">
+          <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" [(ngModel)]="busqueda" (keyup.enter)="buscarSolicitudes()"
+            placeholder="Buscar por Nº expediente o entidad..."
+            class="w-full h-11 pl-10 pr-4 rounded-xl bg-[#F8F9FB] border border-gray-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C8102E]/20 focus:border-[#C8102E] transition-colors text-sm">
+        </div>
+        <select [(ngModel)]="filtroEstado" (change)="filtrarPorEstado(filtroEstado)"
+          class="h-11 px-4 rounded-xl bg-[#F8F9FB] border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/20 focus:border-[#C8102E] md:w-[200px] cursor-pointer">
+          <option value="">Todos los estados</option>
+          <option value="todos">Todos los estados</option>
+          <option value="RECEPCIONADA">Recepcionada</option>
+          <option value="EN_REVISION">En Revisión</option>
+          <option value="RESPONDIDA">Respondida</option>
+          <option value="DENEGADA">Denegada</option>
+          <option value="VENCIDA">Vencida</option>
+        </select>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <div class="text-center py-12">
+        <div class="spinner spinner-lg mx-auto"></div>
+        <p class="mt-4 text-muted-foreground">Cargando solicitudes...</p>
+      </div>
+    } @else if (error()) {
+      <div class="alert alert-error p-6 text-center">
+        <p>{{ error() }}</p>
+        <button (click)="cargarDatos()" class="btn-primary mt-4">
+          Reintentar
+        </button>
+      </div>
+    } @else if (solicitudes().length === 0) {
+      <div class="card p-12 text-center">
+        <svg class="w-16 h-16 mx-auto text-muted-foreground mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h3 class="text-xl font-semibold text-foreground mb-2">No tienes solicitudes</h3>
+        <p class="text-muted-foreground mb-4">Crea tu primera solicitud de acceso a la información pública</p>
+        <a routerLink="/ciudadano/nueva-saip" class="btn-primary inline-flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-width="2" d="M5 12h14"/><path stroke-width="2" d="M12 5v14"/>
+          </svg>
+          Nueva SAIP
+        </a>
+      </div>
+    } @else {
+      <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-[#F8F9FB] border-b border-gray-100">
+                <th class="text-left px-6 py-3 text-[11px] uppercase tracking-wider text-gray-400 font-medium">N. Expediente</th>
+                <th class="text-left px-6 py-3 text-[11px] uppercase tracking-wider text-gray-400 font-medium">Entidad</th>
+                <th class="text-left px-6 py-3 text-[11px] uppercase tracking-wider text-gray-400 font-medium">Fecha</th>
+                <th class="text-left px-6 py-3 text-[11px] uppercase tracking-wider text-gray-400 font-medium">Estado</th>
+                <th class="text-left px-6 py-3 text-[11px] uppercase tracking-wider text-gray-400 font-medium">Apelación</th>
+                <th class="text-right px-6 py-3 text-[11px] uppercase tracking-wider text-gray-400 font-medium">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (solicitud of solicitudes(); track solicitud.id) {
+                <tr class="hover:bg-[#FEF2F2]/20 transition-colors border-b border-gray-50">
+                  <td class="px-6 py-4">
+                    <span class="font-mono text-sm text-[#1a1a2e]">{{ solicitud.expediente }}</span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm text-gray-600">{{ solicitud.entidadNombre }}</div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="text-sm text-gray-400">{{ solicitud.fechaPresentacion | date:'dd/MM/yyyy' }}</span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-col items-start gap-1">
+                      <span [class]="'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ' + getEstadoClass(solicitud.estado)">
+                        {{ solicitud.estado }}
+                      </span>
+                      @if (esSilencioAdministrativo(solicitud)) {
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-800">
+                          SILENCIO ADMINISTRATIVO AUTOMATICO
+                        </span>
+                      }
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    @if (solicitud.apelacion) {
+                      <span [class]="'inline-flex items-center px-2 py-0.5 text-xs rounded-full ' + getApelacionEstadoClass(solicitud.apelacion.estado)">
+                        {{ solicitud.apelacion.estado }}
+                      </span>
+                    } @else {
+                      <span class="text-xs text-gray-400">—</span>
+                    }
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <div class="flex items-center justify-end gap-2">
+                      @if (solicitud.apelacion && solicitud.apelacion.estado === 'EN_SUBSANACION') {
+                        <a [routerLink]="['/ciudadano/subsanacion', solicitud.apelacion.expediente]"
+                          class="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded-lg transition-colors">
+                          Subsanar
+                        </a>
+                      }
+                      @if (solicitud.estado === 'DENEGADA' && !solicitud.apelacion) {
+                        <a [routerLink]="['/ciudadano/nueva-apelacion']" [queryParams]="{solicitudId: solicitud.id}"
+                          class="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-500 hover:bg-purple-600 text-white text-xs font-medium rounded-lg transition-colors">
+                          Apelar
+                        </a>
+                      }
+                      <a [routerLink]="['/ciudadano/solicitud', solicitud.expediente]"
+                        class="text-[#C8102E] hover:text-[#A00D24] text-sm font-medium inline-flex items-center gap-1 transition-colors">
+                        Ver detalles
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Mobile FAB -->
+  <a routerLink="/ciudadano/nueva-saip"
+    class="fixed bottom-6 right-6 md:hidden w-14 h-14 rounded-full shadow-xl shadow-[#C8102E]/25 bg-[#C8102E] hover:bg-[#A00D24] flex items-center justify-center transition-colors z-50">
+    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 5v14M5 12h14"/></svg>
+  </a>
+</div>
