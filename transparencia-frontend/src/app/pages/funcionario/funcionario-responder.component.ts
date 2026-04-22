@@ -176,8 +176,8 @@ export class FuncionarioResponderComponent {
       funcionarioId,
       tipoRespuesta: 'DENEGACION_TOTAL',
       contenido,
-      causalDenegatoria: this.formulario.controls.causalDenegatoria.value?.trim() || null,
-      fundamentoLegal: this.formulario.controls.fundamentoLegal.value?.trim() || null,
+      causalDenegatoria: this.formulario.controls.causalDenegatoria.value?.trim() || undefined,
+      fundamentoLegal: this.formulario.controls.fundamentoLegal.value?.trim() || undefined,
     };
 
     this.respuestaService.denegarSolicitud(payload).subscribe({
