@@ -16,6 +16,7 @@ import {
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
+  const apiUrl = 'http://localhost:8080/api/auth';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -40,7 +41,7 @@ describe('AuthService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('deberia hacer login con POST /api/auth/login', () => {
+  it('deberia hacer login con POST backend /api/auth/login', () => {
     const payload: LoginRequest = {
       identificador: '12345678',
       password: 'Clave123',
@@ -57,13 +58,13 @@ describe('AuthService', () => {
       expect(res).toEqual(response);
     });
 
-    const req = httpMock.expectOne('/api/auth/login');
+    const req = httpMock.expectOne(`${apiUrl}/login`);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(response);
   });
 
-  it('deberia registrar usuario con POST /api/auth/registro', () => {
+  it('deberia registrar usuario con POST backend /api/auth/registro', () => {
     const payload: RegistroRequest = {
       email: 'nuevo@saip.gob.pe',
       password: 'Clave123',
@@ -83,7 +84,7 @@ describe('AuthService', () => {
       expect(res).toEqual(response);
     });
 
-    const req = httpMock.expectOne('/api/auth/registro');
+    const req = httpMock.expectOne(`${apiUrl}/registro`);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(response);

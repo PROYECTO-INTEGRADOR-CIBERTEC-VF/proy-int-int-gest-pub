@@ -43,7 +43,9 @@ export class LoginComponent implements OnInit {
       this.successMessage.set('Registro exitoso. Inicie sesión para continuar.');
     }
 
-    this.redirectIfSessionMatchesRoute();
+    if (this.accessMode() === 'internal') {
+      this.redirectIfSessionMatchesRoute();
+    }
   }
 
   get identificadorControl() {
@@ -194,10 +196,11 @@ export class LoginComponent implements OnInit {
 
   private resolveTargetRoute(response: LoginResponse, role: TipoUsuario | null): string {
     const backendRouteMap: Record<string, string> = {
-      '/ciudadano/dashboard': '/ciudadano',
-      '/entidad/dashboard': '/funcionario',
-      '/ttaip/dashboard': '/ttaip',
-      '/admin/dashboard': '/admin'
+      '/ciudadano/dashboard': '/ciudadano/dashboard',
+      '/entidad/dashboard': '/funcionario/dashboard',
+      '/funcionario/dashboard': '/funcionario/dashboard',
+      '/ttaip/dashboard': '/ttaip/dashboard',
+      '/admin/dashboard': '/admin/dashboard'
     };
 
     if (response.redirectUrl && backendRouteMap[response.redirectUrl]) {
@@ -205,10 +208,10 @@ export class LoginComponent implements OnInit {
     }
 
     const roleRouteMap: Record<TipoUsuario, string> = {
-      CIUDADANO: '/ciudadano',
-      FUNCIONARIO: '/funcionario',
-      TTAIP: '/ttaip',
-      ADMINISTRADOR: '/admin'
+      CIUDADANO: '/ciudadano/dashboard',
+      FUNCIONARIO: '/funcionario/dashboard',
+      TTAIP: '/ttaip/dashboard',
+      ADMINISTRADOR: '/admin/dashboard'
     };
 
     if (role) {
@@ -231,6 +234,8 @@ export class LoginComponent implements OnInit {
       case 'TTAIP':
       case 'ADMINISTRADOR':
         return normalized;
+      case 'ADMIN':
+        return 'ADMINISTRADOR';
       default:
         return null;
     }

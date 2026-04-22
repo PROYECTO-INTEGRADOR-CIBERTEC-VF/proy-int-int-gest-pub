@@ -11,7 +11,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.platformId);
-  private readonly apiUrl = '/api/auth';
+  private readonly apiUrl = 'http://localhost:8080/api/auth';
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials);
