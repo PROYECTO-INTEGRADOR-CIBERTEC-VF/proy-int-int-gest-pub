@@ -33,8 +33,13 @@ export const routes: Routes = [
   },
   {
     path: 'ciudadano',
-    redirectTo: 'ciudadano/nueva-saip',
+    redirectTo: 'ciudadano/dashboard',
     pathMatch: 'full'
+  },
+  {
+    path: 'ciudadano/dashboard',
+    loadComponent: () => import('./pages/ciudadano/ciudadano-dashboard.component').then(m => m.CiudadanoDashboardComponent),
+    canActivate: [tipoUsuarioGuard('CIUDADANO')]
   },
   {
     path: 'ciudadano/nueva-saip',
@@ -53,6 +58,11 @@ export const routes: Routes = [
   },
   {
     path: 'funcionario',
+    redirectTo: 'funcionario/dashboard',
+    pathMatch: 'full'
+  },
+  {
+    path: 'funcionario/dashboard',
     loadComponent: () => import('./pages/funcionario/funcionario-dashboard.component').then(m => m.FuncionarioDashboardComponent),
     canActivate: [tipoUsuarioGuard('FUNCIONARIO')]
   },
@@ -68,6 +78,11 @@ export const routes: Routes = [
   },
   {
     path: 'ttaip',
+    redirectTo: 'ttaip/dashboard',
+    pathMatch: 'full'
+  },
+  {
+    path: 'ttaip/dashboard',
     loadComponent: () => import('./pages/ttaip/ttaip-dashboard.component').then(m => m.TtaipDashboardComponent),
     canActivate: [tipoUsuarioGuard('TTAIP')]
   },
@@ -93,7 +108,18 @@ export const routes: Routes = [
   },
   {
     path: 'ttaip/resolucion/:expediente',
-    loadComponent: () => import('./pages/ttaip/ttaip-resolucion-detalle.component').then(m => m.TtaipResolucionDetalleComponent)
+    loadComponent: () => import('./pages/ttaip/ttaip-resolucion-detalle.component').then(m => m.TtaipResolucionDetalleComponent),
+    canActivate: [tipoUsuarioGuard('TTAIP')]
+  },
+  {
+    path: 'admin',
+    redirectTo: 'admin/dashboard',
+    pathMatch: 'full'
+  },
+  {
+    path: 'admin/dashboard',
+    loadComponent: () => import('./pages/admin/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+    canActivate: [tipoUsuarioGuard('ADMINISTRADOR')]
   },
   { path: '**', redirectTo: 'login' }
 ];
