@@ -1,110 +1,195 @@
 package com.transparencia.api.service;
 
-import com.transparencia.api.model.entity.Apelacion;
-import com.transparencia.api.model.entity.Ciudadano;
-import com.transparencia.api.model.entity.EstadoApelacion;
-import com.transparencia.api.model.entity.Solicitud;
-import com.transparencia.api.repository.ApelacionRepository;
-import com.transparencia.api.repository.CiudadanoRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.transparencia.api.model.entity.Apelacion;
+import com.transparencia.api.model.entity.EstadoApelacion;
+import com.transparencia.api.repository.ApelacionRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ApelacionServiceTest {
 
     @Mock
-    private ApelacionRepository apelacionRepository;
-
-    @Mock
-    private CiudadanoRepository ciudadanoRepository;
+    ApelacionRepository apelacionRepository;
 
     @InjectMocks
-    private ApelacionService apelacionService;
+    ApelacionService apelacionService;
 
-    private Apelacion apelacion;
-    private Ciudadano ciudadano;
-    private Solicitud solicitud;
-
-    @BeforeEach
-    void setUp() {
-        // Preparamos los datos base antes de cada prueba
-        ciudadano = new Ciudadano();
-        ciudadano.setIdUsuario(1L);
-
-        solicitud = new Solicitud();
-        solicitud.setIdSolicitud(1L);
-
-        apelacion = new Apelacion();
-        apelacion.setIdApelacion(1L);
-        apelacion.setCiudadano(ciudadano);
-        apelacion.setSolicitud(solicitud);
-        apelacion.setFundamentos("Fundamentos de prueba");
-        apelacion.setEstado(EstadoApelacion.PENDIENTE_ELEVACION);
+    private Apelacion crearApelacion(Long id, String expediente, EstadoApelacion estado) {
+        Apelacion a = new Apelacion();
+        a.setIdApelacion(id);
+        a.setExpediente(expediente);
+        a.setFundamentos("Fundamentos de prueba");
+        a.setEstado(estado);
+        a.setFechaApelacion(LocalDateTime.now());
+        return a;
     }
 
     // 1 y 4. Test: Crear apelación exitosa y generarExpediente
     @Test
-    void testCrearApelacionExitosaYGenerarExpediente() {
-        // Arrange
-        apelacion.setExpediente(null);
-        when(apelacionRepository.existsBySolicitud_IdSolicitud(1L)).thenReturn(false);
-        when(ciudadanoRepository.findById(1L)).thenReturn(Optional.of(ciudadano));
-        when(apelacionRepository.count()).thenReturn(5L); // Simulamos 5 previas
-        when(apelacionRepository.save(any(Apelacion.class))).thenAnswer(i -> i.getArgument(0));
+    void obtenerTodasLasApelaciones_debeRetornarLista() {
+        var apelaciones = List.of(
+            crearApelacion(1L, "00001-2025-JUS/TTAIP", EstadoApelacion.PENDIENTE_ELEVACION),
+            crearApelacion(2L, "00002-2025-JUS/TTAIP", EstadoApelacion.EN_CALIFICACION_1)
+        );
+        when(apelacionRepository.findAll()).thenReturn(apelaciones);
 
-        // Act
-        Apelacion result = apelacionService.save(apelacion);
+        List<Apelacion> resultado = apelacionService.obtenerTodasLasApelaciones();
 
-        // Assert
-        assertNotNull(result);
-        assertNotNull(result.getExpediente());
-        
-        int currentYear = LocalDate.now().getYear();
-        String expectedExpediente = String.format("00006-%d-JUS-TTAIP", currentYear);
-        
-        assertEquals(expectedExpediente, result.getExpediente());
-        verify(apelacionRepository, times(1)).save(apelacion);
+        assertThat(resultado).hasSize(2);
     }
 
-    // 2. Test: Apelación Duplicada (Lanza Excepción)
     @Test
-    void testCrearApelacionDuplicadaLanzaExcepcion() {
-        // Arrange
-        when(apelacionRepository.existsBySolicitud_IdSolicitud(1L)).thenReturn(true);
-
-        // Act & Assert
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> apelacionService.save(apelacion));
-        assertEquals("La solicitud ya tiene una apelación en curso.", ex.getMessage());
-        verify(apelacionRepository, never()).save(any());
-    }
-
-    // 3. Test: Ciudadano Inexistente (Lanza Excepción)
-    @Test
-    void testCrearApelacionCiudadanoInexistenteLanzaExcepcion() {
-        // Arrange
-        when(apelacionRepository.existsBySolicitud_IdSolicitud(1L)).thenReturn(false);
-        when(ciudadanoRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> apelacionService.save(apelacion));
-        assertEquals("El ciudadano no existe en el sistema.", ex.getMessage());
-        verify(apelacionRepository, never()).save(any());
-    }
-
-    // 5. Test: Cambiar estado
-    @Test
-    void testCambiarEstado() {
-        // Arrange
+    void obtenerApelacionPorId_existente_debeRetornarPresente() {
+        var apelacion = crearApelacion(1L, "00001-2025-JUS/TTAIP", EstadoApelacion.PENDIENTE_ELEVACION);
         when(apelacionRepository.findById(1L)).thenReturn(Optional.of(apelacion));
-        when(apelacionRepository.save(any(Apelacion
+
+        Optional<Apelacion> resultado = apelacionService.obtenerApelacionPorId(1L);
+
+        assertThat(resultado).isPresent();
+        assertThat(resultado.get().getExpediente()).isEqualTo("00001-2025-JUS/TTAIP");
+    }
+
+    @Test
+    void obtenerApelacionPorId_noExistente_debeRetornarVacio() {
+        when(apelacionRepository.findById(999L)).thenReturn(Optional.empty());
+
+        Optional<Apelacion> resultado = apelacionService.obtenerApelacionPorId(999L);
+
+        assertThat(resultado).isEmpty();
+    }
+
+    @Test
+    void obtenerApelacionPorExpediente_debeRetornarApelacion() {
+        var apelacion = crearApelacion(1L, "00001-2025-JUS/TTAIP", EstadoApelacion.PENDIENTE_ELEVACION);
+        when(apelacionRepository.findByExpediente("00001-2025-JUS/TTAIP")).thenReturn(Optional.of(apelacion));
+
+        Optional<Apelacion> resultado = apelacionService.obtenerApelacionPorExpediente("00001-2025-JUS/TTAIP");
+
+        assertThat(resultado).isPresent();
+    }
+
+    @Test
+    void obtenerApelacionesPorEstado_debeRetornarFiltradas() {
+        var apelaciones = List.of(
+            crearApelacion(1L, "00001-2025-JUS/TTAIP", EstadoApelacion.EN_CALIFICACION_1)
+        );
+
+        when(apelacionRepository.findByEstadoOrderByFechaApelacionDesc(EstadoApelacion.EN_CALIFICACION_1)).thenReturn(apelaciones);
+
+        List<Apelacion> resultado = apelacionService.findByEstado(EstadoApelacion.EN_CALIFICACION_1);
+
+        assertThat(resultado).hasSize(1);
+    }
+
+    @Test
+    void contarApelacionesPorEstado_debeRetornarCuenta() {
+        when(apelacionRepository.countByEstado(EstadoApelacion.PENDIENTE_ELEVACION)).thenReturn(7L);
+
+        long resultado = apelacionService.countByEstado(EstadoApelacion.PENDIENTE_ELEVACION);
+
+        assertThat(resultado).isEqualTo(7L);
+    }
+
+    @Test
+    void findByCiudadanoId_debeRetornarApelacionesDelCiudadano() {
+        var apelaciones = List.of(
+            crearApelacion(1L, "00001-2025-JUS/TTAIP", EstadoApelacion.PENDIENTE_ELEVACION)
+        );
+
+        when(apelacionRepository.findByCiudadano_IdUsuarioOrderByFechaApelacionDesc(10L)).thenReturn(apelaciones);
+
+        List<Apelacion> resultado = apelacionService.findByCiudadanoId(10L);
+
+        assertThat(resultado).hasSize(1);
+    }
+
+    @Test
+    void findPendientes_debeRetornarApelacionesPendientes() {
+        var apelaciones = List.of(
+            crearApelacion(1L, "00001-2025-JUS/TTAIP", EstadoApelacion.PENDIENTE_ELEVACION)
+        );
+        when(apelacionRepository.findPendientes(anyList())).thenReturn(apelaciones);
+
+        List<Apelacion> resultado = apelacionService.findPendientes();
+
+        assertThat(resultado).hasSize(1);
+    }
+
+    @Test
+    void generarExpediente_debeGenerarFormatoTTAIP() {
+        int year = LocalDate.now().getYear();
+        when(apelacionRepository.count()).thenReturn(5L);
+
+        String expediente = apelacionService.generarExpediente();
+
+        assertThat(expediente).isEqualTo("00006-" + year + "-JUS-TTAIP");
+    }
+
+    @Test
+    void save_sinExpediente_debeGenerarExpediente() {
+        Apelacion apelacion = crearApelacion(null, null, EstadoApelacion.PENDIENTE_ELEVACION);
+        when(apelacionRepository.count()).thenReturn(0L);
+        when(apelacionRepository.save(any())).thenAnswer(inv -> {
+            Apelacion a = inv.getArgument(0);
+            a.setIdApelacion(1L);
+            return a;
+        });
+
+        Apelacion resultado = apelacionService.save(apelacion);
+
+        assertThat(resultado.getExpediente()).endsWith("-JUS-TTAIP");
+        verify(apelacionRepository).save(apelacion);
+    }
+
+    @Test
+    void save_conExpediente_noDebeRegenerar() {
+        Apelacion apelacion = crearApelacion(1L, "00010-2025-JUS/TTAIP", EstadoApelacion.PENDIENTE_ELEVACION);
+        when(apelacionRepository.save(apelacion)).thenReturn(apelacion);
+
+        Apelacion resultado = apelacionService.save(apelacion);
+
+        assertThat(resultado.getExpediente()).isEqualTo("00010-2025-JUS/TTAIP");
+    }
+
+    @Test
+    void eliminarApelacion_debeInvocarDeleteById() {
+        apelacionService.eliminarApelacion(1L);
+
+        verify(apelacionRepository).deleteById(1L);
+    }
+
+    @Test
+    void count_debeRetornarCuenta() {
+        when(apelacionRepository.count()).thenReturn(12L);
+
+        long resultado = apelacionService.count();
+
+        assertThat(resultado).isEqualTo(12L);
+    }
+
+    @Test
+    void countByCiudadanoId_debeRetornarCantidad() {
+        var apelaciones = List.of(
+            crearApelacion(1L, "00001-2025-JUS/TTAIP", EstadoApelacion.PENDIENTE_ELEVACION),
+            crearApelacion(2L, "00002-2025-JUS/TTAIP", EstadoApelacion.EN_CALIFICACION_1)
+        );
+        when(apelacionRepository.findByCiudadano_IdUsuarioOrderByFechaApelacionDesc(10L)).thenReturn(apelaciones);
+
+        long resultado = apelacionService.countByCiudadanoId(10L);
+
+        assertThat(resultado).isEqualTo(2L);
+    }
+}

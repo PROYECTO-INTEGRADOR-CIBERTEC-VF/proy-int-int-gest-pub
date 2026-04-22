@@ -24,10 +24,13 @@ export enum CalificacionApelacion {
 }
 
 export interface Apelacion {
-  idApelacion: number;
-  expediente: string;
-  solicitudId: number;
-  ciudadanoId: number;
+  idApelacion?: number;
+  id?: number;
+  expediente?: string;
+  solicitudId?: number;
+  solicitudExpediente?: string;
+  ciudadanoId?: number;
+  entidadNombre?: string;
   fundamentos: string;
   fechaApelacion: string;
   estado: EstadoApelacion;

@@ -39,12 +39,12 @@ public class ApelacionService {
 
     @Transactional(readOnly = true)
     public List<Apelacion> findByEstado(EstadoApelacion estado) {
-        return apelacionRepository.findByEstado(estado);
+        return apelacionRepository.findByEstadoOrderByFechaApelacionDesc(estado);
     }
 
     @Transactional(readOnly = true)
     public List<Apelacion> findByCiudadanoId(Long ciudadanoId) {
-        return apelacionRepository.findByCiudadano_IdUsuario(ciudadanoId);
+        return apelacionRepository.findByCiudadano_IdUsuarioOrderByFechaApelacionDesc(ciudadanoId);
     }
 
     @Transactional(readOnly = true)
@@ -107,9 +107,62 @@ public class ApelacionService {
         }
     }
 
-    private String generarExpediente() {
+    public String generarExpediente() {
         long count = apelacionRepository.count();
         int year = LocalDate.now().getYear();
         return String.format("%05d-%d-JUS-TTAIP", count + 1, year);
+    }
+
+    public long countByEstado(EstadoApelacion estado) {
+        return apelacionRepository.countByEstado(estado);
+    }
+
+    // Compatibility wrappers used by existing tests
+    public List<Apelacion> obtenerTodasLasApelaciones() {
+        return findAll();
+    }
+
+    public java.util.Optional<Apelacion> obtenerApelacionPorId(Long id) {
+        return apelacionRepository.findById(id);
+    }
+
+    public java.util.Optional<Apelacion> obtenerApelacionPorExpediente(String expediente) {
+        return apelacionRepository.findByExpediente(expediente);
+    }
+
+    public List<Apelacion> obtenerApelacionesPorEstado(EstadoApelacion estado) {
+        return apelacionRepository.findByEstadoOrderByFechaApelacionDesc(estado);
+    }
+
+    public long contarApelacionesPorEstado(EstadoApelacion estado) {
+        return apelacionRepository.countByEstado(estado);
+    }
+
+    public List<Apelacion> findPendientes() {
+        // Define estados finales que se consideran resueltos
+        List<EstadoApelacion> finales = List.of(
+                EstadoApelacion.RESUELTO,
+                EstadoApelacion.RESUELTO_FUNDADO,
+                EstadoApelacion.RESUELTO_FUNDADO_EN_PARTE,
+                EstadoApelacion.RESUELTO_INFUNDADO,
+                EstadoApelacion.RESUELTO_INFUNDADO_EN_PARTE,
+                EstadoApelacion.RESUELTO_IMPROCEDENTE,
+                EstadoApelacion.TENER_POR_NO_PRESENTADO,
+                EstadoApelacion.CONCLUSION_SUSTRACCION_MATERIA,
+                EstadoApelacion.CONCLUSION_DESISTIMIENTO
+        );
+        return apelacionRepository.findPendientes(finales);
+    }
+
+    public void eliminarApelacion(Long id) {
+        eliminar(id);
+    }
+
+    public long count() {
+        return apelacionRepository.count();
+    }
+
+    public long countByCiudadanoId(Long ciudadanoId) {
+        return apelacionRepository.findByCiudadano_IdUsuarioOrderByFechaApelacionDesc(ciudadanoId).size();
     }
 }

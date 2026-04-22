@@ -28,6 +28,9 @@ public class Ciudadano {
     @Column(length = 20)
     private String dni;
 
+    @Column(length = 200)
+    private String email;
+
     public Long getId() {
         return this.idUsuario;
     }
