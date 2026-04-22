@@ -23,6 +23,11 @@ public class EntidadService {
     }
 
     @Transactional(readOnly = true)
+    public List<Entidad> findActivas() {
+        return entidadRepository.findByActivaTrue();
+    }
+
+    @Transactional(readOnly = true)
     public Optional<Entidad> findById(Long id) {
         return entidadRepository.findById(id);
     }
