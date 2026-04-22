@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { DatePipe, isPlatformBrowser } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Solicitud } from '../../models/solicitud.model';
 import { SolicitudService } from '../../services/solicitud.service';
 
@@ -24,6 +24,7 @@ interface SesionFuncionario {
   styleUrl: './funcionario-dashboard.component.css',
 })
 export class FuncionarioDashboardComponent {
+  private readonly router = inject(Router);
   private readonly solicitudService = inject(SolicitudService);
   private readonly platformId = inject(PLATFORM_ID);
 
@@ -116,6 +117,14 @@ export class FuncionarioDashboardComponent {
 
   obtenerDiasRestantes(solicitud: Solicitud): number | null {
     return typeof solicitud.diasRestantes === 'number' ? solicitud.diasRestantes : null;
+  }
+
+  cerrarSesion(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+    }
+    void this.router.navigate(['/acceso-funcionario']);
   }
 
   private inicializarDesdeSesion(): void {

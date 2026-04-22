@@ -1,8 +1,15 @@
 <div class="min-h-screen bg-(--nieve-calida)">
   <section class="bg-gradient-peru-hero px-4 pb-10 pt-24">
     <div class="mx-auto max-w-7xl">
-      <h1 class="mt-2 text-3xl font-extrabold text-(--carbon)">Dashboard de Funcionario</h1>
-      <p class="mt-1 text-sm text-(--humo)">{{ entidadNombre() }}</p>
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 class="mt-2 text-3xl font-extrabold text-(--carbon)">Dashboard de Funcionario</h1>
+          <p class="mt-1 text-sm text-(--humo)">{{ entidadNombre() }}</p>
+        </div>
+        <button type="button" class="btn-outline h-10 px-4 text-sm" (click)="cerrarSesion()">
+          Cerrar sesion
+        </button>
+      </div>
     </div>
   </section>
 
