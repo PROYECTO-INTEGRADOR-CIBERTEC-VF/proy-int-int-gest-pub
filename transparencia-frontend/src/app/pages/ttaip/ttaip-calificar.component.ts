@@ -16,7 +16,7 @@ type DecisionCalificacion = 'admitir' | 'subsanar' | 'inadmitir' | '';
   styleUrl: './ttaip-calificar.component.css'
 })
 export class TtaipCalificarComponent implements OnInit {
-  expediente = 'SIN-EXPEDIENTE';
+  expediente = '';
 
   decision: DecisionCalificacion = '';
   fundamentos = '';
