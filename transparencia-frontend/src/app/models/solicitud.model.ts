@@ -1,17 +1,13 @@
+import type { components } from '../api/schema';
 import { Respuesta } from './respuesta.model';
 
-export type EstadoSolicitud =
-  | 'RECEPCIONADA'
-  | 'EN_REVISION'
-  | 'PENDIENTE_INFORMACION'
-  | 'RESPONDIDA'
-  | 'DENEGADA'
-  | 'CONCLUIDA'
-  | 'VENCIDA';
+type SolicitudDTO = components['schemas']['SolicitudDTO'];
 
-export type Prioridad = 'BAJA' | 'NORMAL' | 'MEDIA' | 'ALTA' | 'URGENTE';
+export type EstadoSolicitud = Exclude<SolicitudDTO['estado'], undefined>;
 
-export type SemaforoEstado = 'VERDE' | 'AMBAR' | 'ROJO' | 'NEGRO';
+export type Prioridad = Exclude<SolicitudDTO['prioridad'], undefined>;
+
+export type SemaforoEstado = Exclude<SolicitudDTO['semaforo'], undefined>;
 
 export interface Solicitud {
   idSolicitud: number;
