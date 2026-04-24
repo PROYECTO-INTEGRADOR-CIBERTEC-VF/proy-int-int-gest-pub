@@ -2,8 +2,12 @@ package com.transparencia.api.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import com.transparencia.api.model.entity.Apelacion;
+import com.transparencia.api.model.entity.Documento;
+import com.transparencia.api.model.dto.SegundaCalificacionDTO;
 import com.transparencia.api.repository.ApelacionRepository;
+import com.transparencia.api.repository.DocumentoRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,21 +16,28 @@ import java.util.Optional;
 public class ApelacionService {
 
     private static final List<Apelacion.EstadoApelacion> ESTADOS_FINALES = List.of(
-        Apelacion.EstadoApelacion.RESUELTO,
-        Apelacion.EstadoApelacion.RESUELTO_FUNDADO,
-        Apelacion.EstadoApelacion.RESUELTO_FUNDADO_EN_PARTE,
-        Apelacion.EstadoApelacion.RESUELTO_INFUNDADO,
-        Apelacion.EstadoApelacion.RESUELTO_INFUNDADO_EN_PARTE,
-        Apelacion.EstadoApelacion.RESUELTO_IMPROCEDENTE,
-        Apelacion.EstadoApelacion.TENER_POR_NO_PRESENTADO,
-        Apelacion.EstadoApelacion.CONCLUSION_SUSTRACCION_MATERIA,
-        Apelacion.EstadoApelacion.CONCLUSION_DESISTIMIENTO
+            Apelacion.EstadoApelacion.RESUELTO,
+            Apelacion.EstadoApelacion.RESUELTO_FUNDADO,
+            Apelacion.EstadoApelacion.RESUELTO_FUNDADO_EN_PARTE,
+            Apelacion.EstadoApelacion.RESUELTO_INFUNDADO,
+            Apelacion.EstadoApelacion.RESUELTO_INFUNDADO_EN_PARTE,
+            Apelacion.EstadoApelacion.RESUELTO_IMPROCEDENTE,
+            Apelacion.EstadoApelacion.TENER_POR_NO_PRESENTADO,
+            Apelacion.EstadoApelacion.CONCLUSION_SUSTRACCION_MATERIA,
+            Apelacion.EstadoApelacion.CONCLUSION_DESISTIMIENTO
     );
 
     private final ApelacionRepository apelacionRepository;
+    private final DocumentoRepository documentoRepository;
+    private final FileStorageService fileStorageService;
 
-    public ApelacionService(ApelacionRepository apelacionRepository) {
+    //  inyecciones para soportar archivos
+    public ApelacionService(ApelacionRepository apelacionRepository,
+                            DocumentoRepository documentoRepository,
+                            FileStorageService fileStorageService) {
         this.apelacionRepository = apelacionRepository;
+        this.documentoRepository = documentoRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     @Transactional(readOnly = true)
@@ -87,5 +98,48 @@ public class ApelacionService {
     @Transactional(readOnly = true)
     public long count() {
         return apelacionRepository.count();
+    }
+
+    // MÉTODO PARA HU-07 (Segunda Calificación)
+
+    @Transactional
+    public Apelacion procesarSegundaCalificacion(Long idApelacion, SegundaCalificacionDTO request, MultipartFile archivoAdjunto) {
+        Apelacion apelacion = apelacionRepository.findById(idApelacion)
+                .orElseThrow(() -> new RuntimeException("Apelación no encontrada con ID: " + idApelacion));
+
+        // La apelación debe estar en Segunda Calificación
+        if (apelacion.getEstado() != Apelacion.EstadoApelacion.EN_CALIFICACION_2) {
+            throw new IllegalStateException("La apelación no se encuentra en Segunda Calificación.");
+        }
+
+        // El archivo de resolución es obligatorio
+        if (archivoAdjunto == null || archivoAdjunto.isEmpty()) {
+            throw new IllegalArgumentException("Debe cargar el documento de resolución firmada para notificar.");
+        }
+
+        // Guardar el documento físicamente
+        String rutaArchivoFisico = fileStorageService.storeFile(archivoAdjunto, "resoluciones");
+        Documento documento = new Documento();
+        documento.setNombreArchivo(archivoAdjunto.getOriginalFilename());
+        documento.setRutaArchivo(rutaArchivoFisico);
+        documento.setTipoDocumento(Documento.TipoDocumento.RESOLUCION_TTAIP);
+        documento.setApelacion(apelacion);
+
+        documentoRepository.save(documento);
+
+        // Flujo parametrizado según decisión
+        if ("ADMISIBLE".equalsIgnoreCase(request.getDecision())) {
+            // Pasa a Calificación Final
+            apelacion.setEstado(Apelacion.EstadoApelacion.EN_RESOLUCION);
+            apelacion.setResultado("ADMITIDO EN SEGUNDA CALIFICACIÓN");
+        } else if ("IMPROCEDENTE".equalsIgnoreCase(request.getDecision())) {
+            // Cierre definitivo como Improcedente
+            apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_IMPROCEDENTE);
+            apelacion.setResultado("IMPROCEDENTE");
+        } else {
+            throw new IllegalArgumentException("Decisión no válida. Solo se acepta ADMISIBLE o IMPROCEDENTE.");
+        }
+
+        return apelacionRepository.save(apelacion);
     }
 }
