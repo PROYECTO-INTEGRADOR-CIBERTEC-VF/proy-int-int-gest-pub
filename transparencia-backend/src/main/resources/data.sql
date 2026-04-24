@@ -1,8 +1,7 @@
--- 1. Insertar en la tabla base 'usuarios'
--- La contraseña es: admin123
+-- 1. Insertar en la tabla base 'usuarios' (Funciona en MySQL y H2)
 INSERT INTO usuarios (email, password, tipo_usuario, activo, fecha_registro)
-VALUES ('ttaip@test.com', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqCyO', 'TTAIP', true, NOW());
+VALUES ('ttaip@test.com', '$2a$10$Y0iRy1prmCuSBvmhPsDKCO1r3fx5cCwPqVw7kmv5VnNKH8QqhDCJq', 'TTAIP', true, CURRENT_TIMESTAMP);
 
--- 2. Insertar una apelación de prueba (ID 1) en el estado correcto
-INSERT INTO apelaciones (id_apelacion, expediente, estado, fecha_apelacion, resultado)
-VALUES (1, 'EXP-2024-007', 'EN_CALIFICACION_2', NOW(), 'PENDIENTE SEGUNDA CALIFICACIÓN');
+-- 2. Insertar una apelación de prueba (Funciona en MySQL y H2)
+INSERT INTO apelaciones (expediente, estado, fecha_apelacion, resultado)
+VALUES ('EXP-2024-007', 'EN_CALIFICACION_2', CURRENT_TIMESTAMP, 'PENDIENTE SEGUNDA CALIFICACIÓN');
