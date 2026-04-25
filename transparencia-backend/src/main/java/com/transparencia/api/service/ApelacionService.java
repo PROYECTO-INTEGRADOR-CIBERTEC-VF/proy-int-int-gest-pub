@@ -127,18 +127,30 @@ public class ApelacionService {
 
         documentoRepository.save(documento);
 
-        // Flujo parametrizado según decisión
-        if ("ADMISIBLE".equalsIgnoreCase(request.getDecision())) {
-            // Pasa a Calificación Final
+        // Flujo parametrizado según decisión (HU-07 BE-02)
+        if ("ADMISIBLE".equalsIgnoreCase(request.getDecision()) || "ADMITIDO".equalsIgnoreCase(request.getDecision())) {
+            // Pasa a Calificación Final (En Resolución)
             apelacion.setEstado(Apelacion.EstadoApelacion.EN_RESOLUCION);
             apelacion.setResultado("ADMITIDO EN SEGUNDA CALIFICACIÓN");
+            apelacion.setCalificacionSegunda(Apelacion.Calificacion.ADMISIBLE);
+
+        } else if ("TENER_POR_NO_PRESENTADO".equalsIgnoreCase(request.getDecision()) || "NO_PRESENTADO".equalsIgnoreCase(request.getDecision())) {
+            // El ciudadano no subsanó a tiempo
+            apelacion.setEstado(Apelacion.EstadoApelacion.TENER_POR_NO_PRESENTADO);
+            apelacion.setResultado("TENER POR NO PRESENTADO POR FALTA DE SUBSANACIÓN");
+
         } else if ("IMPROCEDENTE".equalsIgnoreCase(request.getDecision())) {
             // Cierre definitivo como Improcedente
             apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_IMPROCEDENTE);
-            apelacion.setResultado("IMPROCEDENTE");
+            apelacion.setResultado("RECHAZO DEFINITIVO - IMPROCEDENTE");
+            apelacion.setCalificacionSegunda(Apelacion.Calificacion.IMPROCEDENTE);
+
         } else {
-            throw new IllegalArgumentException("Decisión no válida. Solo se acepta ADMISIBLE o IMPROCEDENTE.");
+            throw new IllegalArgumentException("Decisión no válida. Solo se acepta ADMISIBLE, TENER_POR_NO_PRESENTADO o IMPROCEDENTE.");
         }
+
+        // Guardar los fundamentos sin importar qué decisión se tomó
+        apelacion.setFundamentos(request.getFundamentos());
 
         return apelacionRepository.save(apelacion);
     }
