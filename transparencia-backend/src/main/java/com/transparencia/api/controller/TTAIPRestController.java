@@ -103,7 +103,7 @@ public class TTAIPRestController {
         return ResponseEntity.ok(ttaipService.declararTenerPorNoPresentado(apelacionId, request));
     }
 
-    // MÉTODO NUEVO PARA HU-07 (Segunda Calificación)
+    // MÉTODO PARA HU-07 (Segunda Calificación)
 
     @PostMapping(value = "/segunda-calificacion/{id}/notificar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> notificarSegundaCalificacion(
@@ -119,5 +119,12 @@ public class TTAIPRestController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", "Error interno al procesar la calificación."));
         }
+    }
+
+    // Endpoint para confirmar la notificación (HU-07 BE-02)
+    @PostMapping("/{id}/confirmar-notificacion")
+    public ResponseEntity<Apelacion> confirmarNotificacion(@PathVariable Long id) {
+        Apelacion apelacionActualizada = apelacionService.confirmarNotificacionSegundaCalificacion(id);
+        return ResponseEntity.ok(apelacionActualizada);
     }
 }
