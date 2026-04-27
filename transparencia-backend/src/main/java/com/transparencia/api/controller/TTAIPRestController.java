@@ -61,9 +61,9 @@ public class TTAIPRestController {
         return ResponseEntity.ok(ttaipService.listarPorEstado(Apelacion.EstadoApelacion.EN_CALIFICACION_2));
     }
 
-    @GetMapping("/en-resolucion")
-    public ResponseEntity<List<ApelacionDTO>> listarEnResolucion() {
-        return ResponseEntity.ok(ttaipService.listarPorEstado(Apelacion.EstadoApelacion.EN_RESOLUCION));
+    @GetMapping("/en-proceso")
+    public ResponseEntity<List<ApelacionDTO>> listarEnProceso() {
+        return ResponseEntity.ok(ttaipService.listarEnProceso());
     }
 
     @GetMapping("/resueltas")
@@ -126,5 +126,13 @@ public class TTAIPRestController {
     public ResponseEntity<Apelacion> confirmarNotificacion(@PathVariable Long id) {
         Apelacion apelacionActualizada = apelacionService.confirmarNotificacionSegundaCalificacion(id);
         return ResponseEntity.ok(apelacionActualizada);
+    }
+
+    @GetMapping("/todas")
+    public ResponseEntity<List<ApelacionDTO>> listarTodas() {
+        // Usa el findAll que ya existe en apelacionService
+        return ResponseEntity.ok(apelacionService.findAll().stream()
+                .map(ApelacionDTO::from)
+                .toList());
     }
 }

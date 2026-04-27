@@ -1,5 +1,6 @@
 package com.transparencia.api.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -59,10 +60,12 @@ public class Documento {
     @JoinColumn(name = "id_respuesta")
     private Respuesta respuesta;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_apelacion")
     private Apelacion apelacion;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_resolucion")
     private Resolucion resolucion;
