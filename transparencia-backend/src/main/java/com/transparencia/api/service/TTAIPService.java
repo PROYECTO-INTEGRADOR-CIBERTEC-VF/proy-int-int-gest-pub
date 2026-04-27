@@ -51,29 +51,35 @@ public class TTAIPService {
         Map<String, Object> stats = new HashMap<>();
         stats.put("total", apelacionService.count());
 
+        // 1. Pendientes de Admisión (Solo etapa inicial)
         long pendientes =
-            apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.PENDIENTE_ELEVACION)
-                + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.EN_CALIFICACION_1);
+                apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.PENDIENTE_ELEVACION)
+                        + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.EN_CALIFICACION_1);
         stats.put("pendientes", pendientes);
 
+        // 2. En Proceso (Solo los que están listos para Resolución Final)
         long enProceso =
-            apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.EN_CALIFICACION_2)
-                + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.NOTIFICACION_SEGUNDA_CALIFICACION)
-                + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.EN_RESOLUCION);
+                apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.NOTIFICACION_SEGUNDA_CALIFICACION)
+                        + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.EN_RESOLUCION);
         stats.put("enProceso", enProceso);
 
+        // 3. En Subsanación
         stats.put("enSubsanacion", apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.EN_SUBSANACION));
 
+        // 4. Segunda Calificación (¡NUEVO! Separado para tu HU-07)
+        stats.put("segundaCalificacion", apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.EN_CALIFICACION_2));
+
+        // 5. Resueltas
         long resueltas =
-            apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.RESUELTO)
-                + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.RESUELTO_FUNDADO)
-                + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.RESUELTO_FUNDADO_EN_PARTE)
-                + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.RESUELTO_INFUNDADO)
-                + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.RESUELTO_INFUNDADO_EN_PARTE)
-                + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.RESUELTO_IMPROCEDENTE)
-                + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.TENER_POR_NO_PRESENTADO)
-                + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.CONCLUSION_SUSTRACCION_MATERIA)
-                + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.CONCLUSION_DESISTIMIENTO);
+                apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.RESUELTO)
+                        + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.RESUELTO_FUNDADO)
+                        + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.RESUELTO_FUNDADO_EN_PARTE)
+                        + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.RESUELTO_INFUNDADO)
+                        + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.RESUELTO_INFUNDADO_EN_PARTE)
+                        + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.RESUELTO_IMPROCEDENTE)
+                        + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.TENER_POR_NO_PRESENTADO)
+                        + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.CONCLUSION_SUSTRACCION_MATERIA)
+                        + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.CONCLUSION_DESISTIMIENTO);
         stats.put("resueltas", resueltas);
 
         return stats;
@@ -81,9 +87,14 @@ public class TTAIPService {
 
     @Transactional(readOnly = true)
     public List<ApelacionDTO> listarPendientes() {
-        return apelacionService.findPendientes().stream()
-            .map(ApelacionDTO::from)
-            .toList();
+        // Antes traía todo. Ahora traemos EXPLÍCITAMENTE solo los de primera calificación.
+        java.util.List<Apelacion> pendientesClasificados = new java.util.ArrayList<>();
+        pendientesClasificados.addAll(apelacionService.obtenerApelacionesPorEstado(Apelacion.EstadoApelacion.PENDIENTE_ELEVACION));
+        pendientesClasificados.addAll(apelacionService.obtenerApelacionesPorEstado(Apelacion.EstadoApelacion.EN_CALIFICACION_1));
+
+        return pendientesClasificados.stream()
+                .map(ApelacionDTO::from)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -216,6 +227,18 @@ public class TTAIPService {
         apelacionService.save(apelacion);
 
         return ApelacionDTO.from(apelacion);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ApelacionDTO> listarEnProceso() {
+
+        java.util.List<Apelacion> enProceso = new java.util.ArrayList<>();
+        enProceso.addAll(apelacionService.obtenerApelacionesPorEstado(Apelacion.EstadoApelacion.NOTIFICACION_SEGUNDA_CALIFICACION));
+        enProceso.addAll(apelacionService.obtenerApelacionesPorEstado(Apelacion.EstadoApelacion.EN_RESOLUCION));
+
+        return enProceso.stream()
+                .map(ApelacionDTO::from)
+                .toList();
     }
 
     private Apelacion buscarApelacion(Long apelacionId) {
