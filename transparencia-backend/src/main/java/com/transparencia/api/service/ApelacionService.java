@@ -1,5 +1,7 @@
 package com.transparencia.api.service;
 
+import com.transparencia.api.util.DiasHabilesUtil;
+import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +33,7 @@ public class ApelacionService {
     private final DocumentoRepository documentoRepository;
     private final FileStorageService fileStorageService;
 
-    //  inyecciones para soportar archivos
+    // Inyecciones para soportar archivos
     public ApelacionService(ApelacionRepository apelacionRepository,
                             DocumentoRepository documentoRepository,
                             FileStorageService fileStorageService) {
@@ -101,7 +103,6 @@ public class ApelacionService {
     }
 
     // MÉTODO PARA HU-07 (Segunda Calificación)
-
     @Transactional
     public Apelacion procesarSegundaCalificacion(Long idApelacion, SegundaCalificacionDTO request, MultipartFile archivoAdjunto) {
         Apelacion apelacion = apelacionRepository.findById(idApelacion)
@@ -111,6 +112,20 @@ public class ApelacionService {
         if (apelacion.getEstado() != Apelacion.EstadoApelacion.EN_CALIFICACION_2) {
             throw new IllegalStateException("La apelación no se encuentra en Segunda Calificación.");
         }
+
+        // Validar plazo de 7 días hábiles
+        LocalDate fechaInicio = apelacion.getFechaSubsanacion() != null
+                ? apelacion.getFechaSubsanacion().toLocalDate()
+                : apelacion.getFechaApelacion().toLocalDate();
+
+        int diasTranscurridos = DiasHabilesUtil.contarDiasHabiles(fechaInicio, LocalDate.now());
+
+        // Si se pasó del plazo, se crea una etiqueta de advertencia para la auditoría
+        String sufijoPlazo = "";
+        if (diasTranscurridos > 7) {
+            sufijoPlazo = " (ALERTA: FUERA DE PLAZO REGLAMENTARIO - " + diasTranscurridos + " días)";
+        }
+
 
         // El archivo de resolución es obligatorio
         if (archivoAdjunto == null || archivoAdjunto.isEmpty()) {
@@ -127,22 +142,22 @@ public class ApelacionService {
 
         documentoRepository.save(documento);
 
-        // Flujo parametrizado según decisión (HU-07 BE-02)
+        // Flujo parametrizado según decisión
         if ("ADMISIBLE".equalsIgnoreCase(request.getDecision()) || "ADMITIDO".equalsIgnoreCase(request.getDecision())) {
-            // Pasa a Calificación Final (En Resolución)
-            apelacion.setEstado(Apelacion.EstadoApelacion.EN_RESOLUCION);
-            apelacion.setResultado("ADMITIDO EN SEGUNDA CALIFICACIÓN");
+            // Pasa a estado de Notificación
+            apelacion.setEstado(Apelacion.EstadoApelacion.NOTIFICACION_SEGUNDA_CALIFICACION);
+            apelacion.setResultado("ADMITIDO EN SEGUNDA CALIFICACIÓN" + sufijoPlazo);
             apelacion.setCalificacionSegunda(Apelacion.Calificacion.ADMISIBLE);
 
         } else if ("TENER_POR_NO_PRESENTADO".equalsIgnoreCase(request.getDecision()) || "NO_PRESENTADO".equalsIgnoreCase(request.getDecision())) {
             // El ciudadano no subsanó a tiempo
             apelacion.setEstado(Apelacion.EstadoApelacion.TENER_POR_NO_PRESENTADO);
-            apelacion.setResultado("TENER POR NO PRESENTADO POR FALTA DE SUBSANACIÓN");
+            apelacion.setResultado("TENER POR NO PRESENTADO POR FALTA DE SUBSANACIÓN" + sufijoPlazo);
 
         } else if ("IMPROCEDENTE".equalsIgnoreCase(request.getDecision())) {
             // Cierre definitivo como Improcedente
             apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_IMPROCEDENTE);
-            apelacion.setResultado("RECHAZO DEFINITIVO - IMPROCEDENTE");
+            apelacion.setResultado("RECHAZO DEFINITIVO - IMPROCEDENTE" + sufijoPlazo);
             apelacion.setCalificacionSegunda(Apelacion.Calificacion.IMPROCEDENTE);
 
         } else {
@@ -152,6 +167,21 @@ public class ApelacionService {
         // Guardar los fundamentos sin importar qué decisión se tomó
         apelacion.setFundamentos(request.getFundamentos());
 
+        return apelacionRepository.save(apelacion);
+    }
+
+    // MÉTODO EXTRA: Para confirmar la notificación y pasar a Resolución Final (BE-02)
+    @Transactional
+    public Apelacion confirmarNotificacionSegundaCalificacion(Long idApelacion) {
+        Apelacion apelacion = apelacionRepository.findById(idApelacion)
+                .orElseThrow(() -> new RuntimeException("Apelación no encontrada con ID: " + idApelacion));
+
+        if (apelacion.getEstado() != Apelacion.EstadoApelacion.NOTIFICACION_SEGUNDA_CALIFICACION) {
+            throw new IllegalStateException("La apelación no está pendiente de notificación.");
+        }
+
+        // Avanza la etapa de resolución
+        apelacion.setEstado(Apelacion.EstadoApelacion.EN_RESOLUCION);
         return apelacionRepository.save(apelacion);
     }
 }
