@@ -110,7 +110,7 @@ public class ApelacionService {
 
         // La apelación debe estar en Segunda Calificación
         if (apelacion.getEstado() != Apelacion.EstadoApelacion.EN_CALIFICACION_2) {
-            throw new IllegalStateException("Error - ID recibido: " + idApelacion + " | Estado en BD: " + apelacion.getEstado());
+            throw new IllegalStateException("La apelación no se encuentra en Segunda Calificación.");
         }
 
         // Validar plazo de 7 días hábiles
