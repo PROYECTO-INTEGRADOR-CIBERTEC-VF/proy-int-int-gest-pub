@@ -121,6 +121,24 @@ export class TtaipResolverComponent implements OnInit {
     this.error.set(err?.error?.mensaje || 'Error al procesar la resolucion');
   }
 
+  confirmarEnvioNotificacion(): void {
+    const id = this.apelacion()?.idApelacion || this.apelacion()?.id;
+    if (!id) return;
+
+    this.loading.set(true);
+    this.ttaipService.confirmarNotificacion(id).subscribe({
+      next: (apelacionActualizada) => {
+        this.loading.set(false);
+        // El estado cambió a EN_RESOLUCION, actualizamos la pantalla
+        this.apelacion.set(apelacionActualizada);
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.error.set('Error al confirmar la notificación.');
+      }
+    });
+  }
+
   getDecisionLabel(): string {
     const labels: Record<string, string> = {
       fundado: 'FUNDADA',

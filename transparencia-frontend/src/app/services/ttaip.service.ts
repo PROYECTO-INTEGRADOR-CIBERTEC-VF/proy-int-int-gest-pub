@@ -23,6 +23,7 @@ interface TtaipEstadisticasResponse {
   enProceso?: number;
   enSubsanacion?: number;
   resueltas?: number;
+  segundaCalificacion?: number;
 }
 
 @Injectable({
@@ -54,8 +55,8 @@ export class TtaipService {
     return this.http.get<Apelacion[]>(`${this.apiUrl}/segunda-calificacion`);
   }
 
-  getEnResolucion(): Observable<Apelacion[]> {
-    return this.http.get<Apelacion[]>(`${this.apiUrl}/en-resolucion`);
+  getEnProceso(): Observable<Apelacion[]> {
+    return this.http.get<Apelacion[]>(`${this.apiUrl}/en-proceso`);
   }
 
   getResueltas(): Observable<Apelacion[]> {
@@ -68,7 +69,7 @@ export class TtaipService {
       this.getEnAnalisis(),
       this.getSubsanacion(),
       this.getSegundaCalificacion(),
-      this.getEnResolucion(),
+      this.getEnProceso(),
       this.getResueltas(),
     ]).pipe(
       map((listas) => listas.flat().find((apelacion) => apelacion.expediente === expediente) ?? null)
@@ -117,5 +118,13 @@ export class TtaipService {
 
   declararNoPresentado(apelacionId: number, data: ResolucionRequest): Observable<Apelacion> {
     return this.http.post<Apelacion>(`${this.resolucionUrl}/${apelacionId}/no-presentado`, data);
+  }
+
+  getTodas(): Observable<Apelacion[]> {
+    return this.http.get<Apelacion[]>(`${this.apiUrl}/todas`);
+  }
+
+  confirmarNotificacion(idApelacion: number | string) {
+    return this.http.post<any>(`${this.apiUrl}/${idApelacion}/confirmar-notificacion`, {});
   }
 }

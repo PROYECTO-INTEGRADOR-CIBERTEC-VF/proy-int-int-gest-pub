@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Apelacion } from '../../models/apelacion.model';
 import { TtaipService } from '../../services/ttaip.service';
+import { TtaipSegundaCalificacionService, SegundaCalificacionRequest } from './ttaip-segunda-calificacion.service';
 
 @Component({
   selector: 'app-ttaip-segunda-calificacion',
@@ -15,6 +16,7 @@ export class TtaipSegundaCalificacionComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly ttaipService = inject(TtaipService);
+  private readonly segundaCalificacionService = inject(TtaipSegundaCalificacionService);
 
   apelacion = signal<Apelacion | null>(null);
   loading = signal<boolean>(false);
@@ -25,6 +27,7 @@ export class TtaipSegundaCalificacionComponent implements OnInit {
 
   decision = '';
   fundamentos = '';
+  archivoAdjunto: File | null = null; // Guardará el PDF
 
   ngOnInit(): void {
     const expediente = this.route.snapshot.paramMap.get('expediente');
@@ -48,7 +51,6 @@ export class TtaipSegundaCalificacionComponent implements OnInit {
           this.loadingApelacion.set(false);
           return;
         }
-
         this.apelacion.set(data);
         this.loadingApelacion.set(false);
       },
@@ -63,78 +65,69 @@ export class TtaipSegundaCalificacionComponent implements OnInit {
     this.activeTab.set(tab);
   }
 
+  // --- Atrapa el archivo desde el HTML ---
+  onArchivoSeleccionado(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.archivoAdjunto = input.files[0];
+    }
+  }
+
   getObservaciones(): string[] {
     const resolucionPrimera = this.apelacion()?.resolucionPrimeraCalificacion;
     const observaciones = resolucionPrimera?.observaciones ?? '';
-
-    if (!observaciones.trim()) {
-      return [];
-    }
-
-    return observaciones
-      .split(';')
-      .map((observacion) => observacion.trim())
-      .filter((observacion) => observacion.length > 0);
+    if (!observaciones.trim()) return [];
+    return observaciones.split(';').map(o => o.trim()).filter(o => o.length > 0);
   }
 
   getSubsanacionFromFundamentos(): string {
     const fundamentos = this.apelacion()?.fundamentos ?? '';
-
-    if (!fundamentos.includes('--- SUBSANACION ---')) {
-      return '';
-    }
-
+    if (!fundamentos.includes('--- SUBSANACION ---')) return '';
     const parts = fundamentos.split('--- SUBSANACION ---');
     return parts.length > 1 ? parts[1].trim() : '';
   }
 
   getOriginalFundamentos(): string {
     const fundamentos = this.apelacion()?.fundamentos ?? '';
-
-    if (!fundamentos.includes('--- SUBSANACION ---')) {
-      return fundamentos;
-    }
-
+    if (!fundamentos.includes('--- SUBSANACION ---')) return fundamentos;
     return fundamentos.split('--- SUBSANACION ---')[0].trim();
   }
 
   enviarCalificacion(): void {
     const apelacion = this.apelacion();
-    if (!apelacion) {
-      return;
-    }
+    if (!apelacion) return;
 
     const apelacionId = apelacion.idApelacion ?? apelacion.id;
     if (!apelacionId) {
-      this.error.set('No se pudo identificar la apelacion para registrar la decision.');
+      this.error.set('No se pudo identificar la apelacion.');
       return;
     }
 
     if (!this.decision) {
-      this.error.set('Debe seleccionar una decision');
+      this.error.set('Debe seleccionar una decisión (ADMISIBLE, IMPROCEDENTE o TENER_POR_NO_PRESENTADO).');
       return;
     }
 
     if (!this.fundamentos.trim()) {
-      this.error.set('Los fundamentos son obligatorios');
+      this.error.set('Los fundamentos son obligatorios.');
+      return;
+    }
+
+    if (!this.archivoAdjunto) {
+      this.error.set('Debe adjuntar el documento de resolución firmado (PDF).');
       return;
     }
 
     this.loading.set(true);
     this.error.set('');
 
-    const request = { fundamentos: this.fundamentos.trim() };
+    const request: SegundaCalificacionRequest = {
+      decision: this.decision.toUpperCase(),
+      fundamentos: this.fundamentos.trim()
+    };
 
-    if (this.decision === 'admitir') {
-      this.ttaipService.admitirApelacion(apelacionId, request).subscribe({
-        next: () => this.exito('Apelacion admitida a tramite'),
-        error: (err) => this.errorHandler(err),
-      });
-      return;
-    }
-
-    this.ttaipService.inadmitirApelacion(apelacionId, request).subscribe({
-      next: () => this.exito('Apelacion declarada improcedente'),
+    this.segundaCalificacionService.notificarSegundaCalificacion(apelacionId, request, this.archivoAdjunto).subscribe({
+      next: () => this.exito(`Decisión registrada correctamente.`),
       error: (err) => this.errorHandler(err),
     });
   }
@@ -142,11 +135,11 @@ export class TtaipSegundaCalificacionComponent implements OnInit {
   private exito(msg: string): void {
     this.loading.set(false);
     this.mensaje.set(msg);
-    setTimeout(() => this.router.navigate(['/ttaip']), 2000);
+    setTimeout(() => this.router.navigate(['/ttaip']), 2500);
   }
 
   private errorHandler(err: any): void {
     this.loading.set(false);
-    this.error.set(err?.error?.mensaje || 'Error al procesar la segunda calificacion');
+    this.error.set(err?.error?.error || 'Error al procesar en el servidor.');
   }
 }
