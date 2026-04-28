@@ -61,9 +61,9 @@ public class TTAIPRestController {
         return ResponseEntity.ok(ttaipService.listarPorEstado(Apelacion.EstadoApelacion.EN_CALIFICACION_2));
     }
 
-    @GetMapping("/en-proceso")
-    public ResponseEntity<List<ApelacionDTO>> listarEnProceso() {
-        return ResponseEntity.ok(ttaipService.listarEnProceso());
+    @GetMapping("/en-resolucion")
+    public ResponseEntity<List<ApelacionDTO>> listarEnResolucion() {
+        return ResponseEntity.ok(ttaipService.listarPorEstado(Apelacion.EstadoApelacion.EN_RESOLUCION));
     }
 
     @GetMapping("/resueltas")
@@ -128,11 +128,85 @@ public class TTAIPRestController {
         return ResponseEntity.ok(apelacionActualizada);
     }
 
-    @GetMapping("/todas")
-    public ResponseEntity<List<ApelacionDTO>> listarTodas() {
-        // Usa el findAll que ya existe en apelacionService
-        return ResponseEntity.ok(apelacionService.findAll().stream()
-                .map(ApelacionDTO::from)
-                .toList());
+    // ============================================
+    // RESOLUCIÓN FINAL — HU-08
+    // ============================================
+
+    public record ResolucionFinalRequest(
+        @jakarta.validation.constraints.NotBlank(message = "Los fundamentos son obligatorios")
+        String fundamentos,
+        Boolean iniciarProcesoDisciplinario
+    ) {}
+
+    @PostMapping("/resolucion/{apelacionId}/fundado")
+    public ResponseEntity<ApelacionDTO> declararFundado(
+            @PathVariable Long apelacionId,
+            @Valid @RequestBody ResolucionFinalRequest request
+    ) {
+        return ResponseEntity.ok(ttaipService.emitirResolucionFinal(
+            apelacionId, "FUNDADO", request.fundamentos(), request.iniciarProcesoDisciplinario()));
+    }
+
+    @PostMapping("/resolucion/{apelacionId}/fundado-en-parte")
+    public ResponseEntity<ApelacionDTO> declararFundadoEnParte(
+            @PathVariable Long apelacionId,
+            @Valid @RequestBody ResolucionFinalRequest request
+    ) {
+        return ResponseEntity.ok(ttaipService.emitirResolucionFinal(
+            apelacionId, "FUNDADO_EN_PARTE", request.fundamentos(), request.iniciarProcesoDisciplinario()));
+    }
+
+    @PostMapping("/resolucion/{apelacionId}/infundado")
+    public ResponseEntity<ApelacionDTO> declararInfundado(
+            @PathVariable Long apelacionId,
+            @Valid @RequestBody ResolucionFinalRequest request
+    ) {
+        return ResponseEntity.ok(ttaipService.emitirResolucionFinal(
+            apelacionId, "INFUNDADO", request.fundamentos(), request.iniciarProcesoDisciplinario()));
+    }
+
+    @PostMapping("/resolucion/{apelacionId}/infundado-en-parte")
+    public ResponseEntity<ApelacionDTO> declararInfundadoEnParte(
+            @PathVariable Long apelacionId,
+            @Valid @RequestBody ResolucionFinalRequest request
+    ) {
+        return ResponseEntity.ok(ttaipService.emitirResolucionFinal(
+            apelacionId, "INFUNDADO_EN_PARTE", request.fundamentos(), request.iniciarProcesoDisciplinario()));
+    }
+
+    @PostMapping("/resolucion/{apelacionId}/improcedente")
+    public ResponseEntity<ApelacionDTO> declararImprocedenteFinal(
+            @PathVariable Long apelacionId,
+            @Valid @RequestBody ResolucionFinalRequest request
+    ) {
+        return ResponseEntity.ok(ttaipService.emitirResolucionFinal(
+            apelacionId, "IMPROCEDENTE", request.fundamentos(), request.iniciarProcesoDisciplinario()));
+    }
+
+    @PostMapping("/resolucion/{apelacionId}/sustraccion-materia")
+    public ResponseEntity<ApelacionDTO> declararSustraccionMateria(
+            @PathVariable Long apelacionId,
+            @Valid @RequestBody ResolucionFinalRequest request
+    ) {
+        return ResponseEntity.ok(ttaipService.emitirResolucionFinal(
+            apelacionId, "CONCLUSION_SUSTRACCION_MATERIA", request.fundamentos(), request.iniciarProcesoDisciplinario()));
+    }
+
+    @PostMapping("/resolucion/{apelacionId}/desistimiento")
+    public ResponseEntity<ApelacionDTO> declararDesistimiento(
+            @PathVariable Long apelacionId,
+            @Valid @RequestBody ResolucionFinalRequest request
+    ) {
+        return ResponseEntity.ok(ttaipService.emitirResolucionFinal(
+            apelacionId, "CONCLUSION_DESISTIMIENTO", request.fundamentos(), request.iniciarProcesoDisciplinario()));
+    }
+
+    @PostMapping("/resolucion/{apelacionId}/no-presentado")
+    public ResponseEntity<ApelacionDTO> declararNoPresentadoFinal(
+            @PathVariable Long apelacionId,
+            @Valid @RequestBody ResolucionFinalRequest request
+    ) {
+        return ResponseEntity.ok(ttaipService.emitirResolucionFinal(
+            apelacionId, "TENER_POR_NO_PRESENTADO", request.fundamentos(), request.iniciarProcesoDisciplinario()));
     }
 }
