@@ -25,4 +25,9 @@ public interface ApelacionRepository extends JpaRepository<Apelacion, Long> {
 
     @Query("SELECT a FROM Apelacion a WHERE a.estado NOT IN :estadosFinales ORDER BY a.fechaApelacion DESC")
     List<Apelacion> findPendientes(@Param("estadosFinales") List<Apelacion.EstadoApelacion> estadosFinales);
+
+    @Query("SELECT MAX(CAST(SUBSTRING(a.expediente, 1, 5) AS int)) FROM Apelacion a WHERE a.expediente LIKE :suffix")
+    Integer findMaxExpedienteNumber(@Param("suffix") String suffix);
+
+    Optional<Apelacion> findBySolicitud_IdSolicitud(Long solicitudId);
 }
