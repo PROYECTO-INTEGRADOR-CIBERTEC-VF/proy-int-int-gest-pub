@@ -142,7 +142,7 @@ export class TtaipSegundaCalificacionComponent implements OnInit {
   private exito(msg: string): void {
     this.loading.set(false);
     this.mensaje.set(msg);
-    setTimeout(() => this.router.navigate(['/ttaip']), 2000);
+    setTimeout(() => this.router.navigate(['/ttaip/dashboard']), 2000);
   }
 
   private errorHandler(err: any): void {
