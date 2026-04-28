@@ -64,6 +64,8 @@ public class TTAIPService {
 
         stats.put("enSubsanacion", apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.EN_SUBSANACION));
 
+        stats.put("segundaCalificacion", apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.EN_CALIFICACION_2));
+
         long resueltas =
             apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.RESUELTO)
                 + apelacionService.contarApelacionesPorEstado(Apelacion.EstadoApelacion.RESUELTO_FUNDADO)
@@ -81,7 +83,23 @@ public class TTAIPService {
 
     @Transactional(readOnly = true)
     public List<ApelacionDTO> listarPendientes() {
-        return apelacionService.findPendientes().stream()
+        return apelacionService.findByEstadoIn(
+            List.of(Apelacion.EstadoApelacion.PENDIENTE_ELEVACION, Apelacion.EstadoApelacion.EN_CALIFICACION_1)
+        ).stream().map(ApelacionDTO::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ApelacionDTO> listarEnProceso() {
+        return apelacionService.findByEstadoIn(List.of(
+            Apelacion.EstadoApelacion.EN_CALIFICACION_2,
+            Apelacion.EstadoApelacion.NOTIFICACION_SEGUNDA_CALIFICACION,
+            Apelacion.EstadoApelacion.EN_RESOLUCION
+        )).stream().map(ApelacionDTO::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ApelacionDTO> listarTodas() {
+        return apelacionService.findAll().stream()
             .map(ApelacionDTO::from)
             .toList();
     }
@@ -224,9 +242,10 @@ public class TTAIPService {
     }
 
     private void validarEstadoPrimeraCalificacion(Apelacion apelacion) {
-        if (apelacion.getEstado() != Apelacion.EstadoApelacion.EN_CALIFICACION_1) {
+        if (apelacion.getEstado() != Apelacion.EstadoApelacion.EN_CALIFICACION_1
+            && apelacion.getEstado() != Apelacion.EstadoApelacion.PENDIENTE_ELEVACION) {
             throw new IllegalArgumentException(
-                "La apelacion debe estar en EN_CALIFICACION_1 para la primera calificacion"
+                "La apelacion debe estar en PENDIENTE_ELEVACION o EN_CALIFICACION_1 para la primera calificacion"
             );
         }
     }

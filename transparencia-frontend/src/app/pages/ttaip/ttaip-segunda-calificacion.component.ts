@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import Swal from 'sweetalert2';
 import { Apelacion } from '../../models/apelacion.model';
 import { TtaipService } from '../../services/ttaip.service';
 import { TtaipSegundaCalificacionService, SegundaCalificacionRequest } from './ttaip-segunda-calificacion.service';
@@ -133,9 +134,20 @@ export class TtaipSegundaCalificacionComponent implements OnInit {
   }
 
   private exito(msg: string): void {
+    // Mantener loading en true para que el boton no se habilite, previniendo doble click
+    // El loading real deberia quizas quitarse para no mostrar el spinner infinito, pero con el modal SweetAlert ya bloqueamos interaccion.
     this.loading.set(false);
-    this.mensaje.set(msg);
-    setTimeout(() => this.router.navigate(['/ttaip']), 2500);
+
+    Swal.fire({
+      title: 'Decisión Registrada',
+      text: msg + ' Se ha notificado al ciudadano en el expediente ' + this.apelacion()?.expediente,
+      icon: 'success',
+      confirmButtonText: 'Ir al Dashboard',
+      confirmButtonColor: '#b91c1c', // peru-rojo
+      allowOutsideClick: false
+    }).then(() => {
+      this.router.navigate(['/ttaip']);
+    });
   }
 
   private errorHandler(err: any): void {

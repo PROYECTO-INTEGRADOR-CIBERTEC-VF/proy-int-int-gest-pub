@@ -159,10 +159,15 @@ public class ApelacionService {
         apelacion.setSolicitud(solicitud);
         apelacion.setCiudadano(ciudadano);
         apelacion.setFundamentos(fundamentos);
-        apelacion.setEstado(Apelacion.EstadoApelacion.EN_CALIFICACION_1);
+        apelacion.setEstado(Apelacion.EstadoApelacion.PENDIENTE_ELEVACION);
         apelacion.setFechaApelacion(LocalDateTime.now());
 
         return save(apelacion);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Apelacion> findByEstadoIn(List<Apelacion.EstadoApelacion> estados) {
+        return apelacionRepository.findByEstadoInOrderByFechaApelacionDesc(estados);
     }
 
     /**

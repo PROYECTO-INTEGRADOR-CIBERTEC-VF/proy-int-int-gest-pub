@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import Swal from 'sweetalert2';
 import { Apelacion } from '../../models/apelacion.model';
 import { TtaipService } from '../../services/ttaip.service';
 
@@ -129,8 +130,20 @@ export class TtaipResolverComponent implements OnInit {
     this.ttaipService.confirmarNotificacion(id).subscribe({
       next: (apelacionActualizada) => {
         this.loading.set(false);
-        // El estado cambió a EN_RESOLUCION, actualizamos la pantalla
+        // El estado cambió a EN_RESOLUCION, actualizamos la pantalla detrás del modal
         this.apelacion.set(apelacionActualizada);
+
+        Swal.fire({
+          title: 'Notificación Confirmada',
+          html: `Se ha confirmado la notificación al ciudadano para el expediente <b>${apelacionActualizada.expediente}</b>.`,
+          icon: 'success',
+          confirmButtonText: 'Emitir Resolución Final',
+          confirmButtonColor: '#b91c1c', // peru-rojo
+          allowOutsideClick: false
+        }).then(() => {
+          // Ya estamos en la ruta correcta (/ttaip/resolver/:expediente),
+          // el html se actualizará automágicamente gracias a signal()
+        });
       },
       error: (err) => {
         this.loading.set(false);

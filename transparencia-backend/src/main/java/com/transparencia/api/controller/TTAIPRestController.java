@@ -66,6 +66,16 @@ public class TTAIPRestController {
         return ResponseEntity.ok(ttaipService.listarPorEstado(Apelacion.EstadoApelacion.EN_RESOLUCION));
     }
 
+    @GetMapping("/en-proceso")
+    public ResponseEntity<List<ApelacionDTO>> listarEnProceso() {
+        return ResponseEntity.ok(ttaipService.listarEnProceso());
+    }
+
+    @GetMapping("/todas")
+    public ResponseEntity<List<ApelacionDTO>> listarTodas() {
+        return ResponseEntity.ok(ttaipService.listarTodas());
+    }
+
     @GetMapping("/resueltas")
     public ResponseEntity<List<ApelacionDTO>> listarResueltas() {
         return ResponseEntity.ok(ttaipService.listarResueltas());
@@ -113,19 +123,19 @@ public class TTAIPRestController {
 
         try {
             Apelacion apelacionActualizada = apelacionService.procesarSegundaCalificacion(id, datos, archivo);
-            return ResponseEntity.ok(apelacionActualizada);
+            return ResponseEntity.ok(ApelacionDTO.from(apelacionActualizada));
         } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(Map.of("error", "Error interno al procesar la calificación."));
+            return ResponseEntity.internalServerError().body(Map.of("error", "Error interno al procesar la calificacion."));
         }
     }
 
-    // Endpoint para confirmar la notificación (HU-07 BE-02)
+    // Endpoint para confirmar la notificacion (HU-07 BE-02)
     @PostMapping("/{id}/confirmar-notificacion")
-    public ResponseEntity<Apelacion> confirmarNotificacion(@PathVariable Long id) {
+    public ResponseEntity<ApelacionDTO> confirmarNotificacion(@PathVariable Long id) {
         Apelacion apelacionActualizada = apelacionService.confirmarNotificacionSegundaCalificacion(id);
-        return ResponseEntity.ok(apelacionActualizada);
+        return ResponseEntity.ok(ApelacionDTO.from(apelacionActualizada));
     }
 
     // ============================================
