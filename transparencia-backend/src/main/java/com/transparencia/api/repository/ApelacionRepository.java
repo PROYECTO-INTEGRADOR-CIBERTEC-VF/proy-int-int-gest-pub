@@ -30,4 +30,6 @@ public interface ApelacionRepository extends JpaRepository<Apelacion, Long> {
     Integer findMaxExpedienteNumber(@Param("suffix") String suffix);
 
     Optional<Apelacion> findBySolicitud_IdSolicitud(Long solicitudId);
+
+    List<Apelacion> findByEstadoInOrderByFechaApelacionDesc(List<Apelacion.EstadoApelacion> estados);
 }

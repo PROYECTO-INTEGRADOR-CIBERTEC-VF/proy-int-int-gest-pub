@@ -11,7 +11,7 @@
           <svg class="w-5 h-5 text-[var(--carbon)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         </div>
         <div class="text-[var(--carbon)]">
-          <h1 class="text-2xl md:text-3xl">2da Calificacion de Apelacion</h1>
+          <h1 class="text-2xl md:text-3xl">2da Calificación de Apelación</h1>
           @if (apelacion()) {
             <p class="text-[var(--carbon)]/70">
               Expediente {{ apelacion()!.expediente }}
@@ -31,15 +31,15 @@
         <svg class="h-4 w-4 text-[var(--estado-ambar)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       </div>
       <div>
-        <p class="text-sm text-[var(--estado-ambar)] mb-0.5 font-medium">Verificacion de subsanacion</p>
-        <p class="text-sm text-[var(--estado-ambar)]">El ciudadano presento documentacion complementaria. Verifique si cumple con los requisitos para ser Admitido a Tramite o si resulta Improcedente.</p>
+        <p class="text-sm text-[var(--estado-ambar)] mb-0.5 font-medium">Verificación de subsanación</p>
+        <p class="text-sm text-[var(--estado-ambar)]">El ciudadano presentó documentación complementaria. Verifique si cumple con los requisitos para ser Admitido a Trámite, si resulta Improcedente, o si no se presentó.</p>
       </div>
     </div>
 
     @if (loadingApelacion()) {
       <div class="text-center py-20">
         <div class="w-8 h-8 border-3 border-[var(--peru-rojo)] border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p class="mt-4 text-[var(--niebla)] text-sm">Cargando apelacion...</p>
+        <p class="mt-4 text-[var(--niebla)] text-sm">Cargando apelación...</p>
       </div>
     } @else if (error() && !apelacion()) {
       <div class="bg-[var(--peru-rojo-suave)] border border-[var(--estado-rojo-borde)] rounded-xl p-6 text-center">
@@ -52,17 +52,17 @@
         <div class="card overflow-hidden">
           <div class="border-b border-[var(--ceniza-claro)]">
             <div class="flex">
-              <button (click)="cambiarTab('subsanacion')" class="px-6 py-3 text-sm font-medium transition-colors" [class]="activeTab() === 'subsanacion' ? 'border-b-2 border-[var(--peru-rojo)] text-[var(--peru-rojo)]' : 'text-[var(--niebla)] hover:text-[var(--humo)]'">Subsanacion</button>
+              <button (click)="cambiarTab('subsanacion')" class="px-6 py-3 text-sm font-medium transition-colors" [class]="activeTab() === 'subsanacion' ? 'border-b-2 border-[var(--peru-rojo)] text-[var(--peru-rojo)]' : 'text-[var(--niebla)] hover:text-[var(--humo)]'">Subsanación</button>
               <button (click)="cambiarTab('adjuntos')" class="px-6 py-3 text-sm font-medium transition-colors" [class]="activeTab() === 'adjuntos' ? 'border-b-2 border-[var(--peru-rojo)] text-[var(--peru-rojo)]' : 'text-[var(--niebla)] hover:text-[var(--humo)]'">Adjuntos</button>
             </div>
           </div>
 
           <div class="p-6">
             @if (activeTab() === 'subsanacion') {
-              <h3 class="text-base font-semibold text-[var(--carbon)] mb-4">Revision de Subsanacion</h3>
+              <h3 class="text-base font-semibold text-[var(--carbon)] mb-4">Revisión de Subsanación</h3>
 
               <div class="bg-[var(--estado-azul-suave)] border border-[var(--estado-azul-borde)] rounded-lg p-4 mb-4">
-                <p class="font-semibold text-[var(--estado-azul)] text-sm mb-2">Observaciones de 1ra Calificacion:</p>
+                <p class="font-semibold text-[var(--estado-azul)] text-sm mb-2">Observaciones de 1ra Calificación:</p>
                 @if (getObservaciones().length > 0) {
                   <ul class="text-sm text-[var(--estado-azul)] list-disc list-inside space-y-1">
                     @for (obs of getObservaciones(); track obs) {
@@ -75,22 +75,22 @@
               </div>
 
               <div class="mb-4">
-                <p class="font-semibold text-[var(--carbon)] text-sm mb-2">Fundamentos de Subsanacion:</p>
+                <p class="font-semibold text-[var(--carbon)] text-sm mb-2">Fundamentos de Subsanación:</p>
                 <div class="bg-[var(--estado-verde-suave)] border border-[var(--estado-verde-borde)] rounded-lg p-4">
                   @if (apelacion()?.fundamentosSubsanacion) {
                     <p class="text-sm text-[var(--estado-verde)] whitespace-pre-wrap">{{ apelacion()!.fundamentosSubsanacion }}</p>
                   } @else if ((apelacion()?.fundamentos || '').includes('--- SUBSANACION ---')) {
                     <p class="text-sm text-[var(--estado-verde)] whitespace-pre-wrap">{{ getSubsanacionFromFundamentos() }}</p>
                   } @else {
-                    <p class="text-sm text-[var(--niebla)] italic">No se registraron fundamentos adicionales de subsanacion.</p>
+                    <p class="text-sm text-[var(--niebla)] italic">No se registraron fundamentos adicionales de subsanación.</p>
                   }
                 </div>
               </div>
 
               <div class="bg-[var(--nieve-calida)] rounded-lg p-3 mb-4">
                 <p class="text-xs text-[var(--humo)]">
-                  <strong>Fecha de solicitud de subsanacion:</strong> {{ apelacion()?.fechaSubsanacion | date:'dd/MM/yyyy' }}<br>
-                  <strong>Plazo otorgado:</strong> {{ apelacion()?.diasSubsanacion || 2 }} dias habiles
+                  <strong>Fecha de solicitud de subsanación:</strong> {{ apelacion()?.fechaSubsanacion | date:'dd/MM/yyyy' }}<br>
+                  <strong>Plazo otorgado:</strong> {{ apelacion()?.diasSubsanacion || 2 }} días hábiles
                 </p>
               </div>
 
@@ -128,8 +128,8 @@
         <div class="space-y-6">
           <div class="card overflow-hidden">
             <div class="border-b border-[var(--ceniza-claro)] px-6 py-4">
-              <h3 class="font-semibold text-[var(--carbon)]">Decision de 2da Calificacion</h3>
-              <p class="text-sm text-[var(--niebla)] mt-1">Seleccione la decision tras revisar la subsanacion</p>
+              <h3 class="font-semibold text-[var(--carbon)]">Decisión de 2da Calificación</h3>
+              <p class="text-sm text-[var(--niebla)] mt-1">Seleccione la decisión tras revisar la subsanación</p>
             </div>
 
             <div class="p-6 space-y-4">
@@ -144,21 +144,30 @@
                 </div>
               }
 
-              <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'admitir' ? 'border-[var(--estado-verde)] bg-[var(--estado-verde-suave)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
-                <input type="radio" [(ngModel)]="decision" name="decision" value="admitir" class="sr-only">
+              <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'ADMISIBLE' ? 'border-[var(--estado-verde)] bg-[var(--estado-verde-suave)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
+                <input type="radio" [(ngModel)]="decision" name="decision" value="ADMISIBLE" class="sr-only">
                 <svg class="w-5 h-5 text-[var(--estado-verde)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <div>
-                  <p class="font-semibold text-[var(--estado-verde)]">ADMITIDO A TRAMITE</p>
-                  <p class="text-xs text-[var(--niebla)]">Pasa a etapa de resolucion</p>
+                  <p class="font-semibold text-[var(--estado-verde)]">ADMITIDO A TRÁMITE</p>
+                  <p class="text-xs text-[var(--niebla)]">Pasa a etapa de notificación y luego resolución</p>
                 </div>
               </label>
 
-              <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'improcedente' ? 'border-[var(--niebla)] bg-[var(--nieve)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
-                <input type="radio" [(ngModel)]="decision" name="decision" value="improcedente" class="sr-only">
+              <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'IMPROCEDENTE' ? 'border-[var(--niebla)] bg-[var(--nieve)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
+                <input type="radio" [(ngModel)]="decision" name="decision" value="IMPROCEDENTE" class="sr-only">
                 <svg class="w-5 h-5 text-[var(--niebla)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <div>
                   <p class="font-semibold text-[var(--humo)]">IMPROCEDENTE</p>
-                  <p class="text-xs text-[var(--niebla)]">No cumple requisitos tras la subsanacion</p>
+                  <p class="text-xs text-[var(--niebla)]">Rechazo definitivo por no cumplir requisitos</p>
+                </div>
+              </label>
+
+              <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'TENER_POR_NO_PRESENTADO' ? 'border-[var(--estado-ambar)] bg-[var(--estado-ambar-suave)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
+                <input type="radio" [(ngModel)]="decision" name="decision" value="TENER_POR_NO_PRESENTADO" class="sr-only">
+                <svg class="w-5 h-5 text-[var(--estado-ambar)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div>
+                  <p class="font-semibold text-[var(--estado-ambar)]">TENER POR NO PRESENTADO</p>
+                  <p class="text-xs text-[var(--niebla)]">El ciudadano no subsanó correctamente a tiempo</p>
                 </div>
               </label>
             </div>
@@ -166,21 +175,35 @@
 
           <div class="card overflow-hidden">
             <div class="border-b border-[var(--ceniza-claro)] px-6 py-4">
-              <h3 class="font-semibold text-[var(--carbon)]">Fundamentos</h3>
+              <h3 class="font-semibold text-[var(--carbon)]">Fundamentos y Resolución</h3>
             </div>
-            <div class="p-6">
-              <label class="block text-sm font-medium text-[var(--humo)] mb-1">Fundamentos <span class="text-[var(--peru-rojo)]">*</span></label>
-              <textarea [(ngModel)]="fundamentos" name="fundamentos" rows="6" class="w-full px-4 py-3 border border-[var(--ceniza-claro)] rounded-xl focus:ring-2 focus:ring-[var(--peru-rojo)]/20 focus:border-[var(--peru-rojo)] outline-none text-sm" placeholder="Fundamente su decision sobre la subsanacion presentada..."></textarea>
+            <div class="p-6 space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-[var(--humo)] mb-1">Fundamentos <span class="text-[var(--peru-rojo)]">*</span></label>
+                <textarea [(ngModel)]="fundamentos" name="fundamentos" rows="4" class="w-full px-4 py-3 border border-[var(--ceniza-claro)] rounded-xl focus:ring-2 focus:ring-[var(--peru-rojo)]/20 focus:border-[var(--peru-rojo)] outline-none text-sm" placeholder="Fundamente su decisión sobre la subsanación presentada..."></textarea>
+              </div>
+
+              <div class="pt-2">
+                <label class="block text-sm font-medium text-[var(--humo)] mb-1">Adjuntar Resolución Firmada (PDF) <span class="text-[var(--peru-rojo)]">*</span></label>
+                <input type="file" accept="application/pdf" (change)="onArchivoSeleccionado($event)"
+                       class="block w-full text-sm text-[var(--humo)]
+                              file:mr-4 file:py-2 file:px-4
+                              file:rounded-xl file:border-0
+                              file:text-sm file:font-semibold
+                              file:bg-[var(--peru-rojo-suave)] file:text-[var(--peru-rojo)]
+                              hover:file:bg-[var(--peru-rojo)] hover:file:text-[var(--carbon)]
+                              transition-colors">
+              </div>
             </div>
           </div>
 
           <div class="flex gap-4">
-            <button (click)="enviarCalificacion()" [disabled]="loading() || !decision" class="flex-1 py-3 bg-[var(--peru-rojo)] hover:bg-[var(--peru-rojo-hover)] text-[var(--carbon)] font-medium rounded-xl disabled:opacity-50 flex items-center justify-center gap-2 transition-colors">
+            <button (click)="enviarCalificacion()" [disabled]="loading() || !decision || !archivoAdjunto" class="flex-1 py-3 bg-[var(--peru-rojo)] hover:bg-[var(--peru-rojo-hover)] text-[var(--carbon)] font-medium rounded-xl disabled:opacity-50 flex items-center justify-center gap-2 transition-colors">
               @if (loading()) {
                 <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 Procesando...
               } @else {
-                Registrar Decision
+                Registrar Decisión
               }
             </button>
             <a routerLink="/ttaip" class="px-6 py-3 border border-[var(--ceniza-claro)] text-[var(--humo)] rounded-xl hover:bg-[var(--nieve)] transition-colors text-center">Cancelar</a>

@@ -84,4 +84,5 @@ export class TtaipResolucionDetalleComponent implements OnInit {
 
     return 'bg-white/20 text-white';
   }
+
 }

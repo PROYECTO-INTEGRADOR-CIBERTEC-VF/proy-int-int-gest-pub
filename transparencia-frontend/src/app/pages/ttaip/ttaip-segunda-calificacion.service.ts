@@ -2,11 +2,9 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-interface CalificacionRequest {
+export interface SegundaCalificacionRequest {
+  decision: string;
   fundamentos: string;
-  miembroId?: number;
-  observaciones?: string;
-  diasSubsanacion?: number;
 }
 
 @Injectable({
@@ -14,17 +12,20 @@ interface CalificacionRequest {
 })
 export class TtaipSegundaCalificacionService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/ttaip/calificacion';
+  // endpoint de la HU-07
+  private readonly apiUrl = 'http://localhost:8080/api/ttaip/segunda-calificacion';
 
-  admitirSegundaCalificacion(apelacionId: number, data: CalificacionRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${apelacionId}/admitir`, data);
-  }
+  notificarSegundaCalificacion(apelacionId: number, request: SegundaCalificacionRequest, archivo: File): Observable<any> {
+    const formData = new FormData();
 
-  rechazarSegundaCalificacion(apelacionId: number, data: CalificacionRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${apelacionId}/inadmitir`, data);
-  }
+    // Convertir el JSON a Blob para que Spring Boot lo lea como @RequestPart("datos")
+    formData.append('datos', new Blob([JSON.stringify(request)], {
+      type: "application/json"
+    }));
 
-  declararTenerPorNoPresentado(apelacionId: number, data: CalificacionRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${apelacionId}/no-presentado`, data);
+    // Adjuntar el archivo físico
+    formData.append('archivo', archivo, archivo.name);
+
+    return this.http.post(`${this.apiUrl}/${apelacionId}/notificar`, formData);
   }
 }

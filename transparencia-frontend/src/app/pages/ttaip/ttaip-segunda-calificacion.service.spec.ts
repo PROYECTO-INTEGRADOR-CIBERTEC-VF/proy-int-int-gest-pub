@@ -6,15 +6,9 @@ describe('TtaipSegundaCalificacionService', () => {
   let service: TtaipSegundaCalificacionService;
   let httpMock: HttpTestingController;
 
-  const apiUrl = 'http://localhost:8080/api/ttaip/calificacion';
-  const payload = {
-    fundamentos: 'Fundamentos de prueba',
-    miembroId: 10
-  };
-
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule], // Simulador de peticiones HTTP
+      imports: [HttpClientTestingModule],
       providers: [TtaipSegundaCalificacionService]
     });
     service = TestBed.inject(TtaipSegundaCalificacionService);
@@ -22,7 +16,7 @@ describe('TtaipSegundaCalificacionService', () => {
   });
 
   afterEach(() => {
-    // Verificamos que no queden peticiones colgadas después de cada prueba
+    // Verificacion para que peticiones no se queden colgadas después de cada prueba
     httpMock.verify();
   });
 
@@ -30,45 +24,24 @@ describe('TtaipSegundaCalificacionService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('debería admitir segunda calificación', () => {
-    const mockResponse = { mensaje: 'Admitido correctamente' };
+  it('debería notificar segunda calificación con archivo', () => {
+    const mockResponse = { id: 25, estado: 'NOTIFICACION_SEGUNDA_CALIFICACION' };
     const apelacionId = 25;
+    const requestData = { decision: 'ADMITIR', fundamentos: 'Fundamentos de prueba' };
 
-    service.admitirSegundaCalificacion(apelacionId, payload).subscribe(res => {
+    // Simular un archivo PDF
+    const mockFile = new File([''], 'resolucion.pdf', { type: 'application/pdf' });
+
+    // Llamar al método nuevo creado
+    service.notificarSegundaCalificacion(apelacionId, requestData, mockFile).subscribe((res: any) => {
       expect(res).toEqual(mockResponse);
     });
 
-    const req = httpMock.expectOne(`${apiUrl}/${apelacionId}/admitir`);
+    // Validar que se haga una petición POST
+    const req = httpMock.expectOne(req => req.method === 'POST');
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush(mockResponse);
-  });
 
-  it('debería rechazar segunda calificación', () => {
-    const mockResponse = { mensaje: 'Rechazado correctamente' };
-    const apelacionId = 25;
-
-    service.rechazarSegundaCalificacion(apelacionId, payload).subscribe(res => {
-      expect(res).toEqual(mockResponse);
-    });
-
-    const req = httpMock.expectOne(`${apiUrl}/${apelacionId}/inadmitir`);
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush(mockResponse);
-  });
-
-  it('debería declarar tener por no presentado', () => {
-    const mockResponse = { mensaje: 'Declarado como no presentado' };
-    const apelacionId = 25;
-
-    service.declararTenerPorNoPresentado(apelacionId, payload).subscribe(res => {
-      expect(res).toEqual(mockResponse);
-    });
-
-    const req = httpMock.expectOne(`${apiUrl}/${apelacionId}/no-presentado`);
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(payload);
+    // el backend responde exitosamente
     req.flush(mockResponse);
   });
 });

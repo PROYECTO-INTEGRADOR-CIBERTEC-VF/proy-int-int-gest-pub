@@ -83,124 +83,142 @@
         </div>
 
         <div class="space-y-6">
-          <div class="card overflow-hidden">
-            <div class="border-b border-[var(--ceniza-claro)] px-6 py-4">
-              <h3 class="font-semibold text-[var(--carbon)]">Decision del Tribunal</h3>
-              <p class="text-sm text-[var(--niebla)] mt-1">Emita la resolucion definitiva del caso</p>
-            </div>
 
-            <div class="p-6 space-y-4">
-              @if (error()) {
-                <div class="bg-[var(--peru-rojo-suave)] border border-[var(--estado-rojo-borde)] rounded-lg p-3">
-                  <p class="text-sm text-[var(--estado-rojo)]">{{ error() }}</p>
-                </div>
-              }
-              @if (mensaje()) {
-                <div class="bg-[var(--estado-verde-suave)] border border-[var(--estado-verde-borde)] rounded-lg p-3">
-                  <p class="text-sm text-[var(--estado-verde)]">{{ mensaje() }}</p>
-                </div>
-              }
+          @if (apelacion()?.estado === 'NOTIFICACION_SEGUNDA_CALIFICACION') {
+            <div class="bg-[var(--estado-azul-suave)] border border-[var(--estado-azul-borde)] rounded-xl p-8 text-center shadow-sm">
+              <svg class="w-16 h-16 text-[var(--estado-azul)] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              <h3 class="text-xl font-bold text-[var(--estado-azul)] mb-2">Confirmar Actos de Notificación</h3>
+              <p class="text-[var(--estado-azul)] mb-6">El expediente ha sido admitido. Confirme que la entidad y el ciudadano han sido debidamente notificadas y que el plazo ha concluido para poder emitir la resolución final.</p>
 
-              <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'fundado' ? 'border-[var(--estado-verde)] bg-[var(--estado-verde-suave)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
-                <input type="radio" [(ngModel)]="decision" name="decision" value="fundado" class="sr-only">
-                <svg class="w-5 h-5 text-[var(--estado-verde)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <div>
-                  <p class="font-semibold text-[var(--estado-verde)]">FUNDADO</p>
-                  <p class="text-xs text-[var(--niebla)]">Se ampara la apelacion y corresponde entrega de informacion</p>
-                </div>
-              </label>
-
-              <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'fundado_en_parte' ? 'border-[var(--estado-verde)] bg-[var(--estado-verde-suave)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
-                <input type="radio" [(ngModel)]="decision" name="decision" value="fundado_en_parte" class="sr-only">
-                <svg class="w-5 h-5 text-[var(--estado-verde)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <div>
-                  <p class="font-semibold text-[var(--estado-verde)]">FUNDADO EN PARTE</p>
-                  <p class="text-xs text-[var(--niebla)]">Se ampara parcialmente la apelacion</p>
-                </div>
-              </label>
-
-              <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'infundado' ? 'border-[var(--estado-rojo)] bg-[var(--estado-rojo-suave)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
-                <input type="radio" [(ngModel)]="decision" name="decision" value="infundado" class="sr-only">
-                <svg class="w-5 h-5 text-[var(--estado-rojo)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <div>
-                  <p class="font-semibold text-[var(--peru-rojo)]">INFUNDADO</p>
-                  <p class="text-xs text-[var(--niebla)]">Se confirma la denegatoria de la entidad</p>
-                </div>
-              </label>
-
-              <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'infundado_en_parte' ? 'border-[var(--estado-rojo)] bg-[var(--estado-rojo-suave)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
-                <input type="radio" [(ngModel)]="decision" name="decision" value="infundado_en_parte" class="sr-only">
-                <svg class="w-5 h-5 text-[var(--estado-rojo)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <div>
-                  <p class="font-semibold text-[var(--peru-rojo)]">INFUNDADO EN PARTE</p>
-                  <p class="text-xs text-[var(--niebla)]">Se confirma parcialmente la postura de la entidad</p>
-                </div>
-              </label>
-
-              <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'improcedente' ? 'border-[var(--estado-ambar)] bg-[var(--estado-ambar-suave)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
-                <input type="radio" [(ngModel)]="decision" name="decision" value="improcedente" class="sr-only">
-                <svg class="w-5 h-5 text-[var(--estado-ambar)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
-                <div>
-                  <p class="font-semibold text-[var(--estado-ambar)]">IMPROCEDENTE</p>
-                  <p class="text-xs text-[var(--niebla)]">No cumple requisitos de fondo o forma</p>
-                </div>
-              </label>
-
-              <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'sustraccion_materia' ? 'border-[var(--accent-violet)] bg-[var(--accent-violet-soft)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
-                <input type="radio" [(ngModel)]="decision" name="decision" value="sustraccion_materia" class="sr-only">
-                <svg class="w-5 h-5 text-[var(--accent-violet)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <div>
-                  <p class="font-semibold text-[var(--accent-violet)]">CONCLUSION POR SUSTRACCION DE LA MATERIA</p>
-                  <p class="text-xs text-[var(--niebla)]">La entidad entrego la informacion durante el tramite</p>
-                </div>
-              </label>
-
-              <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'desistimiento' ? 'border-[var(--niebla)] bg-[var(--nieve-calida)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
-                <input type="radio" [(ngModel)]="decision" name="decision" value="desistimiento" class="sr-only">
-                <svg class="w-5 h-5 text-[var(--niebla)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                <div>
-                  <p class="font-semibold text-[var(--humo)]">CONCLUSION POR DESISTIMIENTO</p>
-                  <p class="text-xs text-[var(--niebla)]">El ciudadano desiste voluntariamente del recurso</p>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          @if (decision === 'fundado' || decision === 'fundado_en_parte') {
-            <div class="bg-[var(--estado-ambar-suave)] border border-[var(--estado-ambar-borde)] rounded-xl p-4">
-              <label class="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" [(ngModel)]="iniciarProcesoDisciplinario" name="iniciarProcesoDisciplinario" class="w-5 h-5 text-[var(--estado-ambar)] border-[var(--ceniza)] rounded focus:ring-[var(--estado-ambar)]">
-                <div>
-                  <span class="font-medium text-[var(--estado-ambar)]">Iniciar Proceso Disciplinario</span>
-                  <p class="text-sm text-[var(--estado-ambar)]">Remitir actuados para evaluacion disciplinaria</p>
-                </div>
-              </label>
+              <button (click)="confirmarEnvioNotificacion()" [disabled]="loading()" class="w-full py-4 bg-[var(--estado-azul)] text-white rounded-xl font-bold hover:bg-blue-700 transition-colors flex justify-center items-center gap-2">
+                @if (loading()) {
+                  <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Procesando...
+                } @else {
+                  Confirmar y Habilitar Resolución Final
+                }
+              </button>
             </div>
           }
 
-          <div class="card overflow-hidden">
-            <div class="border-b border-[var(--ceniza-claro)] px-6 py-4">
-              <h3 class="font-semibold text-[var(--carbon)]">Fundamentos de la Resolucion</h3>
-            </div>
-            <div class="p-6">
-              <label class="block text-sm font-medium text-[var(--humo)] mb-1">Fundamentos <span class="text-[var(--peru-rojo)]">*</span></label>
-              <textarea [(ngModel)]="fundamentos" name="fundamentos" rows="8" required class="w-full px-4 py-3 border border-[var(--ceniza-claro)] rounded-xl focus:ring-2 focus:ring-[var(--peru-rojo)]/20 focus:border-[var(--peru-rojo)] outline-none text-sm" placeholder="Fundamente detalladamente la decision del tribunal..."></textarea>
-              <p class="text-xs text-[var(--niebla)] mt-1">{{ fundamentos.length }} caracteres</p>
-            </div>
-          </div>
+          @if (apelacion()?.estado === 'EN_RESOLUCION') {
+            <div class="card overflow-hidden">
+              <div class="border-b border-[var(--ceniza-claro)] px-6 py-4">
+                <h3 class="font-semibold text-[var(--carbon)]">Decision del Tribunal</h3>
+                <p class="text-sm text-[var(--niebla)] mt-1">Emita la resolucion definitiva del caso</p>
+              </div>
 
-          <div class="flex gap-4">
-            <button (click)="enviarResolucion()" [disabled]="loading() || !decision" class="flex-1 py-3 font-medium rounded-xl disabled:opacity-50 flex items-center justify-center gap-2 transition-colors" [class]="(decision === 'fundado' || decision === 'fundado_en_parte') ? 'bg-[var(--estado-verde)] hover:bg-[var(--estado-verde)] text-[var(--carbon)]' : 'bg-[var(--peru-rojo)] hover:bg-[var(--peru-rojo-hover)] text-[var(--carbon)]'">
-              @if (loading()) {
-                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Emitiendo Resolucion...
-              } @else {
-                Emitir Resolucion {{ getDecisionLabel() }}
-              }
-            </button>
-            <a routerLink="/ttaip" class="px-6 py-3 border border-[var(--ceniza-claro)] text-[var(--humo)] rounded-xl hover:bg-[var(--nieve)] transition-colors text-center">Cancelar</a>
-          </div>
-        </div>
+              <div class="p-6 space-y-4">
+                @if (error()) {
+                  <div class="bg-[var(--peru-rojo-suave)] border border-[var(--estado-rojo-borde)] rounded-lg p-3">
+                    <p class="text-sm text-[var(--estado-rojo)]">{{ error() }}</p>
+                  </div>
+                }
+                @if (mensaje()) {
+                  <div class="bg-[var(--estado-verde-suave)] border border-[var(--estado-verde-borde)] rounded-lg p-3">
+                    <p class="text-sm text-[var(--estado-verde)]">{{ mensaje() }}</p>
+                  </div>
+                }
+
+                <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'fundado' ? 'border-[var(--estado-verde)] bg-[var(--estado-verde-suave)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
+                  <input type="radio" [(ngModel)]="decision" name="decision" value="fundado" class="sr-only">
+                  <svg class="w-5 h-5 text-[var(--estado-verde)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <div>
+                    <p class="font-semibold text-[var(--estado-verde)]">FUNDADO</p>
+                    <p class="text-xs text-[var(--niebla)]">Se ampara la apelacion y corresponde entrega de informacion</p>
+                  </div>
+                </label>
+
+                <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'fundado_en_parte' ? 'border-[var(--estado-verde)] bg-[var(--estado-verde-suave)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
+                  <input type="radio" [(ngModel)]="decision" name="decision" value="fundado_en_parte" class="sr-only">
+                  <svg class="w-5 h-5 text-[var(--estado-verde)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <div>
+                    <p class="font-semibold text-[var(--estado-verde)]">FUNDADO EN PARTE</p>
+                    <p class="text-xs text-[var(--niebla)]">Se ampara parcialmente la apelacion</p>
+                  </div>
+                </label>
+
+                <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'infundado' ? 'border-[var(--estado-rojo)] bg-[var(--estado-rojo-suave)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
+                  <input type="radio" [(ngModel)]="decision" name="decision" value="infundado" class="sr-only">
+                  <svg class="w-5 h-5 text-[var(--estado-rojo)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <div>
+                    <p class="font-semibold text-[var(--peru-rojo)]">INFUNDADO</p>
+                    <p class="text-xs text-[var(--niebla)]">Se confirma la denegatoria de la entidad</p>
+                  </div>
+                </label>
+
+                <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'infundado_en_parte' ? 'border-[var(--estado-rojo)] bg-[var(--estado-rojo-suave)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
+                  <input type="radio" [(ngModel)]="decision" name="decision" value="infundado_en_parte" class="sr-only">
+                  <svg class="w-5 h-5 text-[var(--estado-rojo)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <div>
+                    <p class="font-semibold text-[var(--peru-rojo)]">INFUNDADO EN PARTE</p>
+                    <p class="text-xs text-[var(--niebla)]">Se confirma parcialmente la postura de la entidad</p>
+                  </div>
+                </label>
+
+                <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'improcedente' ? 'border-[var(--estado-ambar)] bg-[var(--estado-ambar-suave)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
+                  <input type="radio" [(ngModel)]="decision" name="decision" value="improcedente" class="sr-only">
+                  <svg class="w-5 h-5 text-[var(--estado-ambar)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                  <div>
+                    <p class="font-semibold text-[var(--estado-ambar)]">IMPROCEDENTE</p>
+                    <p class="text-xs text-[var(--niebla)]">No cumple requisitos de fondo o forma</p>
+                  </div>
+                </label>
+
+                <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'sustraccion_materia' ? 'border-[var(--accent-violet)] bg-[var(--accent-violet-soft)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
+                  <input type="radio" [(ngModel)]="decision" name="decision" value="sustraccion_materia" class="sr-only">
+                  <svg class="w-5 h-5 text-[var(--accent-violet)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <div>
+                    <p class="font-semibold text-[var(--accent-violet)]">CONCLUSION POR SUSTRACCION DE LA MATERIA</p>
+                    <p class="text-xs text-[var(--niebla)]">La entidad entrego la informacion durante el tramite</p>
+                  </div>
+                </label>
+
+                <label class="flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all" [class]="decision === 'desistimiento' ? 'border-[var(--niebla)] bg-[var(--nieve-calida)]' : 'border-[var(--ceniza-claro)] hover:border-[var(--ceniza)]'">
+                  <input type="radio" [(ngModel)]="decision" name="decision" value="desistimiento" class="sr-only">
+                  <svg class="w-5 h-5 text-[var(--niebla)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  <div>
+                    <p class="font-semibold text-[var(--humo)]">CONCLUSION POR DESISTIMIENTO</p>
+                    <p class="text-xs text-[var(--niebla)]">El ciudadano desiste voluntariamente del recurso</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            @if (decision === 'fundado' || decision === 'fundado_en_parte') {
+              <div class="bg-[var(--estado-ambar-suave)] border border-[var(--estado-ambar-borde)] rounded-xl p-4">
+                <label class="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" [(ngModel)]="iniciarProcesoDisciplinario" name="iniciarProcesoDisciplinario" class="w-5 h-5 text-[var(--estado-ambar)] border-[var(--ceniza)] rounded focus:ring-[var(--estado-ambar)]">
+                  <div>
+                    <span class="font-medium text-[var(--estado-ambar)]">Iniciar Proceso Disciplinario</span>
+                    <p class="text-sm text-[var(--estado-ambar)]">Remitir actuados para evaluacion disciplinaria</p>
+                  </div>
+                </label>
+              </div>
+            }
+
+            <div class="card overflow-hidden">
+              <div class="border-b border-[var(--ceniza-claro)] px-6 py-4">
+                <h3 class="font-semibold text-[var(--carbon)]">Fundamentos de la Resolucion</h3>
+              </div>
+              <div class="p-6">
+                <label class="block text-sm font-medium text-[var(--humo)] mb-1">Fundamentos <span class="text-[var(--peru-rojo)]">*</span></label>
+                <textarea [(ngModel)]="fundamentos" name="fundamentos" rows="8" required class="w-full px-4 py-3 border border-[var(--ceniza-claro)] rounded-xl focus:ring-2 focus:ring-[var(--peru-rojo)]/20 focus:border-[var(--peru-rojo)] outline-none text-sm" placeholder="Fundamente detalladamente la decision del tribunal..."></textarea>
+                <p class="text-xs text-[var(--niebla)] mt-1">{{ fundamentos.length }} caracteres</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <button (click)="enviarResolucion()" [disabled]="loading() || !decision" class="flex-1 py-3 font-medium rounded-xl disabled:opacity-50 flex items-center justify-center gap-2 transition-colors" [class]="(decision === 'fundado' || decision === 'fundado_en_parte') ? 'bg-[var(--estado-verde)] hover:bg-[var(--estado-verde)] text-[var(--carbon)]' : 'bg-[var(--peru-rojo)] hover:bg-[var(--peru-rojo-hover)] text-[var(--carbon)]'">
+                @if (loading()) {
+                  <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Emitiendo Resolucion...
+                } @else {
+                  Emitir Resolucion {{ getDecisionLabel() }}
+                }
+              </button>
+              <a routerLink="/ttaip" class="px-6 py-3 border border-[var(--ceniza-claro)] text-[var(--humo)] rounded-xl hover:bg-[var(--nieve)] transition-colors text-center">Cancelar</a>
+            </div>
+          } </div>
       </div>
     }
   </div>
