@@ -55,6 +55,18 @@ public class SecurityConfig {
                 .requestMatchers("/api/ttaip/**")
                 .hasAnyRole("TTAIP", "ADMINISTRADOR")
 
+                .requestMatchers(HttpMethod.POST, "/api/apelaciones/**")
+                .hasAnyRole("CIUDADANO", "ADMINISTRADOR")
+
+                .requestMatchers(HttpMethod.GET, "/api/apelaciones/**")
+                .authenticated()
+
+                .requestMatchers(HttpMethod.GET, "/api/solicitudes/**")
+                .authenticated()
+
+                .requestMatchers(HttpMethod.GET, "/api/entidades/**")
+                .authenticated()
+
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

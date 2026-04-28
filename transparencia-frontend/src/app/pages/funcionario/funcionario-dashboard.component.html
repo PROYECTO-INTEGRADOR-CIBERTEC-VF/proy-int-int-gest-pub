@@ -1,19 +1,32 @@
 <div class="min-h-screen bg-(--nieve-calida)">
-  <section class="bg-gradient-peru-hero px-4 pb-10 pt-24">
-    <div class="mx-auto max-w-7xl">
-      <div class="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 class="mt-2 text-3xl font-extrabold text-(--carbon)">Dashboard de Funcionario</h1>
-          <p class="mt-1 text-sm text-(--humo)">{{ entidadNombre() }}</p>
-        </div>
-        <button type="button" class="btn-outline h-10 px-4 text-sm" (click)="cerrarSesion()">
+  <!-- ═══════ Topbar ═══════ -->
+  <nav class="sticky top-0 z-30 border-b border-(--ceniza-claro) bg-white/80 backdrop-blur-md">
+    <div class="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
+      <div class="flex items-center gap-3">
+        <span class="text-base font-extrabold text-(--peru-rojo) tracking-tight">SAIP</span>
+        <span class="text-(--ceniza)">·</span>
+        <span class="text-sm font-medium text-(--humo)">Funcionario</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-sm text-(--niebla)">{{ entidadNombre() }}</span>
+        <button type="button" class="btn-outline h-8 px-3 text-xs" (click)="cerrarSesion()">
           Cerrar sesion
         </button>
       </div>
     </div>
+  </nav>
+
+  <!-- ═══════ Hero ═══════ -->
+  <section class="bg-gradient-peru-hero px-4 pb-10 pt-10">
+    <div class="mx-auto max-w-7xl">
+      <p class="text-xs font-semibold uppercase tracking-widest text-(--peru-rojo)">Dashboard Institucional</p>
+      <h1 class="mt-1 text-2xl font-extrabold tracking-tight text-(--carbon) md:text-3xl">Panel de Solicitudes</h1>
+      <p class="mt-1 text-sm text-(--humo)">Gestione las solicitudes de acceso a la informacion de su entidad.</p>
+    </div>
   </section>
 
-  <section class="mx-auto -mt-5 max-w-7xl px-4 pb-10">
+  <!-- ═══════ Stats ═══════ -->
+  <section class="mx-auto -mt-5 max-w-7xl px-4 pb-8">
     <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
       <article class="summary-card">
         <span class="summary-label">Pendientes</span>
@@ -46,60 +59,57 @@
 
       @if (loading()) {
         <div class="py-16 text-center">
-          <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-(--ceniza) border-t-(--peru-rojo)"></div>
+          <div class="spinner spinner-lg mx-auto"></div>
           <p class="mt-4 text-sm text-(--niebla)">Cargando solicitudes...</p>
         </div>
       } @else if (solicitudes().length === 0) {
         <div class="py-16 text-center">
+          <svg class="mx-auto mb-3 h-10 w-10 text-(--ceniza)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           <p class="text-sm text-(--niebla)">No hay solicitudes asignadas para esta entidad.</p>
         </div>
       } @else {
         <div class="overflow-x-auto">
-          <table class="min-w-full border-collapse">
-            <thead class="bg-(--nieve) text-left">
+          <table class="table">
+            <thead>
               <tr>
-                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--humo)">Expediente</th>
-                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--humo)">Asunto</th>
-                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--humo)">Fecha limite</th>
-                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--humo)">Dias restantes</th>
-                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--humo)">Semaforo</th>
-                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--humo)">Estado</th>
-                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--humo) text-right">Accion</th>
+                <th>Expediente</th>
+                <th>Asunto</th>
+                <th>Fecha limite</th>
+                <th>Dias</th>
+                <th>Semaforo</th>
+                <th>Estado</th>
+                <th class="text-right">Accion</th>
               </tr>
             </thead>
             <tbody>
               @for (solicitud of solicitudes(); track solicitud.idSolicitud) {
-                <tr class="border-t border-(--ceniza-claro)">
-                  <td class="px-4 py-3">
+                <tr>
+                  <td>
                     <span class="font-expediente text-sm text-(--carbon)">{{ solicitud.expediente }}</span>
                   </td>
-                  <td class="max-w-90 px-4 py-3">
+                  <td class="max-w-72">
                     <p class="truncate text-sm text-(--humo)" [title]="solicitud.asunto">{{ solicitud.asunto }}</p>
                   </td>
-                  <td class="px-4 py-3 text-sm text-(--humo)">
+                  <td class="text-sm text-(--humo)">
                     @if (solicitud.fechaLimite) {
                       {{ solicitud.fechaLimite | date: 'dd/MM/yyyy' }}
-                    } @else {
-                      -
-                    }
+                    } @else { - }
                   </td>
-                  <td class="px-4 py-3 text-sm font-semibold text-(--carbon)">
+                  <td class="text-sm font-semibold text-(--carbon)">
                     @if (obtenerDiasRestantes(solicitud) !== null) {
                       {{ obtenerDiasRestantes(solicitud) }}
-                    } @else {
-                      -
-                    }
+                    } @else { - }
                   </td>
-                  <td class="px-4 py-3">
-                    <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold" [class]="obtenerSemaforoClase(solicitud)">
+                  <td>
+                    <span class="badge" [class]="obtenerSemaforoClase(solicitud)">
                       {{ obtenerSemaforoEtiqueta(solicitud) }}
                     </span>
                   </td>
-                  <td class="px-4 py-3 text-xs font-semibold text-(--humo)">{{ solicitud.estado }}</td>
-                  <td class="px-4 py-3 text-right">
+                  <td class="text-xs font-semibold text-(--humo)">{{ solicitud.estado }}</td>
+                  <td class="text-right">
                     <div class="flex items-center justify-end gap-2">
                       <a
-                        class="btn-outline h-9 px-3 text-xs"
+                        class="btn-outline h-8 px-3 text-xs"
                         [routerLink]="['/funcionario/solicitud', solicitud.expediente]"
                         style="text-decoration: none;"
                       >
@@ -108,7 +118,7 @@
 
                       @if (canResponder(solicitud)) {
                         <a
-                          class="btn-primary h-9 px-4 text-xs"
+                          class="btn-primary h-8 px-3 text-xs"
                           [routerLink]="['/funcionario/responder', solicitud.expediente]"
                           style="text-decoration: none;"
                           title="Responder solicitud"
@@ -118,9 +128,9 @@
                       } @else {
                         <button
                           type="button"
-                          class="btn-primary h-9 px-4 text-xs"
+                          class="btn-primary h-8 px-3 text-xs"
                           [disabled]="true"
-                          title="Deshabilitado por silencio administrativo o respuesta previa"
+                          title="Deshabilitado"
                         >
                           Responder
                         </button>

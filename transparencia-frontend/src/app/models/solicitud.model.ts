@@ -11,6 +11,7 @@ export type SemaforoEstado = Exclude<SolicitudDTO['semaforo'], undefined>;
 
 export interface Solicitud {
   idSolicitud: number;
+  id?: number;
   expediente: string;
   asunto: string;
   descripcion: string;

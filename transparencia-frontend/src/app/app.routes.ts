@@ -2,16 +2,23 @@ import { Routes } from '@angular/router';
 import { tipoUsuarioGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
+  // ═══════ PUBLIC ═══════
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'login'
+    loadComponent: () => import('./pages/landing/landing.component').then(m => m.LandingComponent)
   },
   {
     path: 'login',
     loadComponent: () => import('./pages/auth/login.component').then(m => m.LoginComponent),
     data: { accessMode: 'citizen' }
   },
+  {
+    path: 'registro',
+    loadComponent: () => import('./pages/auth/registro.component').then(m => m.RegistroComponent)
+  },
+
+  // ═══════ INTERNAL LOGIN (hidden URLs, not linked publicly) ═══════
   {
     path: 'acceso-funcionario',
     loadComponent: () => import('./pages/auth/login.component').then(m => m.LoginComponent),
@@ -27,10 +34,8 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/auth/login.component').then(m => m.LoginComponent),
     data: { accessMode: 'internal', requiredRole: 'ADMINISTRADOR' }
   },
-  {
-    path: 'registro',
-    loadComponent: () => import('./pages/auth/registro.component').then(m => m.RegistroComponent)
-  },
+
+  // ═══════ CIUDADANO ═══════
   {
     path: 'ciudadano',
     redirectTo: 'ciudadano/dashboard',
@@ -56,6 +61,8 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/ciudadano/subsanacion.component').then(m => m.SubsanacionComponent),
     canActivate: [tipoUsuarioGuard('CIUDADANO')]
   },
+
+  // ═══════ FUNCIONARIO ═══════
   {
     path: 'funcionario',
     redirectTo: 'funcionario/dashboard',
@@ -76,6 +83,8 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/funcionario/funcionario-responder.component').then(m => m.FuncionarioResponderComponent),
     canActivate: [tipoUsuarioGuard('FUNCIONARIO')]
   },
+
+  // ═══════ TTAIP ═══════
   {
     path: 'ttaip',
     redirectTo: 'ttaip/dashboard',
@@ -111,6 +120,8 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/ttaip/ttaip-resolucion-detalle.component').then(m => m.TtaipResolucionDetalleComponent),
     canActivate: [tipoUsuarioGuard('TTAIP')]
   },
+
+  // ═══════ ADMIN ═══════
   {
     path: 'admin',
     redirectTo: 'admin/dashboard',
@@ -121,5 +132,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/admin/admin-dashboard.component').then(m => m.AdminDashboardComponent),
     canActivate: [tipoUsuarioGuard('ADMINISTRADOR')]
   },
-  { path: '**', redirectTo: 'login' }
+
+  // ═══════ FALLBACK ═══════
+  { path: '**', redirectTo: '' }
 ];

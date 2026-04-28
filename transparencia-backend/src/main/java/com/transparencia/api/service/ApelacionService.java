@@ -1,16 +1,23 @@
 package com.transparencia.api.service;
 
+import com.transparencia.api.exception.RecursoNoEncontradoException;
 import com.transparencia.api.util.DiasHabilesUtil;
 import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.transparencia.api.model.entity.Apelacion;
+import com.transparencia.api.model.entity.Ciudadano;
 import com.transparencia.api.model.entity.Documento;
+import com.transparencia.api.model.entity.Solicitud;
 import com.transparencia.api.model.dto.SegundaCalificacionDTO;
 import com.transparencia.api.repository.ApelacionRepository;
 import com.transparencia.api.repository.DocumentoRepository;
+import com.transparencia.api.repository.CiudadanoRepository;
+import com.transparencia.api.repository.SolicitudRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,14 +39,19 @@ public class ApelacionService {
     private final ApelacionRepository apelacionRepository;
     private final DocumentoRepository documentoRepository;
     private final FileStorageService fileStorageService;
+    private final CiudadanoRepository ciudadanoRepository;
+    private final SolicitudRepository solicitudRepository;
 
-    // Inyecciones para soportar archivos
     public ApelacionService(ApelacionRepository apelacionRepository,
                             DocumentoRepository documentoRepository,
-                            FileStorageService fileStorageService) {
+                            FileStorageService fileStorageService,
+                            CiudadanoRepository ciudadanoRepository,
+                            SolicitudRepository solicitudRepository) {
         this.apelacionRepository = apelacionRepository;
         this.documentoRepository = documentoRepository;
         this.fileStorageService = fileStorageService;
+        this.ciudadanoRepository = ciudadanoRepository;
+        this.solicitudRepository = solicitudRepository;
     }
 
     @Transactional(readOnly = true)
@@ -94,12 +106,100 @@ public class ApelacionService {
 
     @Transactional
     public Apelacion save(Apelacion apelacion) {
+        if (!StringUtils.hasText(apelacion.getExpediente())) {
+            apelacion.setExpediente(generarExpedienteTTAIP());
+        }
         return apelacionRepository.save(apelacion);
     }
 
     @Transactional(readOnly = true)
     public long count() {
         return apelacionRepository.count();
+    }
+
+    /**
+     * Genera un expediente TTAIP unico con formato NNNNN-AAAA-JUS/TTAIP
+     */
+    public String generarExpedienteTTAIP() {
+        int year = LocalDate.now().getYear();
+        String suffix = "%-" + year + "-JUS/TTAIP";
+        Integer maxNumber = apelacionRepository.findMaxExpedienteNumber(suffix);
+        int siguienteNumero = (maxNumber == null ? 0 : maxNumber) + 1;
+        return String.format("%05d", siguienteNumero) + "-" + year + "-JUS/TTAIP";
+    }
+
+    /**
+     * Crea una apelacion desde solicitud. Valida que la solicitud tenga respuesta
+     * y que no exista ya una apelacion para ella.
+     */
+    @Transactional
+    public Apelacion crearApelacion(Long solicitudId, Long ciudadanoId, String fundamentos) {
+        Solicitud solicitud = solicitudRepository.findById(solicitudId)
+            .orElseThrow(() -> new RecursoNoEncontradoException("Solicitud no encontrada con ID: " + solicitudId));
+
+        // Validar que la solicitud tenga una respuesta (respondida, denegada o vencida)
+        boolean puedeApelar = solicitud.getEstado() == Solicitud.EstadoSolicitud.RESPONDIDA
+            || solicitud.getEstado() == Solicitud.EstadoSolicitud.DENEGADA
+            || solicitud.getEstado() == Solicitud.EstadoSolicitud.VENCIDA;
+        if (!puedeApelar) {
+            throw new IllegalArgumentException(
+                "Solo se puede apelar una solicitud con estado RESPONDIDA, DENEGADA o VENCIDA. Estado actual: " + solicitud.getEstado()
+            );
+        }
+
+        // Validar que no exista ya una apelacion para esta solicitud
+        if (apelacionRepository.findBySolicitud_IdSolicitud(solicitudId).isPresent()) {
+            throw new IllegalArgumentException("Ya existe una apelacion para esta solicitud");
+        }
+
+        Ciudadano ciudadano = ciudadanoRepository.findById(ciudadanoId)
+            .orElseThrow(() -> new RecursoNoEncontradoException("Ciudadano no encontrado con ID: " + ciudadanoId));
+
+        Apelacion apelacion = new Apelacion();
+        apelacion.setSolicitud(solicitud);
+        apelacion.setCiudadano(ciudadano);
+        apelacion.setFundamentos(fundamentos);
+        apelacion.setEstado(Apelacion.EstadoApelacion.EN_CALIFICACION_1);
+        apelacion.setFechaApelacion(LocalDateTime.now());
+
+        return save(apelacion);
+    }
+
+    /**
+     * Subsanar una apelacion que esta en EN_SUBSANACION.
+     * Valida plazo de 2 dias habiles.
+     */
+    @Transactional
+    public Apelacion subsanar(Long apelacionId, String fundamentosAdicionales) {
+        Apelacion apelacion = apelacionRepository.findById(apelacionId)
+            .orElseThrow(() -> new RecursoNoEncontradoException("Apelacion no encontrada con ID: " + apelacionId));
+
+        if (apelacion.getEstado() != Apelacion.EstadoApelacion.EN_SUBSANACION) {
+            throw new IllegalStateException(
+                "La apelacion debe estar en estado EN_SUBSANACION para poder subsanar. Estado actual: " + apelacion.getEstado()
+            );
+        }
+
+        // Validar plazo de subsanacion (2 dias habiles por BR-TTAIP-004)
+        if (apelacion.getFechaSubsanacion() != null) {
+            int diasSubsanacionPermitidos = apelacion.getDiasSubsanacion() != null ? apelacion.getDiasSubsanacion() : 2;
+            int diasTranscurridos = DiasHabilesUtil.contarDiasHabiles(
+                apelacion.getFechaSubsanacion().toLocalDate(),
+                LocalDate.now()
+            );
+            if (diasTranscurridos > diasSubsanacionPermitidos) {
+                throw new IllegalStateException(
+                    "El plazo de " + diasSubsanacionPermitidos + " dias habiles para subsanar ha vencido"
+                );
+            }
+        }
+
+        // Actualizar con los fundamentos adicionales y pasar a segunda calificacion
+        String fundamentosOriginales = apelacion.getFundamentos() != null ? apelacion.getFundamentos() : "";
+        apelacion.setFundamentos(fundamentosOriginales + "\n\n--- SUBSANACION ---\n" + fundamentosAdicionales);
+        apelacion.setEstado(Apelacion.EstadoApelacion.EN_CALIFICACION_2);
+
+        return apelacionRepository.save(apelacion);
     }
 
     // MÉTODO PARA HU-07 (Segunda Calificación)
