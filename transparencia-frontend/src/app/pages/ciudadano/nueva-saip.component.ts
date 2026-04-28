@@ -202,7 +202,7 @@ export class NuevaSaipComponent implements OnDestroy {
 
     this.redirectTimeoutId = setTimeout(() => {
       this.confirmacionVisible.set(false);
-      this.router.navigate(['/ciudadano']);
+      this.router.navigate(['/ciudadano/dashboard']);
     }, 2000);
   }
 }
