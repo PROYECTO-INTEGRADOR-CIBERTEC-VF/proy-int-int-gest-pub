@@ -451,3 +451,352 @@ textarea.input {
 .animate-fade-in {
 	animation: fadeIn 220ms ease both;
 }
+
+/* ============================================
+   Badge system for status indicators
+   ============================================ */
+
+.badge-info {
+	background: var(--estado-azul-suave);
+	color: var(--estado-azul);
+	border: 1px solid var(--estado-azul-borde);
+}
+
+.badge-warning {
+	background: var(--estado-ambar-suave);
+	color: var(--estado-ambar);
+	border: 1px solid var(--estado-ambar-borde);
+}
+
+.badge-success {
+	background: var(--estado-verde-suave);
+	color: var(--estado-verde);
+	border: 1px solid var(--estado-verde-borde);
+}
+
+.badge-danger {
+	background: var(--estado-rojo-suave);
+	color: var(--estado-rojo);
+	border: 1px solid var(--estado-rojo-borde);
+}
+
+.badge-dark {
+	background: #1f2937;
+	color: #ffffff;
+	border: 1px solid #374151;
+}
+
+.badge-muted {
+	background: var(--nieve);
+	color: var(--niebla);
+	border: 1px solid var(--ceniza-claro);
+}
+
+.badge-in-process {
+	background: #eef2ff;
+	color: #4f46e5;
+	border: 1px solid #c7d2fe;
+}
+
+/* ============================================
+   Summary cards for dashboard stats
+   ============================================ */
+
+.summary-card {
+	background: var(--blanco);
+	border: 1px solid var(--ceniza-claro);
+	border-radius: 1rem;
+	padding: 1.25rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	box-shadow: var(--shadow-sm);
+	transition: all var(--duration-normal) var(--ease-out-expo);
+}
+
+.summary-card:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-md);
+}
+
+.summary-label {
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: var(--niebla);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.summary-value {
+	font-size: 1.75rem;
+	font-weight: 800;
+	font-family: 'Inter', sans-serif;
+	line-height: 1.1;
+	letter-spacing: -0.02em;
+}
+
+/* ============================================
+   Metric rows for admin/dashboard stats
+   ============================================ */
+
+.metric-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.65rem 0;
+	border-bottom: 1px solid var(--ceniza-claro);
+}
+
+.metric-row:last-child {
+	border-bottom: none;
+}
+
+.metric-row span {
+	color: var(--humo);
+}
+
+.metric-row strong {
+	color: var(--carbon);
+	font-weight: 700;
+}
+
+/* ============================================
+   Data tables
+   ============================================ */
+
+.table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.table thead {
+	background: var(--nieve);
+}
+
+.table th {
+	padding: 0.75rem 1rem;
+	font-size: 0.7rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--humo);
+	text-align: left;
+	border-bottom: 1px solid var(--ceniza-claro);
+}
+
+.table td {
+	padding: 0.75rem 1rem;
+	border-bottom: 1px solid var(--ceniza-claro);
+	font-size: 0.875rem;
+	vertical-align: middle;
+}
+
+.table tbody tr {
+	transition: background-color 0.15s ease;
+}
+
+.table tbody tr:hover {
+	background: var(--nieve-calida);
+}
+
+.table tbody tr:last-child td {
+	border-bottom: none;
+}
+
+/* ============================================
+   Badge (inline)
+   ============================================ */
+
+.badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.2rem 0.55rem;
+	border-radius: 100px;
+	font-size: 0.7rem;
+	font-weight: 600;
+	letter-spacing: 0.01em;
+	white-space: nowrap;
+}
+
+/* ============================================
+   Icon containers for metric cards
+   ============================================ */
+
+.icon-container {
+	display: grid;
+	place-items: center;
+}
+
+.icon-container-sm {
+	width: 2rem;
+	height: 2rem;
+}
+
+.icon-container-primary {
+	background: var(--peru-rojo-suave);
+	color: var(--peru-rojo);
+}
+
+.icon-container-info {
+	background: var(--estado-azul-suave);
+	color: var(--estado-azul);
+}
+
+.icon-container-warning {
+	background: var(--estado-ambar-suave);
+	color: var(--estado-ambar);
+}
+
+.icon-container-success {
+	background: var(--estado-verde-suave);
+	color: var(--estado-verde);
+}
+
+.icon-container-oro {
+	background: var(--peru-oro-suave);
+	color: var(--peru-oro-profundo);
+}
+
+/* ============================================
+   Metric cards (TTAIP dashboard)
+   ============================================ */
+
+.metric-card {
+	background: var(--blanco);
+	border: 1px solid var(--ceniza-claro);
+	border-radius: 1rem;
+	padding: 1.25rem;
+	box-shadow: var(--shadow-sm);
+	cursor: pointer;
+	transition: all 0.25s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.metric-card:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-md);
+}
+
+.metric-value {
+	font-size: 1.5rem;
+	font-weight: 800;
+	line-height: 1.1;
+	letter-spacing: -0.02em;
+}
+
+.metric-label {
+	font-size: 0.72rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--niebla);
+	margin-top: 0.15rem;
+}
+
+/* ============================================
+   Decision cards (funcionario responder)
+   ============================================ */
+
+.decision-card {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.85rem 1rem;
+	border-radius: 0.85rem;
+	border: 1.5px solid var(--ceniza-claro);
+	background: #fff;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.decision-card:hover {
+	border-color: var(--ceniza);
+	background: var(--nieve-calida);
+}
+
+.decision-card.active-accept {
+	border-color: var(--estado-verde);
+	background: var(--estado-verde-suave);
+}
+
+.decision-card.active-deny {
+	border-color: var(--estado-rojo);
+	background: var(--estado-rojo-suave);
+}
+
+.decision-card input[type='radio'] {
+	accent-color: var(--peru-rojo);
+	width: 1.1rem;
+	height: 1.1rem;
+	margin: 0;
+}
+
+.decision-title {
+	font-weight: 700;
+	font-size: 0.9rem;
+	color: var(--carbon);
+	margin: 0;
+}
+
+.decision-desc {
+	font-size: 0.78rem;
+	color: var(--niebla);
+	margin: 0;
+}
+
+/* ============================================
+   File inputs and previews
+   ============================================ */
+
+.file-input {
+	width: 100%;
+	padding: 0.5rem;
+	border: 1.5px solid var(--ceniza);
+	border-radius: var(--radius);
+	background: var(--blanco);
+	font-size: 0.85rem;
+	cursor: pointer;
+}
+
+.file-input:hover {
+	border-color: var(--niebla);
+}
+
+.file-preview-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.65rem 0.85rem;
+	border: 1px solid var(--ceniza-claro);
+	border-radius: 0.75rem;
+	background: var(--nieve-calida);
+}
+
+/* ============================================
+   Spinner
+   ============================================ */
+
+.spinner {
+	width: 2rem;
+	height: 2rem;
+	border: 3px solid var(--ceniza);
+	border-top-color: var(--peru-rojo);
+	border-radius: 50%;
+	animation: spin 0.7s linear infinite;
+}
+
+.spinner-lg {
+	width: 2.5rem;
+	height: 2.5rem;
+}
+
+@keyframes spin {
+	to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   Required field indicator
+   ============================================ */
+
+.required {
+	color: var(--estado-rojo);
+}
