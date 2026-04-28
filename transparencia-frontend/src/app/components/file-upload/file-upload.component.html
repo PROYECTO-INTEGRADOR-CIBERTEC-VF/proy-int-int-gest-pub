@@ -1,0 +1,50 @@
+<div class="file-upload space-y-4">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+    @for (slot of slotViewModels(); track slot.index) {
+      <article
+        class="upload-slot"
+        [class.upload-slot-dragging]="slot.isDragging"
+        [class.upload-slot-complete]="slot.file !== null"
+        (dragover)="onDragOver($event, slot.index)"
+        (dragleave)="onDragLeave($event, slot.index)"
+        (drop)="onDrop($event, slot.index)"
+      >
+        <header class="upload-slot-header">
+          <span class="upload-slot-index">{{ slot.index }}</span>
+          <div>
+            <p class="upload-slot-title">Archivo {{ slot.index }}</p>
+            <p class="upload-slot-hint">Max 10MB · PDF/JPG/PNG/DOC/DOCX</p>
+          </div>
+        </header>
+
+        @if (slot.file) {
+          <div class="upload-preview">
+            <p class="upload-preview-name">{{ slot.file.name }}</p>
+            <p class="upload-preview-meta">{{ formatFileSize(slot.file.size) }} · {{ slot.file.type || 'extension validada' }}</p>
+            <button type="button" class="upload-remove" (click)="removeFile(slot.index)">Quitar</button>
+          </div>
+        } @else {
+          <label class="upload-select" [attr.for]="'upload-input-' + slot.index">
+            <span>Arrastra aqui o haz clic para seleccionar</span>
+          </label>
+          <input
+            class="sr-only"
+            type="file"
+            [id]="'upload-input-' + slot.index"
+            [accept]="acceptTypes"
+            (change)="onSelectFile($event, slot.index)"
+          />
+        }
+
+        @if (slot.error) {
+          <p class="upload-error">{{ slot.error }}</p>
+        }
+      </article>
+    }
+  </div>
+
+  <div class="upload-summary">
+    <p>Archivos cargados: {{ uploadedFiles().length }} / {{ maxFilesSafe() }}</p>
+    <p>Tipos permitidos: PDF, JPG, PNG, DOC, DOCX · Maximo 10MB por archivo.</p>
+  </div>
+</div>

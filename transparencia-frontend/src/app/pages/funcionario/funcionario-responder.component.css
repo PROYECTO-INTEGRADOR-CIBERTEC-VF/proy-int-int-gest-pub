@@ -1,0 +1,89 @@
+:host {
+  display: block;
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border: 1px solid var(--ceniza-claro);
+  border-radius: 0.85rem;
+  background: var(--blanco);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.summary-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--niebla);
+}
+
+.summary-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.decision-card {
+  align-items: flex-start;
+  background: var(--blanco);
+  border: 2px solid var(--ceniza-claro);
+  border-radius: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.decision-card input[type='radio'] {
+  accent-color: var(--peru-rojo);
+  margin-top: 0.1rem;
+}
+
+.decision-card.active-accept {
+  border-color: var(--estado-verde);
+  background: var(--estado-verde-suave);
+}
+
+.decision-card.active-deny {
+  border-color: var(--estado-rojo);
+  background: var(--estado-rojo-suave);
+}
+
+.decision-title {
+  color: var(--carbon);
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.decision-desc {
+  color: var(--niebla);
+  font-size: 0.77rem;
+  margin: 0.2rem 0 0;
+}
+
+.file-input {
+  border: 1px solid var(--ceniza-claro);
+  border-radius: 0.75rem;
+  color: var(--humo);
+  display: block;
+  font-size: 0.85rem;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.file-preview-item {
+  align-items: center;
+  background: var(--nieve);
+  border: 1px solid var(--ceniza-claro);
+  border-radius: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+}

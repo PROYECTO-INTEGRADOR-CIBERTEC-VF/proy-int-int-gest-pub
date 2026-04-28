@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border: 1px solid var(--ceniza-claro);
+  border-radius: 0.85rem;
+  background: var(--blanco);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.summary-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--niebla);
+}
+
+.summary-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+}

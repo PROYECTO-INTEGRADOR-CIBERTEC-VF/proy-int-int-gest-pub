@@ -1,0 +1,133 @@
+:host {
+  display: block;
+}
+
+.upload-slot {
+  border: 2px dashed var(--ceniza-claro, #e5e5e5);
+  border-radius: 0.9rem;
+  background: #ffffff;
+  padding: 0.9rem;
+  min-height: 184px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+
+.upload-slot:hover {
+  border-color: rgba(200, 16, 46, 0.35);
+}
+
+.upload-slot-dragging {
+  border-color: var(--peru-rojo, #c8102e);
+  background: var(--peru-rojo-suave, #fef2f2);
+  transform: translateY(-2px);
+}
+
+.upload-slot-complete {
+  border-color: var(--estado-verde, #059669);
+  background: var(--estado-verde-suave, #ecfdf5);
+}
+
+.upload-slot-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.upload-slot-index {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--peru-rojo, #c8102e);
+  font-size: 0.75rem;
+}
+
+.upload-slot-title {
+  font-weight: 600;
+  color: var(--carbon, #171717);
+  font-size: 0.9rem;
+}
+
+.upload-slot-hint {
+  color: var(--niebla, #737373);
+  font-size: 0.7rem;
+}
+
+.upload-select {
+  border: 1px solid var(--ceniza-claro, #e5e5e5);
+  border-radius: 0.75rem;
+  padding: 0.8rem;
+  min-height: 82px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--niebla, #737373);
+  cursor: pointer;
+  background: #ffffff;
+}
+
+.upload-select:hover {
+  border-color: rgba(200, 16, 46, 0.35);
+}
+
+.upload-preview {
+  border: 1px solid var(--ceniza-claro, #e5e5e5);
+  border-radius: 0.75rem;
+  background: #ffffff;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.upload-preview-name {
+  color: var(--carbon, #171717);
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  word-break: break-word;
+}
+
+.upload-preview-meta {
+  color: var(--niebla, #737373);
+  font-size: 0.72rem;
+}
+
+.upload-remove {
+  align-self: flex-start;
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--peru-rojo-suave, #fef2f2);
+  color: var(--peru-rojo, #c8102e);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+}
+
+.upload-remove:hover {
+  background: #fde6e8;
+}
+
+.upload-error {
+  margin-top: auto;
+  color: var(--estado-rojo, #dc2626);
+  font-size: 0.75rem;
+}
+
+.upload-summary {
+  border-radius: 0.75rem;
+  border: 1px solid var(--ceniza-claro, #e5e5e5);
+  background: var(--nieve, #f5f5f5);
+  padding: 0.75rem;
+  color: var(--niebla, #737373);
+  font-size: 0.74rem;
+  display: grid;
+  gap: 0.2rem;
+}
