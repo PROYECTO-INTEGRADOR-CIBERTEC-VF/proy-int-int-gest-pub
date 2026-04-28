@@ -1,16 +1,27 @@
 <section class="auth-layout">
-  <div class="glow glow-left" aria-hidden="true"></div>
-  <div class="glow glow-right" aria-hidden="true"></div>
+  <div class="auth-bg" aria-hidden="true">
+    <div class="auth-orb auth-orb-1"></div>
+    <div class="auth-orb auth-orb-2"></div>
+  </div>
 
   <article class="auth-card">
+    <!-- Brand -->
+    <div class="auth-brand">
+      <a routerLink="/" class="brand-link">
+        <span class="brand-logo">SAIP</span>
+        <span class="brand-sep">·</span>
+        <span class="brand-text">Portal de Transparencia</span>
+      </a>
+    </div>
+
     <header class="auth-header">
-      <p class="eyebrow">SAIP · Acceso</p>
-      <h1>Iniciar sesión</h1>
+      <h1>Iniciar sesion</h1>
       <p class="subtitle" *ngIf="accessMode() === 'citizen'">
-        Ingrese con DNI y contraseña para presentar su solicitud de acceso.
+        Ingrese con su DNI y contraseña para acceder a sus solicitudes.
       </p>
       <p class="subtitle" *ngIf="accessMode() === 'internal'">
-        Ingreso interno habilitado para perfil {{ requiredRoleLabel() }}.
+        <span class="internal-badge">{{ requiredRoleLabel() }}</span>
+        Ingreso interno del sistema
       </p>
     </header>
 
@@ -28,7 +39,7 @@
           [placeholder]="identificadorPlaceholder()"
           (input)="onIdentificadorInput(identificadorInput.value)"
         />
-        <small class="hint" *ngIf="accessMode() === 'citizen'">Solo números, 8 dígitos.</small>
+        <small class="hint" *ngIf="accessMode() === 'citizen'">Solo numeros, 8 digitos.</small>
         <p class="field-error" *ngIf="identificadorError()">{{ identificadorError() }}</p>
       </div>
 
@@ -45,11 +56,15 @@
       </div>
 
       <p class="alert success" *ngIf="successMessage()">{{ successMessage() }}</p>
-
       <p class="alert error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
 
-      <button type="submit" class="btn-primary" [disabled]="loading()">
-        {{ loading() ? 'Validando acceso...' : 'Ingresar' }}
+      <button type="submit" class="btn-submit" [disabled]="loading()">
+        @if (loading()) {
+          <span class="btn-spinner"></span>
+          Validando acceso...
+        } @else {
+          Ingresar
+        }
       </button>
 
       <div class="auth-links" *ngIf="accessMode() === 'citizen'">
@@ -58,17 +73,8 @@
       </div>
 
       <div class="auth-links" *ngIf="accessMode() === 'internal'">
-        <a routerLink="/login">Volver al acceso ciudadano</a>
+        <a routerLink="/">Volver al portal publico</a>
       </div>
     </form>
-
-    <footer class="role-switcher">
-      <p>Accesos internos</p>
-      <nav>
-        <a routerLink="/acceso-funcionario">Funcionario</a>
-        <a routerLink="/acceso-ttaip">TTAIP</a>
-        <a routerLink="/acceso-admin">Administrador</a>
-      </nav>
-    </footer>
   </article>
 </section>

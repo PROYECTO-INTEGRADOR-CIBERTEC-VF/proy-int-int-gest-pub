@@ -3,8 +3,16 @@
   <div class="shape shape-bottom" aria-hidden="true"></div>
 
   <article class="registro-card">
+    <!-- Brand -->
+    <div style="text-align: center; margin-bottom: 1rem;">
+      <a routerLink="/" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+        <span style="font-size: 1.1rem; font-weight: 800; color: var(--peru-rojo); letter-spacing: -0.02em;">SAIP</span>
+        <span style="color: var(--ceniza); font-weight: 300;">·</span>
+        <span style="font-size: 0.8rem; color: var(--niebla); font-weight: 500;">Portal de Transparencia</span>
+      </a>
+    </div>
+
     <header>
-      <p class="eyebrow">SAIP · Registro</p>
       <h1>Crear cuenta ciudadana</h1>
       <p>Complete el proceso en dos pasos para habilitar su acceso.</p>
 
@@ -48,7 +56,7 @@
 
       <ng-container *ngIf="pasoActual() === 2">
         <div class="form-row">
-          <label for="email">Correo electrónico</label>
+          <label for="email">Correo electronico</label>
           <input
             id="email"
             type="email"
@@ -66,14 +74,14 @@
             type="password"
             formControlName="password"
             autocomplete="new-password"
-            placeholder="Mínimo 6 caracteres"
+            placeholder="Minimo 6 caracteres"
           />
           <p class="field-error" *ngIf="passwordError()">{{ passwordError() }}</p>
 
           <ul class="password-rules">
-            <li [class.ok]="cumpleLongitud()">Mínimo 6 caracteres</li>
-            <li [class.ok]="cumpleMayuscula()">Al menos 1 mayúscula</li>
-            <li [class.ok]="cumpleNumero()">Al menos 1 número</li>
+            <li [class.ok]="cumpleLongitud()">Minimo 6 caracteres</li>
+            <li [class.ok]="cumpleMayuscula()">Al menos 1 mayuscula</li>
+            <li [class.ok]="cumpleNumero()">Al menos 1 numero</li>
           </ul>
         </div>
 
@@ -90,7 +98,7 @@
         </div>
 
         <div class="form-row">
-          <label for="telefono">Teléfono (opcional)</label>
+          <label for="telefono">Telefono (opcional)</label>
           <input
             id="telefono"
             formControlName="telefono"
@@ -99,7 +107,7 @@
         </div>
 
         <div class="form-row">
-          <label for="direccion">Dirección (opcional)</label>
+          <label for="direccion">Direccion (opcional)</label>
           <input
             id="direccion"
             formControlName="direccion"
@@ -111,7 +119,7 @@
         <p class="alert success" *ngIf="successMessage()">{{ successMessage() }}</p>
 
         <div class="wizard-actions">
-          <button type="button" class="btn-secondary" (click)="volverPasoUno()">Atrás</button>
+          <button type="button" class="btn-secondary" (click)="volverPasoUno()">Atras</button>
           <button type="submit" class="btn-primary" [disabled]="loading()">
             {{ loading() ? 'Registrando...' : 'Registrar cuenta' }}
           </button>
@@ -121,7 +129,7 @@
 
     <footer>
       <span>¿Ya tiene una cuenta?</span>
-      <a routerLink="/login">Ir a iniciar sesión</a>
+      <a routerLink="/login">Ir a iniciar sesion</a>
     </footer>
   </article>
 </section>
