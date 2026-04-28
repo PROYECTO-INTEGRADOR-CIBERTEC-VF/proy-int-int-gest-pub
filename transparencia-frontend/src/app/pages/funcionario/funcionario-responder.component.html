@@ -1,47 +1,37 @@
 <div class="min-h-screen bg-(--nieve-calida)">
-  @if (loadingSolicitud()) {
-    <section class="bg-gradient-peru-hero px-4 pb-10 pt-24">
-      <div class="mx-auto max-w-7xl">
-        <h1 class="text-2xl font-semibold text-(--carbon)">Cargando formulario de respuesta...</h1>
+  <!-- ═══════ Topbar ═══════ -->
+  <nav class="sticky top-0 z-30 border-b border-(--ceniza-claro) bg-white/80 backdrop-blur-md">
+    <div class="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
+      <div class="flex items-center gap-3">
+        <span class="text-base font-extrabold text-(--peru-rojo) tracking-tight">SAIP</span>
+        <span class="text-(--ceniza)">·</span>
+        <span class="text-sm font-medium text-(--humo)">Responder Solicitud</span>
       </div>
-    </section>
+      <a routerLink="/funcionario/dashboard" class="btn-outline h-8 px-3 text-xs" style="text-decoration: none;">
+        &larr; Volver al dashboard
+      </a>
+    </div>
+  </nav>
+
+  @if (loadingSolicitud()) {
     <section class="mx-auto max-w-7xl px-4 py-14 text-center">
-      <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-(--ceniza) border-t-(--peru-rojo)"></div>
+      <div class="spinner spinner-lg mx-auto"></div>
+      <p class="mt-4 text-sm text-(--niebla)">Cargando formulario de respuesta...</p>
     </section>
   } @else if (error() && !solicitud()) {
-    <section class="bg-gradient-peru-hero px-4 pb-10 pt-24">
-      <div class="mx-auto max-w-7xl">
-        <a
-          routerLink="/funcionario"
-          class="inline-flex items-center gap-2 text-sm text-(--humo) transition hover:text-(--carbon)"
-          style="text-decoration: none;"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-          Volver al Dashboard
-        </a>
-      </div>
-    </section>
-    <section class="mx-auto max-w-7xl px-4 pb-10">
+    <section class="mx-auto max-w-7xl px-4 py-8">
       <div class="alert-error">
         <p>{{ error() }}</p>
       </div>
     </section>
   } @else if (solicitud(); as solicitudData) {
-    <section class="bg-gradient-peru-hero px-4 pb-10 pt-24">
+    <!-- ═══════ Hero ═══════ -->
+    <section class="bg-gradient-peru-hero px-4 pb-10 pt-8">
       <div class="mx-auto max-w-7xl">
-        <a
-          [routerLink]="['/funcionario/solicitud', solicitudData.expediente]"
-          class="inline-flex items-center gap-2 text-sm text-(--humo) transition hover:text-(--carbon)"
-          style="text-decoration: none;"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-          Volver al detalle
-        </a>
-
-        <div class="mt-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <p class="text-sm font-semibold uppercase tracking-[0.08em] text-(--niebla)">HU-03 · FE-02</p>
-            <h1 class="mt-1 text-3xl font-extrabold text-(--carbon)">Responder Solicitud</h1>
+            <p class="text-xs font-semibold uppercase tracking-widest text-(--peru-rojo)">HU-03 · Respuesta</p>
+            <h1 class="mt-1 text-2xl font-extrabold text-(--carbon) md:text-3xl">Responder Solicitud</h1>
             <p class="mt-1 font-expediente text-sm text-(--humo)">{{ solicitudData.expediente }}</p>
           </div>
 
@@ -187,7 +177,7 @@
             }
 
             <div class="space-y-2">
-              <label class="label" for="archivos">Adjuntar archivos <span class="text-(--estado-rojo)">*</span></label>
+              <label class="label" for="archivos">Adjuntar archivos <span class="text-(--niebla) text-xs font-normal">(Opcional)</span></label>
               <input
                 id="archivos"
                 type="file"
@@ -195,7 +185,7 @@
                 class="file-input"
                 (change)="onSeleccionArchivos($event)"
               />
-              <p class="helper">Puede adjuntar uno o varios archivos para la respuesta.</p>
+              <p class="helper">Puede adjuntar documentos de soporte (PDF, Word, imagenes).</p>
 
               @if (previewArchivos().length > 0) {
                 <div class="space-y-2 pt-2">
@@ -221,9 +211,12 @@
                 [disabled]="loading() || !puedeRegistrarRespuesta()"
               >
                 @if (loading()) {
-                  Enviando...
+                  <span class="inline-flex items-center gap-2">
+                    <span class="inline-block h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></span>
+                    Enviando respuesta...
+                  </span>
                 } @else {
-                  Validar respuesta
+                  Enviar respuesta
                 }
               </button>
             </div>
