@@ -55,8 +55,13 @@ export class TtaipCalificarComponent implements OnInit {
     this.loadingApelacion.set(true);
     this.error.set('');
 
-    this.apelacionService.findByExpediente(expediente).subscribe({
+    this.ttaipService.getApelacionPorExpediente(expediente).subscribe({
       next: (apelacion) => {
+        if (!apelacion) {
+          this.loadingApelacion.set(false);
+          this.error.set('No se pudo encontrar la apelacion para calificar.');
+          return;
+        }
         this.apelacion.set(apelacion);
         this.expediente = apelacion.expediente;
         this.loadingApelacion.set(false);
@@ -111,8 +116,16 @@ export class TtaipCalificarComponent implements OnInit {
       fundamentos: fundamentosLimpios
     };
 
+    // Use id fallback since backend returns 'id' not 'idApelacion'
+    const apelacionId = apelacionActual.idApelacion ?? (apelacionActual as any).id;
+    if (!apelacionId) {
+      this.error.set('No se pudo determinar el ID de la apelacion.');
+      this.loading.set(false);
+      return;
+    }
+
     if (this.decision === 'admitir') {
-      this.ttaipService.admitirApelacion(apelacionActual.idApelacion, requestBase).subscribe({
+      this.ttaipService.admitirApelacion(apelacionId, requestBase).subscribe({
         next: () => this.procesarExito('Apelacion admitida correctamente.'),
         error: (err: any) => this.procesarError(err)
       });
@@ -120,7 +133,7 @@ export class TtaipCalificarComponent implements OnInit {
     }
 
     if (this.decision === 'subsanar') {
-      this.ttaipService.requerirSubsanacion(apelacionActual.idApelacion, {
+      this.ttaipService.requerirSubsanacion(apelacionId, {
         ...requestBase,
         observaciones: observacionesLimpias,
         diasSubsanacion: this.diasSubsanacion
@@ -131,7 +144,7 @@ export class TtaipCalificarComponent implements OnInit {
       return;
     }
 
-    this.ttaipService.inadmitirApelacion(apelacionActual.idApelacion, requestBase).subscribe({
+    this.ttaipService.inadmitirApelacion(apelacionId, requestBase).subscribe({
       next: () => this.procesarExito('Apelacion inadmitida correctamente.'),
       error: (err: any) => this.procesarError(err)
     });
@@ -141,7 +154,7 @@ export class TtaipCalificarComponent implements OnInit {
     this.loading.set(false);
     this.mensaje.set(mensaje);
     setTimeout(() => {
-      this.router.navigate(['/ttaip']);
+      this.router.navigate(['/ttaip/dashboard']);
     }, 1800);
   }
 
