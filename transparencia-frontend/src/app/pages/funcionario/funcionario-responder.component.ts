@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { DatePipe, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Solicitud } from '../../models/solicitud.model';
 import { CrearRespuestaRequest } from '../../models/respuesta.model';
 import { RespuestaService } from '../../services/respuesta.service';
@@ -43,6 +43,7 @@ export class FuncionarioResponderComponent {
   private readonly respuestaService = inject(RespuestaService);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
 
   readonly loading = signal(false);
   readonly loadingSolicitud = signal(true);
@@ -67,8 +68,10 @@ export class FuncionarioResponderComponent {
     fundamentoLegal: this.fb.control(''),
   });
 
+  readonly decisionActual = signal<DecisionFormulario>('ACEPTAR');
+
   readonly mostrarCamposDenegacion = computed(
-    () => this.formulario.controls.decision.value === 'DENEGAR',
+    () => this.decisionActual() === 'DENEGAR',
   );
 
   readonly puedeRegistrarRespuesta = computed(() => {
@@ -77,7 +80,26 @@ export class FuncionarioResponderComponent {
       return false;
     }
 
-    return canSendManualResponse(this.construirContexto(solicitud));
+    // Allow if solicitud hasn't been answered yet and is not expired
+    const estado = (solicitud.estado ?? '').toUpperCase();
+    const yaRespondida = estado === 'RESPONDIDA' || estado === 'DENEGADA' || estado === 'CONCLUIDA';
+    const tieneRespuesta = !!solicitud.respuesta?.tipoRespuesta;
+
+    if (yaRespondida || tieneRespuesta) {
+      return false;
+    }
+
+    // Check silencio administrativo - but be lenient if diasRestantes is null/undefined
+    if (estado === 'VENCIDA') {
+      return false;
+    }
+
+    const dias = solicitud.diasRestantes;
+    if (typeof dias === 'number' && dias < 0) {
+      return false;
+    }
+
+    return true;
   });
 
   readonly previewArchivos = computed<ArchivoPreview[]>(() =>
@@ -89,6 +111,7 @@ export class FuncionarioResponderComponent {
 
   constructor() {
     this.formulario.controls.decision.valueChanges.subscribe((decision) => {
+      this.decisionActual.set(decision);
       this.actualizarValidacionesSegunDecision(decision);
     });
 
@@ -126,11 +149,6 @@ export class FuncionarioResponderComponent {
 
     this.formulario.markAllAsTouched();
 
-    if (this.archivosAdjuntos().length === 0) {
-      this.error.set('Debe adjuntar al menos un archivo para la respuesta.');
-      return;
-    }
-
     if (this.formulario.invalid) {
       this.error.set('Complete los campos obligatorios antes de enviar la respuesta.');
       return;
@@ -147,9 +165,18 @@ export class FuncionarioResponderComponent {
     const contenido = this.formulario.controls.contenido.value.trim();
     const decision = this.formulario.controls.decision.value;
 
+    // Use id fallback because backend DTO uses 'id' instead of 'idSolicitud'
+    const solicitudId = solicitud.idSolicitud ?? (solicitud as any).id ?? solicitud.id;
+
+    if (!solicitudId) {
+      this.error.set('No se pudo determinar el ID de la solicitud.');
+      this.loading.set(false);
+      return;
+    }
+
     if (decision === 'ACEPTAR') {
       const payload: CrearRespuestaRequest = {
-        solicitudId: solicitud.idSolicitud,
+        solicitudId,
         funcionarioId,
         tipoRespuesta: 'ENTREGA_TOTAL',
         contenido,
@@ -161,6 +188,9 @@ export class FuncionarioResponderComponent {
         next: () => {
           this.loading.set(false);
           this.mensaje.set('Respuesta de aceptacion enviada correctamente.');
+          setTimeout(() => {
+            this.router.navigate(['/funcionario/dashboard']);
+          }, 2000);
         },
         error: (errorResponse) => {
           this.loading.set(false);
@@ -172,7 +202,7 @@ export class FuncionarioResponderComponent {
     }
 
     const payload: CrearRespuestaRequest = {
-      solicitudId: solicitud.idSolicitud,
+      solicitudId,
       funcionarioId,
       tipoRespuesta: 'DENEGACION_TOTAL',
       contenido,
@@ -184,6 +214,9 @@ export class FuncionarioResponderComponent {
       next: () => {
         this.loading.set(false);
         this.mensaje.set('Respuesta de denegacion enviada correctamente.');
+        setTimeout(() => {
+          this.router.navigate(['/funcionario/dashboard']);
+        }, 2000);
       },
       error: (errorResponse) => {
         this.loading.set(false);
