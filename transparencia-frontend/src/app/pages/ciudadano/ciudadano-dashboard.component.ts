@@ -1,9 +1,14 @@
 import { ChangeDetectionStrategy, Component, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { DatePipe, isPlatformBrowser } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { Solicitud } from '../../models/solicitud.model';
+import { Apelacion } from '../../models/apelacion.model';
 import { SolicitudService } from '../../services/solicitud.service';
+import { ApelacionService } from '../../services/apelacion.service';
 import { AuthService } from '../../services/auth.service';
+
+type TabActiva = 'saip' | 'apelaciones';
 
 interface SesionCiudadano {
   ciudadanoId?: number;
@@ -13,7 +18,7 @@ interface SesionCiudadano {
 @Component({
   selector: 'app-ciudadano-dashboard',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, FormsModule],
   templateUrl: './ciudadano-dashboard.component.html',
   styleUrl: './ciudadano-dashboard.component.css',
 })
@@ -21,13 +26,18 @@ export class CiudadanoDashboardComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly solicitudService = inject(SolicitudService);
+  private readonly apelacionService = inject(ApelacionService);
   private readonly platformId = inject(PLATFORM_ID);
 
   readonly loading = signal(true);
+  readonly loadingApelaciones = signal(false);
   readonly error = signal<string | null>(null);
   readonly ciudadanoId = signal<number | null>(null);
   readonly nombreUsuario = signal('Ciudadano');
   readonly solicitudes = signal<Solicitud[]>([]);
+  readonly apelaciones = signal<Apelacion[]>([]);
+  readonly tabActiva = signal<TabActiva>('saip');
+  readonly solicitudExpandida = signal<number | null>(null);
 
   readonly total = computed(() => this.solicitudes().length);
 
@@ -49,8 +59,36 @@ export class CiudadanoDashboardComponent {
 
   readonly vencidas = computed(() => this.solicitudes().filter((solicitud) => solicitud.estado === 'VENCIDA').length);
 
+  readonly totalApelaciones = computed(() => this.apelaciones().length);
+
+  readonly puedeApelar = computed(() =>
+    this.solicitudes().filter((s) =>
+      (s.estado === 'RESPONDIDA' || s.estado === 'DENEGADA' || s.estado === 'VENCIDA')
+      && !this.apelaciones().some((a) => a.solicitudId === (s.idSolicitud ?? s.id))
+    ).length > 0,
+  );
+
+  readonly solicitudesApelables = computed(() =>
+    this.solicitudes().filter((s) =>
+      (s.estado === 'RESPONDIDA' || s.estado === 'DENEGADA' || s.estado === 'VENCIDA')
+      && !this.apelaciones().some((a) => a.solicitudId === (s.idSolicitud ?? s.id))
+    ),
+  );
+
   constructor() {
     this.inicializarDesdeSesion();
+  }
+
+  cambiarTab(tab: TabActiva): void {
+    this.tabActiva.set(tab);
+    if (tab === 'apelaciones' && this.apelaciones().length === 0 && this.ciudadanoId()) {
+      this.cargarApelaciones();
+    }
+  }
+
+  toggleDetalle(solicitud: Solicitud): void {
+    const sid = solicitud.idSolicitud ?? solicitud.id ?? 0;
+    this.solicitudExpandida.set(this.solicitudExpandida() === sid ? null : sid);
   }
 
   cargarSolicitudes(): void {
@@ -69,6 +107,8 @@ export class CiudadanoDashboardComponent {
       next: (data) => {
         this.solicitudes.set(data);
         this.loading.set(false);
+        // Tambien cargar apelaciones del ciudadano
+        this.cargarApelaciones();
       },
       error: () => {
         this.loading.set(false);
@@ -77,18 +117,97 @@ export class CiudadanoDashboardComponent {
     });
   }
 
+  cargarApelaciones(): void {
+    const idCiudadano = this.ciudadanoId();
+    if (!idCiudadano) {
+      return;
+    }
+
+    this.loadingApelaciones.set(true);
+    this.apelacionService.findByCiudadanoId(idCiudadano).subscribe({
+      next: (data) => {
+        this.apelaciones.set(data);
+        this.loadingApelaciones.set(false);
+      },
+      error: () => {
+        this.loadingApelaciones.set(false);
+      },
+    });
+  }
+
   getEstadoClass(estado: string): string {
     const classes: Record<string, string> = {
-      RECEPCIONADA: 'bg-blue-100 text-blue-700 border border-blue-200',
-      EN_REVISION: 'bg-amber-100 text-amber-700 border border-amber-200',
-      PENDIENTE_INFORMACION: 'bg-amber-100 text-amber-700 border border-amber-200',
-      RESPONDIDA: 'bg-emerald-100 text-emerald-700 border border-emerald-200',
-      CONCLUIDA: 'bg-emerald-100 text-emerald-700 border border-emerald-200',
-      DENEGADA: 'bg-red-100 text-red-700 border border-red-200',
-      VENCIDA: 'bg-neutral-800 text-white border border-neutral-700',
+      RECEPCIONADA: 'badge-info',
+      EN_REVISION: 'badge-warning',
+      PENDIENTE_INFORMACION: 'badge-warning',
+      RESPONDIDA: 'badge-success',
+      CONCLUIDA: 'badge-success',
+      DENEGADA: 'badge-danger',
+      VENCIDA: 'badge-dark',
     };
 
-    return classes[estado] ?? 'bg-neutral-100 text-neutral-700 border border-neutral-200';
+    return classes[estado] ?? 'badge-muted';
+  }
+
+  getApelacionEstadoClass(estado: string): string {
+    const classes: Record<string, string> = {
+      PENDIENTE_ELEVACION: 'badge-warning',
+      EN_CALIFICACION_1: 'badge-warning',
+      EN_SUBSANACION: 'badge-warning',
+      EN_CALIFICACION_2: 'badge-info',
+      NOTIFICACION_SEGUNDA_CALIFICACION: 'badge-info',
+      EN_RESOLUCION: 'badge-info',
+      RESUELTO: 'badge-success',
+      RESUELTO_FUNDADO: 'badge-success',
+      RESUELTO_FUNDADO_EN_PARTE: 'badge-success',
+      RESUELTO_INFUNDADO: 'badge-danger',
+      RESUELTO_INFUNDADO_EN_PARTE: 'badge-danger',
+      RESUELTO_IMPROCEDENTE: 'badge-danger',
+      TENER_POR_NO_PRESENTADO: 'badge-dark',
+    };
+
+    return classes[estado] ?? 'badge-muted';
+  }
+
+  getEstadoLabel(estado: string): string {
+    const labels: Record<string, string> = {
+      RECEPCIONADA: 'Recepcionada',
+      EN_REVISION: 'En revision',
+      PENDIENTE_INFORMACION: 'Pendiente informacion',
+      RESPONDIDA: 'Respondida',
+      CONCLUIDA: 'Concluida',
+      DENEGADA: 'Denegada',
+      VENCIDA: 'Vencida',
+      PENDIENTE_ELEVACION: 'Pendiente elevacion',
+      EN_CALIFICACION_1: '1ra. Calificacion',
+      EN_SUBSANACION: 'En subsanacion',
+      EN_CALIFICACION_2: '2da. Calificacion',
+      NOTIFICACION_SEGUNDA_CALIFICACION: 'Notificacion',
+      EN_RESOLUCION: 'En resolucion',
+      RESUELTO: 'Resuelto',
+      RESUELTO_FUNDADO: 'Fundado',
+      RESUELTO_FUNDADO_EN_PARTE: 'Fundado en parte',
+      RESUELTO_INFUNDADO: 'Infundado',
+      RESUELTO_INFUNDADO_EN_PARTE: 'Infundado en parte',
+      RESUELTO_IMPROCEDENTE: 'Improcedente',
+      TENER_POR_NO_PRESENTADO: 'No presentado',
+      CONCLUSION_SUSTRACCION_MATERIA: 'Conclusion sustraccion',
+      CONCLUSION_DESISTIMIENTO: 'Desistimiento',
+    };
+
+    return labels[estado] ?? estado;
+  }
+
+  puedeApelarSolicitud(solicitud: Solicitud): boolean {
+    const estadosApelables = ['RESPONDIDA', 'DENEGADA', 'VENCIDA'];
+    if (!estadosApelables.includes(solicitud.estado)) {
+      return false;
+    }
+    return !this.apelaciones().some((a) => a.solicitudId === (solicitud.idSolicitud ?? solicitud.id));
+  }
+
+  puedeSubsanar(apelacion: Apelacion): boolean {
+    return apelacion.estado === 'EN_SUBSANACION';
   }
 
   cerrarSesion(): void {

@@ -30,10 +30,6 @@ public class Apelacion {
     @JoinColumn(name = "id_ciudadano")
     private Ciudadano ciudadano;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_entidad")
-    private Entidad entidad;
-
     @Column(columnDefinition = "TEXT")
     private String fundamentos;
 
