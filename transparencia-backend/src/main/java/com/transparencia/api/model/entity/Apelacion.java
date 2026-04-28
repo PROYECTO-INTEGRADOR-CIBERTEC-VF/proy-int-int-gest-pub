@@ -52,6 +52,7 @@ public class Apelacion {
     private String resultado;
     private LocalDateTime fechaApelacion;
     private LocalDateTime fechaSubsanacion;
+    private LocalDateTime fechaResolucion;
     private Integer diasSubsanacion;
 
     public enum EstadoApelacion {

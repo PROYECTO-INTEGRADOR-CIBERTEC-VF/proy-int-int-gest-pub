@@ -209,4 +209,13 @@ public class TTAIPRestController {
         return ResponseEntity.ok(ttaipService.emitirResolucionFinal(
             apelacionId, "TENER_POR_NO_PRESENTADO", request.fundamentos(), request.iniciarProcesoDisciplinario()));
     }
+
+    @PostMapping(value = "/{id}/emitir-resolucion", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Apelacion> emitirResolucion(
+            @PathVariable Long id,
+            @RequestPart("datos") com.transparencia.api.model.dto.ResolucionFinalRequest datos,
+            @RequestPart("archivo") MultipartFile archivo) {
+
+        return ResponseEntity.ok(apelacionService.emitirResolucionFinal(id, datos, archivo));
+    }
 }

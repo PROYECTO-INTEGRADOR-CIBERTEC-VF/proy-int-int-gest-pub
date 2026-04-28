@@ -284,4 +284,73 @@ public class ApelacionService {
         apelacion.setEstado(Apelacion.EstadoApelacion.EN_RESOLUCION);
         return apelacionRepository.save(apelacion);
     }
+
+    // --- MÉTODO PARA HU-08 (BE-01): EMITIR FALLO FINAL CON 7 DECISIONES ---
+    @Transactional
+    public Apelacion emitirResolucionFinal(Long idApelacion, com.transparencia.api.model.dto.ResolucionFinalRequest request, MultipartFile archivoAdjunto) {
+        Apelacion apelacion = apelacionRepository.findById(idApelacion)
+                .orElseThrow(() -> new RuntimeException("Apelación no encontrada con ID: " + idApelacion));
+
+        if (apelacion.getEstado() != Apelacion.EstadoApelacion.EN_RESOLUCION) {
+            throw new IllegalStateException("La apelación debe estar en etapa de EN_RESOLUCION para emitir un fallo.");
+        }
+
+        if (archivoAdjunto == null || archivoAdjunto.isEmpty()) {
+            throw new IllegalArgumentException("Debe cargar el documento de resolución firmada (PDF).");
+        }
+
+        // 1. Guardar el documento físico (usando el fileStorageService que Daniel ya inyectó)
+        String rutaArchivoFisico = fileStorageService.storeFile(archivoAdjunto, "resoluciones_finales");
+        Documento documento = new Documento();
+        documento.setNombreArchivo(archivoAdjunto.getOriginalFilename());
+        documento.setRutaArchivo(rutaArchivoFisico);
+        documento.setTipoDocumento(Documento.TipoDocumento.RESOLUCION_TTAIP);
+        documento.setApelacion(apelacion);
+        documentoRepository.save(documento);
+
+        // 2. Mapear las 7 decisiones del Excel
+        String decisionNormalizada = request.getDecision().toLowerCase();
+
+        switch (decisionNormalizada) {
+            case "fundado":
+                apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_FUNDADO);
+                apelacion.setResultado("RESUELTO - FUNDADO");
+                break;
+            case "fundado_en_parte":
+                apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_FUNDADO_EN_PARTE);
+                apelacion.setResultado("RESUELTO - FUNDADO EN PARTE");
+                break;
+            case "infundado":
+                apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_INFUNDADO);
+                apelacion.setResultado("RESUELTO - INFUNDADO");
+                break;
+            case "infundado_en_parte":
+                apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_INFUNDADO_EN_PARTE);
+                apelacion.setResultado("RESUELTO - INFUNDADO EN PARTE");
+                break;
+            case "improcedente":
+                apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_IMPROCEDENTE);
+                apelacion.setResultado("RESUELTO - IMPROCEDENTE");
+                break;
+            case "sustraccion_materia":
+                apelacion.setEstado(Apelacion.EstadoApelacion.CONCLUSION_SUSTRACCION_MATERIA);
+                apelacion.setResultado("CONCLUSIÓN POR SUSTRACCIÓN DE MATERIA");
+                break;
+            case "desistimiento":
+                apelacion.setEstado(Apelacion.EstadoApelacion.CONCLUSION_DESISTIMIENTO);
+                apelacion.setResultado("CONCLUSIÓN POR DESISTIMIENTO");
+                break;
+            default:
+                throw new IllegalArgumentException("Tipo de resolución no válido: " + request.getDecision());
+        }
+
+        apelacion.setFundamentos(request.getFundamentos());
+        apelacion.setFechaResolucion(LocalDateTime.now()); // Este es el campo que Daniel ya tiene en su entidad
+
+        if (Boolean.TRUE.equals(request.getIniciarProcesoDisciplinario())) {
+            apelacion.setResultado(apelacion.getResultado() + " (INCLUYE PROCESO DISCIPLINARIO)");
+        }
+
+        return apelacionRepository.save(apelacion);
+    }
 }
