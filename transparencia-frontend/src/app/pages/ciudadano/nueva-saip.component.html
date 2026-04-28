@@ -1,13 +1,24 @@
 <main class="saip-page min-h-screen bg-[var(--nieve)] text-[var(--carbon)]">
-  <section class="bg-gradient-peru-hero pt-20 pb-10 px-4 relative overflow-hidden">
-    <div class="absolute top-0 right-0 w-[360px] h-[360px] rounded-full border border-[var(--ceniza-claro)]"></div>
-    <div class="max-w-7xl mx-auto relative">
-      <a routerLink="/" class="inline-flex items-center gap-2 text-sm text-[var(--carbon)]/60 hover:text-[var(--carbon)] transition-colors">
-        <span aria-hidden="true">&larr;</span>
-        Volver al dashboard
+  <!-- ═══════ Topbar ═══════ -->
+  <nav class="sticky top-0 z-30 border-b border-[var(--ceniza-claro)] bg-white/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto flex h-14 items-center justify-between px-4">
+      <div class="flex items-center gap-3">
+        <a routerLink="/ciudadano/dashboard" class="text-base font-extrabold text-[var(--peru-rojo)] tracking-tight" style="text-decoration: none;">SAIP</a>
+        <span class="text-[var(--ceniza)]">·</span>
+        <span class="text-sm font-medium text-[var(--humo)]">Nueva Solicitud</span>
+      </div>
+      <a routerLink="/ciudadano/dashboard" class="btn-outline h-8 px-3 text-xs" style="text-decoration: none;">
+        &larr; Volver al dashboard
       </a>
-      <h1 class="mt-4 text-2xl md:text-3xl font-bold tracking-tight">Nueva Solicitud SAIP</h1>
-      <p class="mt-1 text-[var(--carbon)]/65">Complete el formulario para presentar su solicitud de acceso a informacion publica.</p>
+    </div>
+  </nav>
+
+  <!-- ═══════ Hero ═══════ -->
+  <section class="bg-gradient-peru-hero pt-8 pb-8 px-4">
+    <div class="max-w-7xl mx-auto">
+      <p class="text-xs font-semibold uppercase tracking-widest text-[var(--peru-rojo)]">Formulario SAIP</p>
+      <h1 class="mt-1 text-2xl md:text-3xl font-bold tracking-tight">Nueva Solicitud SAIP</h1>
+      <p class="mt-1 text-sm text-[var(--humo)]">Complete el formulario para presentar su solicitud de acceso a informacion publica.</p>
     </div>
   </section>
 
