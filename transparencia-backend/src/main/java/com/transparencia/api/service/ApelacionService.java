@@ -285,7 +285,7 @@ public class ApelacionService {
         return apelacionRepository.save(apelacion);
     }
 
-    // --- MÉTODO PARA HU-08 (BE-01): EMITIR FALLO FINAL CON 7 DECISIONES ---
+    // --- MÉTODO PARA HU-08: EMITIR FALLO FINAL CON 7 DECISIONES ---
     @Transactional
     public Apelacion emitirResolucionFinal(Long idApelacion, com.transparencia.api.model.dto.ResolucionFinalRequest request, MultipartFile archivoAdjunto) {
         Apelacion apelacion = apelacionRepository.findById(idApelacion)
@@ -299,7 +299,19 @@ public class ApelacionService {
             throw new IllegalArgumentException("Debe cargar el documento de resolución firmada (PDF).");
         }
 
-        // 1. Guardar el documento físico (usando el fileStorageService que Daniel ya inyectó)
+        // --- BE-02: Validar plazo máximo de 10 días hábiles ---
+        LocalDate fechaInicio = apelacion.getFechaApelacion().toLocalDate();
+        if (apelacion.getFechaSubsanacion() != null) {
+            fechaInicio = apelacion.getFechaSubsanacion().toLocalDate();
+        }
+
+        int diasTranscurridos = DiasHabilesUtil.contarDiasHabiles(fechaInicio, LocalDate.now());
+        String sufijoPlazo = "";
+        if (diasTranscurridos > 10) {
+            sufijoPlazo = " (ALERTA: FUERA DE PLAZO - Emitido " + diasTranscurridos + " días después)";
+        }
+
+        // 1. Guardar el documento físico
         String rutaArchivoFisico = fileStorageService.storeFile(archivoAdjunto, "resoluciones_finales");
         Documento documento = new Documento();
         documento.setNombreArchivo(archivoAdjunto.getOriginalFilename());
@@ -308,48 +320,51 @@ public class ApelacionService {
         documento.setApelacion(apelacion);
         documentoRepository.save(documento);
 
-        // 2. Mapear las 7 decisiones del Excel
+        // 2. Mapear las 7 decisiones y sus ESTADOS EXACTOS (Para cumplir GitHub BE-03)
         String decisionNormalizada = request.getDecision().toLowerCase();
+        String textoResultado = "";
 
         switch (decisionNormalizada) {
             case "fundado":
                 apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_FUNDADO);
-                apelacion.setResultado("RESUELTO - FUNDADO");
+                textoResultado = "RESUELTO - FUNDADO";
                 break;
             case "fundado_en_parte":
                 apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_FUNDADO_EN_PARTE);
-                apelacion.setResultado("RESUELTO - FUNDADO EN PARTE");
+                textoResultado = "RESUELTO - FUNDADO EN PARTE";
                 break;
             case "infundado":
                 apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_INFUNDADO);
-                apelacion.setResultado("RESUELTO - INFUNDADO");
+                textoResultado = "RESUELTO - INFUNDADO";
                 break;
             case "infundado_en_parte":
                 apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_INFUNDADO_EN_PARTE);
-                apelacion.setResultado("RESUELTO - INFUNDADO EN PARTE");
+                textoResultado = "RESUELTO - INFUNDADO EN PARTE";
                 break;
             case "improcedente":
                 apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_IMPROCEDENTE);
-                apelacion.setResultado("RESUELTO - IMPROCEDENTE");
+                textoResultado = "RESUELTO - IMPROCEDENTE";
                 break;
             case "sustraccion_materia":
                 apelacion.setEstado(Apelacion.EstadoApelacion.CONCLUSION_SUSTRACCION_MATERIA);
-                apelacion.setResultado("CONCLUSIÓN POR SUSTRACCIÓN DE MATERIA");
+                textoResultado = "CONCLUSIÓN POR SUSTRACCIÓN DE MATERIA";
                 break;
             case "desistimiento":
                 apelacion.setEstado(Apelacion.EstadoApelacion.CONCLUSION_DESISTIMIENTO);
-                apelacion.setResultado("CONCLUSIÓN POR DESISTIMIENTO");
+                textoResultado = "CONCLUSIÓN POR DESISTIMIENTO";
                 break;
             default:
                 throw new IllegalArgumentException("Tipo de resolución no válido: " + request.getDecision());
         }
 
-        apelacion.setFundamentos(request.getFundamentos());
-        apelacion.setFechaResolucion(LocalDateTime.now()); // Este es el campo que Daniel ya tiene en su entidad
-
+        // --- BE-03: El resultado queda guardado (Cumpliendo el escenario 3 de GitHub) ---
         if (Boolean.TRUE.equals(request.getIniciarProcesoDisciplinario())) {
-            apelacion.setResultado(apelacion.getResultado() + " (INCLUYE PROCESO DISCIPLINARIO)");
+            textoResultado += " (INCLUYE PROCESO DISCIPLINARIO)";
         }
+
+        apelacion.setResultado(textoResultado + sufijoPlazo);
+        apelacion.setFundamentos(request.getFundamentos());
+        apelacion.setFechaResolucion(LocalDateTime.now());
 
         return apelacionRepository.save(apelacion);
     }

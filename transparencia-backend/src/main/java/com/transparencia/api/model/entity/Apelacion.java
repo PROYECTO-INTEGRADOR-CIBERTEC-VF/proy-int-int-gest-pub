@@ -56,10 +56,10 @@ public class Apelacion {
     private Integer diasSubsanacion;
 
     public enum EstadoApelacion {
-        PENDIENTE_ELEVACION, EN_CALIFICACION_1, EN_SUBSANACION, EN_CALIFICACION_2, 
-        NOTIFICACION_SEGUNDA_CALIFICACION, EN_RESOLUCION, RESUELTO, TENER_POR_NO_PRESENTADO, 
-        CONCLUSION_SUSTRACCION_MATERIA, CONCLUSION_DESISTIMIENTO, RESUELTO_FUNDADO, 
-        RESUELTO_FUNDADO_EN_PARTE, RESUELTO_INFUNDADO, RESUELTO_INFUNDADO_EN_PARTE, 
+        PENDIENTE_ELEVACION, EN_CALIFICACION_1, EN_SUBSANACION, EN_CALIFICACION_2,
+        NOTIFICACION_SEGUNDA_CALIFICACION, EN_RESOLUCION, NOTIFICACION_CALIFICACION_FINAL, RESUELTO, TENER_POR_NO_PRESENTADO,
+        CONCLUSION_SUSTRACCION_MATERIA, CONCLUSION_DESISTIMIENTO, RESUELTO_FUNDADO,
+        RESUELTO_FUNDADO_EN_PARTE, RESUELTO_INFUNDADO, RESUELTO_INFUNDADO_EN_PARTE,
         RESUELTO_IMPROCEDENTE
     }
 
@@ -74,8 +74,8 @@ public class Apelacion {
     }
 
     public boolean isResuelta() {
-        return this.estado != null && (this.estado == EstadoApelacion.RESUELTO || 
-               this.estado.name().startsWith("RESUELTO_"));
+        return this.estado != null && (this.estado == EstadoApelacion.RESUELTO ||
+                this.estado.name().startsWith("RESUELTO_"));
     }
 
     public Long getId() {
