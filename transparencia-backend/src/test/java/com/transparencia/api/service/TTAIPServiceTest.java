@@ -107,4 +107,42 @@ class TTAIPServiceTest {
         verify(resolucionService).save(any(Resolucion.class));
         verify(apelacionService).save(apelacion);
     }
+
+    @Test
+    void subsanarDebeLanzarExcepcionSiPlazoVencido() {
+        Apelacion apelacion = new Apelacion();
+        apelacion.setIdApelacion(1L);
+        apelacion.setEstado(Apelacion.EstadoApelacion.EN_SUBSANACION);
+        apelacion.setFechaSubsanacion(LocalDateTime.now().minusDays(5));
+        apelacion.setDiasSubsanacion(2);
+
+        when(apelacionService.findById(1L)).thenReturn(apelacion);
+
+        IllegalStateException exception = org.junit.jupiter.api.Assertions.assertThrows(
+            IllegalStateException.class,
+            () -> apelacionService.subsanar(1L, "Fundamentos adicionales")
+        );
+
+        assertThat(exception.getMessage()).isEqualTo("El plazo para subsanar ha vencido");
+    }
+
+    @Test
+    void subsanarDebeActualizarFundamentosYEstadoSiDentroDePlazo() {
+        Apelacion apelacion = new Apelacion();
+        apelacion.setIdApelacion(1L);
+        apelacion.setEstado(Apelacion.EstadoApelacion.EN_SUBSANACION);
+        apelacion.setFechaSubsanacion(LocalDateTime.now().minusDays(1));
+        apelacion.setDiasSubsanacion(2);
+        apelacion.setFundamentos("Fundamentos iniciales");
+
+        when(apelacionService.findById(1L)).thenReturn(apelacion);
+        when(apelacionService.save(any(Apelacion.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Apelacion resultado = apelacionService.subsanar(1L, "Fundamentos adicionales");
+
+        assertThat(resultado.getFundamentos()).contains("Fundamentos iniciales");
+        assertThat(resultado.getFundamentos()).contains("Fundamentos adicionales");
+        assertThat(resultado.getEstado()).isEqualTo(Apelacion.EstadoApelacion.EN_CALIFICACION_2);
+        verify(apelacionService).save(apelacion);
+    }
 }

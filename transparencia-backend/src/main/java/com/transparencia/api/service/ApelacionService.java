@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.transparencia.api.util.DiasHabilesUtil;
+
 @Service
 @RequiredArgsConstructor
 public class ApelacionService {
@@ -90,6 +92,12 @@ public class ApelacionService {
         if (apelacion.getEstado() != EstadoApelacion.EN_SUBSANACION) {
             throw new IllegalArgumentException(
                     "La apelación no está en estado de espera de subsanación. Estado actual: " + apelacion.getEstado());
+        }
+
+        // Validación de plazo de subsanación
+        int diasTranscurridos = DiasHabilesUtil.contarDiasHabiles(apelacion.getFechaSubsanacion(), LocalDate.now());
+        if (diasTranscurridos > apelacion.getDiasSubsanacion()) {
+            throw new IllegalStateException("El plazo para subsanar ha vencido");
         }
 
         // Concatenación de fundamentos con separador específico
