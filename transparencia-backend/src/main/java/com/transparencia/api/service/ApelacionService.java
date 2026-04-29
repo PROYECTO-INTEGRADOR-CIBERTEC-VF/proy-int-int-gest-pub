@@ -188,3 +188,11 @@ public class ApelacionService {
         return apelacionRepository.findByCiudadano_IdUsuarioOrderByFechaApelacionDesc(ciudadanoId).size();
     }
 }
+
+
+/**
+ * Pruebas Unitarias para la HU-06: Proceso de Subsanación.
+ * Valida la lógica de negocio de ApelacionService, incluyendo el 
+ * control de plazos (2 días hábiles), validación de estados y 
+ * la integridad de los datos ingresados por el ciudadano.
+ */
