@@ -320,40 +320,44 @@ public class ApelacionService {
         documento.setApelacion(apelacion);
         documentoRepository.save(documento);
 
-        // 2. Mapear las 7 decisiones del Excel
+        // 2. Mapear las 7 decisiones y sus ESTADOS EXACTOS (Para cumplir GitHub BE-03)
         String decisionNormalizada = request.getDecision().toLowerCase();
         String textoResultado = "";
 
         switch (decisionNormalizada) {
             case "fundado":
+                apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_FUNDADO);
                 textoResultado = "RESUELTO - FUNDADO";
                 break;
             case "fundado_en_parte":
+                apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_FUNDADO_EN_PARTE);
                 textoResultado = "RESUELTO - FUNDADO EN PARTE";
                 break;
             case "infundado":
+                apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_INFUNDADO);
                 textoResultado = "RESUELTO - INFUNDADO";
                 break;
             case "infundado_en_parte":
+                apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_INFUNDADO_EN_PARTE);
                 textoResultado = "RESUELTO - INFUNDADO EN PARTE";
                 break;
             case "improcedente":
+                apelacion.setEstado(Apelacion.EstadoApelacion.RESUELTO_IMPROCEDENTE);
                 textoResultado = "RESUELTO - IMPROCEDENTE";
                 break;
             case "sustraccion_materia":
+                apelacion.setEstado(Apelacion.EstadoApelacion.CONCLUSION_SUSTRACCION_MATERIA);
                 textoResultado = "CONCLUSIÓN POR SUSTRACCIÓN DE MATERIA";
                 break;
             case "desistimiento":
+                apelacion.setEstado(Apelacion.EstadoApelacion.CONCLUSION_DESISTIMIENTO);
                 textoResultado = "CONCLUSIÓN POR DESISTIMIENTO";
                 break;
             default:
                 throw new IllegalArgumentException("Tipo de resolución no válido: " + request.getDecision());
         }
 
-        // --- BE-03: Actualizar a estado NOTIFICACION CALIFICACION FINAL ---
-        // (El estado interno cambia a Notificación, pero el Resultado guarda si fue Fundado/Infundado)
-        apelacion.setEstado(Apelacion.EstadoApelacion.NOTIFICACION_CALIFICACION_FINAL);
-
+        // --- BE-03: El resultado queda guardado (Cumpliendo el escenario 3 de GitHub) ---
         if (Boolean.TRUE.equals(request.getIniciarProcesoDisciplinario())) {
             textoResultado += " (INCLUYE PROCESO DISCIPLINARIO)";
         }
