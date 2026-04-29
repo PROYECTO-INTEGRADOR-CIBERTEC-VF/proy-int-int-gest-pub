@@ -1,0 +1,42 @@
+<div class="alerts-container mt-4 px-6">
+  @for (item of apelacionesEnSubsanacion(); track item.idApelacion) {
+    <div 
+      class="flex items-center justify-between p-4 mb-4 rounded-lg border-2"
+      [ngClass]="{
+        'bg-red-50 border-red-500 text-red-900': obtenerDiasRestantes(item) <= 1,
+        'bg-yellow-50 border-yellow-400 text-yellow-900': obtenerDiasRestantes(item) > 1
+      }">
+      
+      <div class="flex items-center">
+        <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+        </svg>
+        
+        <div>
+          <p class="font-bold">Subsanación Pendiente - Expediente: {{ item.expediente }}</p>
+          <p class="text-sm">
+            @if (obtenerDiasRestantes(item) <= 1) {
+              <span class="font-black uppercase italic">¡Urgente! El plazo vence en {{ obtenerDiasRestantes(item) }} día hábil.</span>
+            } @else {
+              <span>Tienes {{ obtenerDiasRestantes(item) }} días hábiles para completar tu información.</span>
+            }
+          </p>
+        </div>
+      </div>
+
+      <button 
+        [routerLink]="['/ciudadano/subsanacion', item.expediente]"
+        class="ml-4 px-5 py-2 rounded-md font-semibold transition-colors"
+        [ngClass]="{
+          'bg-red-700 hover:bg-red-800 text-white': obtenerDiasRestantes(item) <= 1,
+          'bg-yellow-600 hover:bg-yellow-700 text-white': obtenerDiasRestantes(item) > 1
+        }">
+        Subsanar Ahora
+      </button>
+    </div>
+  }
+</div>
+
+<div class="dashboard-content p-6">
+  <h2 class="text-2xl font-bold mb-4">Mis Apelaciones en Curso</h2>
+  </div>
